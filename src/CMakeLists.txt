@@ -1,19 +1,44 @@
+# set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+# # Create a variable called helloworld_SOURCES containing all .cpp files:
+# #set(helloworld_SOURCES helloworld.cpp main.cpp)
+
+# # For a large number of source files you can create it in a simpler way
+# # using file() function:
+# file(GLOB hellworld_SOURCES *.c)
+
+# # Create an executable file called helloworld from sources:
+# add_executable(helloworld ${helloworld_SOURCES})
+
+
+
+# CMake configuration file in hydra/src folder
+
 # sources and linkage
 
 # define the sources
-set(EXAMPLE_LIB_SRC  h_grids.c)
-add_library(example-lib SHARED h_grids.c)
-target_link_libraries(example-lib ${CMAKE_REQUIRED_LIBRARIES})
+SET(HYDRA_LIB_SRC  h_grids.c)
+ADD_LIBRARY(hydra-lib SHARED ${HYDRA_LIB_SRC})
+TARGET_LINK_LIBRARIES(hydra-lib ${CMAKE_REQUIRED_LIBRARIES})
 
 # additional includes
-include_directories(. ..)
+INCLUDE_DIRECTORIES(. ..)
+
+# compiler switches
+SET(w_flags "-ansi -pedantic -Wall -Wshadow -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wnested-externs -fshort-enums -fno-common -Dinline=")
+SET(o_flags "-O3")
+SET(d_flags "-ggdb")
 
 # enable gcc specific stuff
-if (CMAKE_COMPILER_IS_GNUCC)
-  set_source_files_properties(${EXAMPLE_LIB_SRC} PROPERTIES COMPILE_FLAGS "-std=c99 -Werror -Wall -pedantic")
-endif ()
+IF (CMAKE_COMPILER_IS_GNUCC)
+    SET_SOURCE_FILES_PROPERTIES(${EXAMPLE_SRC} 
+      PROPERTIES
+      COMPILE_FLAGS
+      "${w_flags} ${o_flags} ${d_flags}")
+ENDIF ()
 
-set(CMAKE_REQUIRED_LIBRARIES "example-lib;${CMAKE_REQUIRED_LIBRARIES}")
+
+SET(CMAKE_REQUIRED_LIBRARIES "hydra-lib;${CMAKE_REQUIRED_LIBRARIES}")
 
 # install
-install(TARGETS example-lib LIBRARY DESTINATION lib)
+INSTALL(TARGETS hydra-lib LIBRARY DESTINATION lib)

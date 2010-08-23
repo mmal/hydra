@@ -1,4 +1,6 @@
-include_directories(
+# CMake configuration file in hydra/bin folder
+
+INCLUDE_DIRECTORIES(
     .
     ..
     ${CMAKE_CURRENT_BINARY_DIR}
@@ -6,25 +8,29 @@ include_directories(
     ${CMAKE_SOURCE_DIR}
     ${CMAKE_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/bin/
-    ${CMAKE_SOURCE_DIR}/src/
-    )
+   )
 
 # define the sources
-set(EXAMPLE_SRC h_grid_alloc_test.c)
+SET(EXAMPLE_SRC h_grid_alloc_test.c)
 
 # define executable
-add_executable(example-prog ${EXAMPLE_SRC})
-target_link_libraries(example-prog ${CMAKE_REQUIRED_LIBRARIES})
-add_dependencies(example-prog example-lib)
+SET(CMAKE_REQUIRED_LIBRARIES "hydra-lib;${CMAKE_REQUIRED_LIBRARIES}")
+ADD_EXECUTABLE(example-prog ${EXAMPLE_SRC})
+TARGET_LINK_LIBRARIES(example-prog ${CMAKE_REQUIRED_LIBRARIES})
+ADD_DEPENDENCIES(example-prog hydra-lib)
 
 # compiler switches
-
-set(CMAKE_REQUIRED_LIBRARIES "example-lib;${CMAKE_REQUIRED_LIBRARIES}")
+SET(w_flags "-ansi -pedantic -Wall -Wshadow -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wnested-externs -fshort-enums -fno-common -Dinline=")
+SET(o_flags "-O3")
+SET(d_flags "-ggdb")
 
 # enable gcc specific stuff
-if (CMAKE_COMPILER_IS_GNUCC)
-    set_source_files_properties(${EXAMPLE_SRC} PROPERTIES COMPILE_FLAGS "-std=c99 -Werror -Wall -pedantic -lexample-lib")
-endif ()
+IF (CMAKE_COMPILER_IS_GNUCC)
+    SET_SOURCE_FILES_PROPERTIES(${EXAMPLE_SRC} 
+      PROPERTIES
+      COMPILE_FLAGS
+      "${w_flags} ${o_flags} ${d_flags}")
+ENDIF ()
 
 # install binaries
-install(TARGETS example-prog RUNTIME DESTINATION bin)
+INSTALL(TARGETS example-prog RUNTIME DESTINATION bin)

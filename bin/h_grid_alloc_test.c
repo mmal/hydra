@@ -1,10 +1,7 @@
 #include "h_test.h"
 
-int main(int argc, char *argv[])
+int main( void )
 {
-  int i;
-  i = 0;
-  
   h_grid * g = h_grid_alloc ( );
 
   free( g );

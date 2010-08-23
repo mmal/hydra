@@ -1,69 +1,49 @@
-# #set(CMAKE_C_COMPILER gcc-4.3)
-# cmake_minimum_required(VERSION 2.6)
+# Main CMake configuration file in hydra root folder
 
-# PROJECT(HYDRA)
+PROJECT(hydra)
 
-# set(PROJECT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
-
-# include_directories(${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/src/common)
-
-# file(GLOB_RECURSE src ${PROJECT_SOURCE_DIR}/*.c)
-
-# set(w_flags "-ansi -pedantic -Wall -Wshadow -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wnested-externs -fshort-enums -fno-common -Dinline=")
-
-# set(o_flags "-O3")
-
-# set(d_flags "-ggdb")
-
-# set_source_files_properties(${src}
-#   PROPERTIES
-#   COMPILE_FLAGS
-#   "${w_flags} ${o_flags} ${d_flags}")
-
-# set_source_files_properties(${testing}
-#   PROPERTIES
-#   COMPILE_FLAGS
-#   "${w_flags} ${o_flags} ${d_flags}")
+# The version number.
+set (Tutorial_VERSION_MAJOR 1)
+set (Tutorial_VERSION_MINOR 0)
 
 
-# add_library(hydra SHARED ${src})
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
-# # yapdes independent part
+# Appends the cmake/modules path inside the MAKE_MODULE_PATH variable which stores the
+# directories of additional CMake modules (eg MacroOutOfSourceBuild.cmake):
+SET(CMAKE_MODULE_PATH ${hydra_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 
-# # create targets out of all files from src/test, they will compile to
-# # the bin/test directory
+# The macro below forces the build directory to be different from source directory
+INCLUDE(MacroOutOfSourceBuild)
+MACRO_ENSURE_OUT_OF_SOURCE_BUILD("${PROJECT_NAME} requires an out of source build. Please, see README.")
 
-# file(GLOB bin_list RELATIVE ${PROJECT_SOURCE_DIR}/testing ${PROJECT_SOURCE_DIR}/testing/*.c)
-# file(MAKE_DIRECTORY "bin/test")
-
-# foreach(bin ${bin_list})
-#   string(REPLACE ".c" "" bin ${bin})
-#   add_executable(${bin} ${PROJECT_SOURCE_DIR}/testing/${bin}.c)
-#   set_target_properties(${bin}
-#     PROPERTIES
-#     RUNTIME_OUTPUT_DIRECTORY
-#     bin/test/)
-#   target_link_libraries(${bin} m)
-# endforeach(bin)
-
-project(test-program)
-cmake_minimum_required(VERSION 2.6)
-
-add_subdirectory(src)
-add_subdirectory(bin)
 # check libs and packages (headers + lib)
 
 # std C libraries
-# find_package(stdlibs REQUIRED)
+#find_package(stdlibs REQUIRED)
 
+# libpthread with pthread.h
+#find_package(pthread REQUIRED)
 
 # check_include_file(argp.h HAVE_ARGP_H)
 
 # additional compiler flags
-add_definitions(-Wall -Wextra -pedantic -Werror -std=c99 -D_BSD_SOURCE)
+ADD_DEFINITIONS(-Wall -Wextra -pedantic -std=c99 -D_BSD_SOURCE)
 
 # 'other' documentation files
-set(DOC_FILES AUTHORS NEWS README)
-set(DOC_PATH "share/doc/testprogram-0.1")
-install(FILES ${DOC_FILES}
-        DESTINATION ${DOC_PATH})
+SET(DOC_FILES AUTHORS NEWS README)
+SET(DOC_PATH "share/doc/hydra-0.1")
+INSTALL(FILES ${DOC_FILES}
+  DESTINATION ${DOC_PATH})
+
+ADD_SUBDIRECTORY(src)
+ADD_SUBDIRECTORY(bin)
+
+# to provide the "make uninstall" target
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+  IMMEDIATE @ONLY)
+
+ADD_CUSTOM_TARGET(uninstall
+  "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
