@@ -17,7 +17,13 @@
 # sources and linkage
 
 # define the sources
-SET(HYDRA_LIB_SRC  h_grids.c)
+
+# define single file
+# SET(HYDRA_LIB_SRC  h_grids.c)
+
+# define recursive, all files with *.c extension
+FILE(GLOB_RECURSE HYDRA_LIB_SRC *.c)
+
 ADD_LIBRARY(hydra-lib SHARED ${HYDRA_LIB_SRC})
 TARGET_LINK_LIBRARIES(hydra-lib ${CMAKE_REQUIRED_LIBRARIES})
 
@@ -26,7 +32,7 @@ INCLUDE_DIRECTORIES(. ..)
 
 # compiler switches
 SET(w_flags "-ansi -pedantic -Wall -Wshadow -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wnested-externs -fshort-enums -fno-common -Dinline=")
-SET(o_flags "-O3")
+SET(o_flags "-O1")
 SET(d_flags "-ggdb")
 
 # enable gcc specific stuff

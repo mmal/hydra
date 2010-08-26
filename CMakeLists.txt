@@ -3,8 +3,8 @@
 PROJECT(hydra)
 
 # The version number.
-set (Tutorial_VERSION_MAJOR 1)
-set (Tutorial_VERSION_MINOR 0)
+SET(hydra_VERSION_MAJOR 0)
+SET(hydra_VERSION_MINOR 1)
 
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
@@ -32,7 +32,7 @@ ADD_DEFINITIONS(-Wall -Wextra -pedantic -std=c99 -D_BSD_SOURCE)
 
 # 'other' documentation files
 SET(DOC_FILES AUTHORS NEWS README)
-SET(DOC_PATH "share/doc/hydra-0.1")
+SET(DOC_PATH "share/doc/hydra-@hydra_VERSION_MAJOR@.@hydra_VERSION_MINOR@")
 INSTALL(FILES ${DOC_FILES}
   DESTINATION ${DOC_PATH})
 

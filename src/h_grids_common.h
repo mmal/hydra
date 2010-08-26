@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "common/h_types.h"
+#include "src/error_log/error_printf.h"
 
 typedef struct
 {
@@ -31,6 +32,10 @@ typedef struct
 } h_union_grid;
 
 
-h_grid * h_grid_alloc ( void );
+h_grid * h_alloc_grid ( void );
+
+void h_init_coarse_grid ( h_grid * g, H_DBL xL, H_DBL xR, int N );
+
+void h_free_grid ( h_grid * g );
 
 #endif /* _H_GRIDS_COMMON_H_ */

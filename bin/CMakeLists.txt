@@ -21,7 +21,7 @@ ADD_DEPENDENCIES(example-prog hydra-lib)
 
 # compiler switches
 SET(w_flags "-ansi -pedantic -Wall -Wshadow -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wnested-externs -fshort-enums -fno-common -Dinline=")
-SET(o_flags "-O3")
+SET(o_flags "-O1")
 SET(d_flags "-ggdb")
 
 # enable gcc specific stuff
