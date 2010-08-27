@@ -27,6 +27,9 @@ MACRO_ENSURE_OUT_OF_SOURCE_BUILD("${PROJECT_NAME} requires an out of source buil
 
 # check_include_file(argp.h HAVE_ARGP_H)
 
+# gsl libraries
+FIND_PACKAGE(GSL REQUIRED)
+
 # additional compiler flags
 ADD_DEFINITIONS(-Wall -Wextra -pedantic -std=c99 -D_BSD_SOURCE)
 
@@ -37,7 +40,7 @@ INSTALL(FILES ${DOC_FILES}
   DESTINATION ${DOC_PATH})
 
 ADD_SUBDIRECTORY(src)
-ADD_SUBDIRECTORY(bin)
+ADD_SUBDIRECTORY(test)
 
 # to provide the "make uninstall" target
 CONFIGURE_FILE(
