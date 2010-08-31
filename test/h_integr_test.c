@@ -1,29 +1,19 @@
 #include "h_integr_test.h"
 
 
-/* int main( void ) */
-/* { */
-/*   h_grid * g = h_alloc_grid ( ); */
-
-/*   h_init_coarse_grid ( g, -1., 1., 11 ); */
-
-/*   h_free_grid ( g ); */
-
-/*   return 0; */
-/* } */
-int func (double t, const double y[], double f[],
+int func (H_DBL t, const H_DBL y[], H_DBL f[],
           void *params)
 {
-  double mu = *(double *)params;
+  H_DBL mu = *(H_DBL *)params;
   f[0] = y[1];
   f[1] = -y[0] - mu*y[1]*(y[0]*y[0] - 1);
   return GSL_SUCCESS;
 }
      
-int jac (double t, const double y[], double *dfdy, 
-     double dfdt[], void *params)
+int jac (H_DBL t, const H_DBL y[], H_DBL *dfdy, 
+     H_DBL dfdt[], void *params)
 {
-  double mu = *(double *)params;
+  H_DBL mu = *(H_DBL *)params;
   gsl_matrix_view dfdy_mat 
       = gsl_matrix_view_array (dfdy, 2, 2);
   gsl_matrix * m = &dfdy_mat.matrix; 
@@ -38,22 +28,21 @@ int jac (double t, const double y[], double *dfdy,
 
 
 
-int
-main (void)
+int main (void)
 {
   const gsl_odeiv_step_type * T 
       = gsl_odeiv_step_rk4;
-     
+  
   gsl_odeiv_step * s 
       = gsl_odeiv_step_alloc (T, 2);
      
-  double mu = 10;
+  H_DBL mu = 10;
   gsl_odeiv_system sys = {func, jac, 2, &mu};
      
-  double t = 0.0, t1 = 10.0;
-  double h = 1e-2;
-  double y[2] = { 1.0, 0.0 }, y_err[2];
-  double dydt_in[2], dydt_out[2];
+  H_DBL t = 0.0, t1 = 10.0;
+  H_DBL h = 1e-2;
+  H_DBL y[2] = { 1.0, 0.0 }, y_err[2];
+  H_DBL dydt_in[2], dydt_out[2];
      
   /* initialise dydt_in from system parameters */
   GSL_ODEIV_FN_EVAL(&sys, t, y, dydt_in);

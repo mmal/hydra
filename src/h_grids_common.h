@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "common/h_types.h"
+#include "src/common/h_types.h"
 #include "src/error_log/error_printf.h"
 
 typedef struct
@@ -12,7 +12,8 @@ typedef struct
   H_DBL xL, xR;
   H_DBL h;
   int N, l, m;
-
+  int ord;
+  
   struct h_grid * offspring;
   struct h_grid * sibling;
   struct h_grid * parent;
@@ -34,7 +35,11 @@ typedef struct
 
 h_grid * h_alloc_grid ( void );
 
-void h_init_coarse_grid ( h_grid * g, H_DBL xL, H_DBL xR, int N );
+void h_init_coarse_grid ( h_grid * g, H_DBL xL, H_DBL xR,
+                          int N, int ord );
+
+void h_init_fine_grid ( h_grid * g, H_DBL xL, H_DBL xR,
+                        int N, int ord, int l, int m );
 
 void h_free_grid ( h_grid * g );
 

@@ -3,8 +3,8 @@
 PROJECT(hydra)
 
 # The version number.
-SET(hydra_VERSION_MAJOR 0)
-SET(hydra_VERSION_MINOR 1)
+SET(PROJECT_VERSION_MAJOR 0)
+SET(PROJECT_VERSION_MINOR 1)
 
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
@@ -30,12 +30,18 @@ MACRO_ENSURE_OUT_OF_SOURCE_BUILD("${PROJECT_NAME} requires an out of source buil
 # gsl libraries
 FIND_PACKAGE(GSL REQUIRED)
 
+# argtable2 libraries
+FIND_PACKAGE(ARGTABLE2 REQUIRED)
+
+# Use Doxygen
+INCLUDE(UseDoxygen OPTIONAL)
+
 # additional compiler flags
 ADD_DEFINITIONS(-Wall -Wextra -pedantic -std=c99 -D_BSD_SOURCE)
 
 # 'other' documentation files
 SET(DOC_FILES AUTHORS NEWS README)
-SET(DOC_PATH "share/doc/hydra-@hydra_VERSION_MAJOR@.@hydra_VERSION_MINOR@")
+SET(DOC_PATH "share/doc/hydra-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@")
 INSTALL(FILES ${DOC_FILES}
   DESTINATION ${DOC_PATH})
 
@@ -44,7 +50,7 @@ ADD_SUBDIRECTORY(test)
 
 # to provide the "make uninstall" target
 CONFIGURE_FILE(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
+  "${CMAKE_MODULE_PATH}/cmake_uninstall.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
   IMMEDIATE @ONLY)
 

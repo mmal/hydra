@@ -17,9 +17,6 @@ INCLUDE_DIRECTORIES(
 
 # define executable
 SET(CMAKE_REQUIRED_LIBRARIES "hydra-lib;${GSL_LIBRARIES};${GSLCBLAS_LIBRARIES};${CMAKE_REQUIRED_LIBRARIES}")
-# ADD_EXECUTABLE(example-prog ${EXAMPLE_SRC})
-# TARGET_LINK_LIBRARIES(example-prog ${CMAKE_REQUIRED_LIBRARIES})
-# ADD_DEPENDENCIES(example-prog hydra-lib)
 
 # compiler switches
 SET(w_flags "-ansi -pedantic -Wall -Wshadow -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wnested-externs -fshort-enums -fno-common -Dinline=")
@@ -41,16 +38,3 @@ FOREACH(bin ${bin_list})
     TARGET_LINK_LIBRARIES(${bin} ${CMAKE_REQUIRED_LIBRARIES})
     LINK_LIBRARIES(${CMAKE_REQUIRED_LIBRARIES})
 ENDFOREACH(bin)
-
-
-
-# # enable gcc specific stuff
-# IF (CMAKE_COMPILER_IS_GNUCC)
-#     SET_SOURCE_FILES_PROPERTIES(${EXAMPLE_SRC} 
-#       PROPERTIES
-#       COMPILE_FLAGS
-#       "${w_flags} ${o_flags} ${d_flags}")
-# ENDIF ()
-
-# # install binaries
-# INSTALL(TARGETS example-prog RUNTIME DESTINATION bin)
