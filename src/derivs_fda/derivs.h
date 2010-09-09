@@ -1,7 +1,7 @@
 #ifndef __DERIVS_H__
 #define __DERIVS_H__
 
-#include "src/common/h_types.h"
+#include "src/common/types.h"
 
 int sgn ( int a );
 /**

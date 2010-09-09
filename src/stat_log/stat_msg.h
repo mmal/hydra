@@ -1,5 +1,5 @@
-#ifndef _ERROR_PRINTF_H_
-#define _ERROR_PRINTF_H_
+#ifndef _STAT_MSG_H_
+#define _STAT_MSG_H_
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,4 +17,4 @@ void STAT_MSG ( const char * msg, const char * rsn, const int stat_id,
     } while (0)
 
 
-#endif /* _ERROR_PRINTF_H_ */
+#endif /* _STAT_MSG_H_ */

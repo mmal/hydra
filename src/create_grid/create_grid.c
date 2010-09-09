@@ -1,4 +1,4 @@
-#include "h_generate_grid.h"
+#include "create_grid.h"
 
 
 void h_gen_grid_family ( h_grid * cg, h_amrp *p )

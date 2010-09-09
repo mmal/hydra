@@ -1,5 +1,5 @@
 /**
- * @file   h_plot_1D.c
+ * @file   plot_1D.c
  * @author Maciej Maliborski <maciej.maliborski@gmail.com>
  * @date   Sun Aug 29 14:38:40 2010
  * 
@@ -9,7 +9,7 @@
  */
 
 
-#include "h_plot_1D.h"
+#include "plot_1D.h"
 
 
 void _h_1D_set_plot_options ( gnuplot_ctrl * h, const char * title,
@@ -40,7 +40,7 @@ void _h_1D_set_plot_options ( gnuplot_ctrl * h, const char * title,
 }
 
 
-void h_plot_1D_one_grid ( const h_grid * g, const char* title, int sleep_time )
+void h_1D_plot_one_grid ( const h_grid * g, const char* title, int sleep_time )
 {
   gnuplot_ctrl * handler = gnuplot_init();
 
@@ -54,8 +54,8 @@ void h_plot_1D_one_grid ( const h_grid * g, const char* title, int sleep_time )
 }
 
             
-void h_plot_1D_grid_family ( const h_grid * cg, int lmax, char* title,
-                             int sleep_time )
+void h_1D_plot_set_of_grids ( const h_grid * cg, int lmax, char* title,
+                              int sleep_time )
 {
   int l;
   

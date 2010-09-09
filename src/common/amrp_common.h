@@ -1,8 +1,9 @@
 #ifndef _H_AMRP_H_
 #define _H_AMRP_H_
 
-#include "src/common/h_types.h"
-#include "src/error_log/error_printf.h"
+
+#include "src/common/types.h"
+#include "src/stat_log/stat_msg.h"
 
 
 typedef struct

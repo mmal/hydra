@@ -1,4 +1,6 @@
-#include "h_amrp.h"
+
+
+#include "amrp_common.h"
 
 
 h_amrp * h_alloc_amrp ( void )

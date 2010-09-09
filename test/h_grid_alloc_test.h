@@ -1,10 +1,10 @@
 #ifndef _H_GRID_ALLOC_TEST_H_
 #define _H_GRID_ALLOC_TEST_H_
 
-#include "src/common/h_types.h"
-#include "src/h_grids_common.h"
 
+#include "src/common/types.h"
+#include "src/common/grids_common.h"
+#include "src/stat_log/stat_msg.h"
 
-#include "src/error_log/error_printf.h"
 
 #endif /* _H_GRID_ALLOC_TEST_H_ */

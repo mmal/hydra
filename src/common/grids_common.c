@@ -1,4 +1,4 @@
-#include "h_grids_common.h"
+#include "grids_common.h"
 
 
 h_grid * h_alloc_grid ( void )

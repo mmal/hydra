@@ -101,9 +101,9 @@ int main (void)
         }
         fprintf(fp, "\n\n");
         
-        h_plot_1D_one_grid ( g, NULL, 2 );
+        h_1D_plot_one_grid ( g, NULL, 2 );
 
-        h_plot_1D_grid_family ( g, p->lmax, NULL, 10 );
+        h_1D_plot_set_of_grids ( g, p->lmax, NULL, 10 );
         
         int status = gsl_odeiv_step_apply (s, t, h,
                                            g->u, y_err,

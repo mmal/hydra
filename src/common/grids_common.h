@@ -1,11 +1,13 @@
 #ifndef _H_GRIDS_COMMON_H_
 #define _H_GRIDS_COMMON_H_
 
+
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "src/common/h_types.h"
-#include "src/error_log/error_printf.h"
+#include "src/common/types.h"
+#include "src/stat_log/stat_msg.h"
+
 
 typedef struct
 {
