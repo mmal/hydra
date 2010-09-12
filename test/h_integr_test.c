@@ -7,6 +7,7 @@ int func (H_DBL t, const H_DBL y[], H_DBL f[],
   H_DBL mu = *(H_DBL *)params;
   f[0] = y[1];
   f[1] = -y[0] - mu*y[1]*(y[0]*y[0] - 1);
+  t = 0.0;
   return GSL_SUCCESS;
 }
      
@@ -23,6 +24,7 @@ int jac (H_DBL t, const H_DBL y[], H_DBL *dfdy,
   gsl_matrix_set (m, 1, 1, -mu*(y[0]*y[0] - 1.0));
   dfdt[0] = 0.0;
   dfdt[1] = 0.0;
+  t = 0.0;
   return GSL_SUCCESS;
 }
 
@@ -37,6 +39,7 @@ int main (void)
       = gsl_odeiv_step_alloc (T, 2);
      
   H_DBL mu = 10;
+
   gsl_odeiv_system sys = {func, jac, 2, &mu};
      
   H_DBL t = 0.0, t1 = 10.0;

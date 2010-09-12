@@ -13,6 +13,18 @@
 #include "flag_criterion.h"
 
 
+int h_fc_Test ( h_grid * g, h_amrp * p, H_DBL * tau )
+{
+  int i;
+  
+  int N = g->N;
+
+  for (i = 0; i < N; i++) {
+      tau[i] = sin(2*i)*10;
+  }
+  
+  return H_OK;
+}
 
 int h_fc_Richardson ( h_grid * g, h_amrp * p, H_DBL * tau ){
   return H_ER;

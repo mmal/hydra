@@ -34,5 +34,9 @@ void init_v ( int dim, ... );
 
 H_DBL lin ( H_DBL x, void * params );
 
+H_DBL sin_ (H_DBL x, void * params);
+
+H_DBL zero_ (H_DBL x, void * params);
+
     
 #endif /* _H_INTEGR_TEST_H_ */

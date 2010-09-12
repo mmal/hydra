@@ -1,4 +1,62 @@
+
+
 #include "create_grid.h"
+
+
+void _h_create_child_grid ( h_grid *parent, h_grid **child,
+                            h_amrp *p, int m, int idL, int idR )
+{
+  /* ghost points, what with them ? */ 
+  int rr = p->rr;
+  int Nf = (idR-idL)*rr+1;
+
+  int Lghost_p = parent->Lghost; /* number of left ghost
+                                  * points of the parent grid */ 
+  int Rghost_p = parent->Rghost; /* number of right ghost
+                                  * points of the parent grid */ 
+  
+  int Lghost, Rghost; /* left and right ghost points of the child grid */
+  
+  H_DBL xL = parent->x[idL];
+  H_DBL xR = parent->x[idR];
+
+  
+  h_grid *fineg = h_alloc_grid ( );
+
+  h_init_grid ( fineg, xL, xR, Nf, 0, 0, parent->rank, (parent->l)+1, m );
+  
+  /* if( m != 0 ) */
+  /*     fineg->Lsibling = parent->children[m]; */
+  /* if( m != parent->Nchildren-1 ) */
+  /*     fineg->Rsibling = parent->children[m+1]; */
+  printf("create_grid.c m=%d, fineg->xL=%f, fineg->xR=%f\n",
+         m, fineg->xL, fineg->xR );
+  
+  fineg->parent = (h_grid*) parent;
+
+  *child = fineg;
+}
+                            
+void _h_create_offspring_grids ( h_grid *cg, h_amrp *p,
+                                int *idL, int *idR, int Ngrids )
+{
+  /* h_grid *g = fg; */
+  int m;
+  
+  h_grid **child = (h_grid **) malloc( Ngrids*sizeof( h_grid *) );
+
+  /* CAUSED FREE ERROR */
+  /* for (m = 0; m < Ngrids; m++) { */
+  /*     child[m] = h_alloc_grid ( ); */
+  /* } */
+
+  for (m = 0; m < Ngrids; m++) {
+      _h_create_child_grid ( cg, &child[m], p, m, idL[m], idR[m] );
+  }
+  
+  cg->children = (void **) child;
+  cg->Nchildren = Ngrids;
+}
 
 
 void h_gen_grid_family ( h_grid * cg, h_amrp *p )
@@ -56,7 +114,7 @@ void h_gen_off_grid ( h_grid *cg, h_amrp *p, int l )
   
   fN = (int) ( lround( (xR-xL)/ch*rr) ) + 1;
   
-  h_init_fine_grid ( fg, xL, xR, fN, cg->ord, l, 0 );
+  h_init_grid ( fg, xL, xR, fN, 0, 0, cg->rank, l, 0 );
   
   cg->offspring = fg;
   fg->parent = cg;

@@ -11,37 +11,42 @@
 
 typedef struct
 {
-  H_DBL xL, xR;
-  H_DBL h;
   int N, l, m;
-  int ord;
+  int rank;
   
-  struct h_grid * offspring;
-  struct h_grid * sibling;
-  struct h_grid * parent;
-  struct h_grid * neighbour;
+  H_DBL xL, xR;
+  H_DBL h, dt;
+  
+  void *offspring;
+  void *sibling;
+  void *parent;
+  void *neighbour;
 
+  void *Lsibling;
+  void *Rsibling;
+  
+  void **children;
+  int Nchildren;
+  
   H_DBL t;
+  
+  H_DBL *x;
+  H_DBL *u;
 
-  H_DBL * x;
-  H_DBL * u;
+  int Lghost, Rghost;
   
 } h_grid;
 
-typedef struct
-{
-  h_grid * g;
-  void * params;
-} h_union_grid;
 
 
 h_grid * h_alloc_grid ( void );
 
-void h_init_coarse_grid ( h_grid * g, H_DBL xL, H_DBL xR,
-                          int N, int ord );
+void h_init_grid ( h_grid * g, H_DBL xL, H_DBL xR,
+                   int N, int Lghost, int Rghost,
+                   int rank, int l, int m );
 
-void h_init_fine_grid ( h_grid * g, H_DBL xL, H_DBL xR,
-                        int N, int ord, int l, int m );
+void h_init_coarse_grid ( h_grid * g, H_DBL xL, H_DBL xR,
+                          int N, int rank );
 
 void h_free_grid ( h_grid * g );
 

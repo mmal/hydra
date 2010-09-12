@@ -3,7 +3,7 @@
 #include "amrp_common.h"
 
 
-h_amrp * h_alloc_amrp ( void )
+h_amrp *h_alloc_amrp ( void )
 {
   h_amrp * p = (h_amrp*) malloc ( sizeof( h_amrp ) );
 
@@ -19,7 +19,7 @@ h_amrp * h_alloc_amrp ( void )
 }
 
 
-void h_free_amrp ( h_amrp * p )
+void h_free_amrp ( h_amrp *p )
 {
   if ( p != NULL ) {
       free( p );

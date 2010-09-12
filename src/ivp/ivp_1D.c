@@ -1,10 +1,10 @@
 #include "ivp_1D.h"
 
 
-void h_ivp_1D ( h_grid *g, void *params, int ord, ... )
+void h_ivp_1D ( h_grid *g, void *params, int rank, ... )
 {
   int i, j, N;
-
+  
   va_list arguments;
 
   H_DBL (*fnc_ptr)( H_DBL, void * );
@@ -14,14 +14,14 @@ void h_ivp_1D ( h_grid *g, void *params, int ord, ... )
                   "grid non allocated",
                   ERROR, 0 );
 
-  if ( g->ord != ord )
+  if ( g->rank != rank )
       _STAT_MSG ( "Initial value problem: using given initial conditions",
                   "orders not equal",
                   ERROR, 0 );
 
-  va_start ( arguments, ord );
+  va_start ( arguments, rank );
 
-  for ( i = 0; i < ord; i++ ) {
+  for ( i = 0; i < rank; i++ ) {
       fnc_ptr = va_arg ( arguments, H_DBL (*)(H_DBL, void*) );
       if ( fnc_ptr == NULL ) {
           va_end ( arguments );
@@ -47,7 +47,7 @@ void h_ivp_1D ( h_grid *g, void *params, int ord, ... )
 }
 
 
-void h_ivp_1D_grid_family ( h_grid *cg, h_amrp *p, void *params, int ord, ... )
+void h_ivp_1D_grid_family ( h_grid *cg, h_amrp *p, void *params, int rank, ... )
 {
   int i, j, l, N;
 
@@ -64,14 +64,14 @@ void h_ivp_1D_grid_family ( h_grid *cg, h_amrp *p, void *params, int ord, ... )
                   "grid non allocated",
                   ERROR, 0 );
 
-  if ( g->ord != ord )
+  if ( g->rank != rank )
       _STAT_MSG ( "Initial value problem: using given initial conditions",
                   "orders not equal",
                   ERROR, 0 );
 
-  va_start ( arguments, ord );
+  va_start ( arguments, rank );
 
-  for ( i = 0; i < ord; i++ ) {
+  for ( i = 0; i < rank; i++ ) {
       fnc_ptr = va_arg ( arguments, H_DBL (*)(H_DBL, void*) );
       if ( fnc_ptr == NULL ) {
           va_end ( arguments );

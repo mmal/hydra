@@ -1,12 +1,15 @@
 #ifndef _FLAG_CRITERION_H_
 #define _FLAG_CRITERION_H_
 
+#include <math.h>
 
 #include "src/common/types.h"
 #include "src/common/grids_common.h"
 #include "src/common/amrp_common.h"
 
 
+
+int h_fc_Test ( h_grid * g, h_amrp * p, H_DBL * tau );
 
 int h_fc_Richardson ( h_grid * g, h_amrp * p, H_DBL * tau );
 

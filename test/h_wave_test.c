@@ -9,13 +9,18 @@ int func_wave (H_DBL t, const H_DBL y[], H_DBL f[], void *params)
 
   const int N = g->N;
   const H_DBL h = g->h;
+
+  H_DBL *yptr = y;
   
   for (i = 1; i < N-1; ++i) {
       f[i] = y[N+i];
-      f[N+i] = fda_D2_eon_3 (y, h, N, i ); 
+      f[N+i] = fda_D2_eon_3 (yptr, h, N, i ); 
   }
   f[0] = 0.;
   f[N-1] = 0.;
+
+  t = 1;
+  
   return GSL_SUCCESS;
 }
 
@@ -23,6 +28,15 @@ int func_wave (H_DBL t, const H_DBL y[], H_DBL f[], void *params)
 int jac_wave (H_DBL t, const H_DBL y[], H_DBL *dfdy, 
               H_DBL dfdt[], void *params)
 {
+  H_DBL temp;
+  void *vtemp;
+
+  temp = t;
+  temp = dfdy[0];
+  temp = dfdt[0];
+  temp = y[0];
+  vtemp = params;
+  
   printf("This stepper requires jacobian matrix\n"); 
   return 0;
 }
@@ -41,6 +55,9 @@ H_DBL sin_ (H_DBL x, void * params)
 
 H_DBL zero_ (H_DBL x, void * params)
 {
+  void *temp;
+  temp = params;
+  x = 0;
   return 0.;
 }
 
@@ -49,7 +66,7 @@ int main (void)
 {
   FILE *fp = fopen("file", "w");
 
-  int i;
+  int i, status;
   const int ord = 2;
   const int N = 11;
   
@@ -105,7 +122,7 @@ int main (void)
 
         h_1D_plot_set_of_grids ( g, p->lmax, NULL, 10 );
         
-        int status = gsl_odeiv_step_apply (s, t, h,
+        status = gsl_odeiv_step_apply (s, t, h,
                                            g->u, y_err,
                                            dydt_in,
                                            dydt_out,

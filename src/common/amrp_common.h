@@ -21,8 +21,8 @@ typedef struct
 } h_amrp;
 
 
-h_amrp * h_alloc_amrp ( void );
+h_amrp *h_alloc_amrp ( void );
 
-void h_free_amrp ( h_amrp * p );
+void h_free_amrp ( h_amrp *p );
 
 #endif /* _H_AMRP_H_ */

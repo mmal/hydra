@@ -61,7 +61,7 @@ void h_1D_plot_set_of_grids ( const h_grid * cg, int lmax, char* title,
   
   gnuplot_ctrl * handler = gnuplot_init();
 
-  h_grid * g = cg;
+  const h_grid * g = cg;
   
   _h_1D_set_plot_options ( handler, title, g->t );
 
