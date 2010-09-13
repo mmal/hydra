@@ -105,6 +105,8 @@ void h_init_grid ( h_grid * g, H_DBL xL, H_DBL xR,
                   ERROR, 0 );
   }
 
+  g->master = NULL;
+  
   g->offspring = NULL;
   g->sibling = NULL;
   g->parent = NULL;
@@ -124,6 +126,9 @@ void h_init_coarse_grid ( h_grid * g, H_DBL xL, H_DBL xR,
                           int N, int rank )
 {
   h_init_grid ( g, xL, xR, N, 0, 0, rank, 0, 0 );
+  g->master = NULL;
+  g->is_master = H_TRUE;
+  g->Nchildren = 0;
 }
 
 

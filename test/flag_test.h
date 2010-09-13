@@ -5,9 +5,14 @@
 #include <stdarg.h>
 #include <math.h>
 
+
+/* #include <nana.h> */
+
+
 #include "src/common/types.h"
 #include "src/common/grids_common.h"
 #include "src/common/amrp_common.h"
+#include "src/common/fnc_common.h"
 #include "src/stat_log/stat_msg.h"
 
 
@@ -21,4 +26,8 @@
 #include "src/create_grid/create_grid.h"
 
 
+
+H_DBL zero_ ( H_DBL x, void *params );
+H_DBL one_ ( H_DBL x, void *params );
+    
 #endif /* _FLAG_TEST_H_ */

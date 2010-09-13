@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+
 #include "src/common/types.h"
 #include "src/stat_log/stat_msg.h"
 
@@ -16,6 +17,9 @@ typedef struct
   
   H_DBL xL, xR;
   H_DBL h, dt;
+  
+  int is_master;
+  void *master;
   
   void *offspring;
   void *sibling;
@@ -39,13 +43,13 @@ typedef struct
 
 
 
-h_grid * h_alloc_grid ( void );
+h_grid *h_alloc_grid ( void );
 
-void h_init_grid ( h_grid * g, H_DBL xL, H_DBL xR,
+void h_init_grid ( h_grid *g, H_DBL xL, H_DBL xR,
                    int N, int Lghost, int Rghost,
                    int rank, int l, int m );
 
-void h_init_coarse_grid ( h_grid * g, H_DBL xL, H_DBL xR,
+void h_init_coarse_grid ( h_grid *g, H_DBL xL, H_DBL xR,
                           int N, int rank );
 
 void h_free_grid ( h_grid * g );

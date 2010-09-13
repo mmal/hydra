@@ -1,6 +1,22 @@
+
+
 #include "flag_test.h"
 
+H_DBL zero_ ( H_DBL x, void *params )
+{
+  void *newp;
+  newp = (void*) params;
+  x = 0.;
+  return 0.1;
+}
 
+H_DBL one_ ( H_DBL x, void *params )
+{
+  void *newp;
+  newp = (void*) params;
+  x = 0.;
+  return 1.;
+}
 
 int main( void )
 {
@@ -17,10 +33,26 @@ int main( void )
 
   h_amrp * p = h_alloc_amrp ( );
 
+  h_fnc * f = h_alloc_fnc ( NULL, rank, zero_, one_ );
+
   int *id_fp;
   int Nfp;
 
   int *idL, *idR, Ngrids;
+
+  /* H_DBL (*fnc_ptr)( H_DBL, void * ); */
+
+  _fnc_1D fnc_ptr;
+
+  fnc_ptr = (f->C_da[0]);
+  
+  VL(("main.c fnc_ptr[0](0,NULL)=%f, fnc_ptr[0](0,NULL)=%f\n", fnc_ptr(0,NULL), fnc_ptr(0,NULL)  ));
+
+  fnc_ptr = (f->C_da[1]);
+
+  VL(("main.c fnc_ptr[0](0,NULL)=%f, fnc_ptr[0](0,NULL)=%f\n", fnc_ptr(0,NULL), fnc_ptr(0,NULL)  ));
+  
+  h_free_fnc( f );
   
   p->rr = 2;
   p->buf = 1;
@@ -39,9 +71,9 @@ int main( void )
 
   /* printf(" TEST main.c Nfp=%d\n", Nfp); */
 
-  printf( " Calling h_clustering_flagged\n");
+  L( " Calling h_clustering_flagged\n");
   h_clustering_flagged ( id_fp, Nfp, p->buf, g->N, &idL, &idR, &Ngrids );
-  printf( " Exiting h_clustering_flagged\n");
+  L( " Exiting h_clustering_flagged\n");
 
   /* i=1; */
   /* if( id_fp == NULL ) printf( "TEST main.c id_fp == NULL\n" ); */
@@ -73,6 +105,8 @@ int main( void )
   h_free_grid ( g );
   
   h_free_amrp ( p );
+  
+  VL(( " main.c Exiting flag_test\n"));
   
   return 0;
 }

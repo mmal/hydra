@@ -48,6 +48,28 @@ INSTALL(FILES ${DOC_FILES}
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(test)
 
+
+# SET(BSH_SCRIPT ${hydra_SOURCE_DIR}/scripts/test.sh)
+# EXEC_PROGRAM( sh ${hydra_SOURCE_DIR}/scripts/ )
+
+
+# add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+
+# add_custom_command(
+#   OUTPUT bla  
+#   COMMAND sh ${hydra_SOURCE_DIR}/scripts/test.sh
+#   )
+# add_custom_target(bla ALL DEPENDS ${hydra_SOURCE_DIR}/bla )
+
+
+add_custom_command(
+  OUTPUT bla.txt
+  COMMAND sh ${hydra_SOURCE_DIR}/scripts/test.sh arg
+  COMMENT " ... config comment ..."
+  )
+add_custom_target(config ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bla.txt)
+
+
 # to provide the "make uninstall" target
 CONFIGURE_FILE(
   "${CMAKE_MODULE_PATH}/cmake_uninstall.cmake.in"

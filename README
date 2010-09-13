@@ -4,6 +4,11 @@ gcc
 g++
 cmake
 
+For debugging:
+GNU Nana
+    installing:
+    sudo apt-get install nana
+
 
 For generating documentation:
 doxygen

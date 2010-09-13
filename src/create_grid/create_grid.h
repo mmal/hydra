@@ -1,6 +1,7 @@
 #ifndef _H_GENERATE_GRID_H_
 #define _H_GENERATE_GRID_H_
 
+#include <stdarg.h>
 #include <math.h>
 
 
