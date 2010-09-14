@@ -18,6 +18,14 @@ H_DBL one_ ( H_DBL x, void *params )
   return 1.;
 }
 
+H_DBL sin_ ( H_DBL x, void *params )
+{
+  void *newp;
+  newp = (void*) params;
+  return sin(2*M_PI*x);
+}
+
+
 int main( void )
 {
   int i, j;
@@ -33,7 +41,7 @@ int main( void )
 
   h_amrp * p = h_alloc_amrp ( );
 
-  h_fnc * f = h_alloc_fnc ( NULL, rank, zero_, one_ );
+  h_fnc * f = h_alloc_fnc ( NULL, rank, sin_, one_ );
 
   int *id_fp;
   int Nfp;
@@ -117,6 +125,52 @@ int main( void )
       
       }
   }
+
+  /* h_1D_plot_one_grid ( g, "test main grid", 3 ); */
+  /* h_1D_plot_one_grid ( g->children[1], "test children grid", 3 ); */
+  h_1D_plot_set_of_grids ( g, 1, "plot set of grids", -1 );
+
+  gnuplot_ctrl * handler = gnuplot_init();
+
+  g_t = g->children[1];
+
+  gnuplot_plot_xy( handler, g_t->x, g_t->u, g->N+g->Lghost+g->Rghost, NULL );
+
+  /* gnuplot_plot_xy( handler, h_get_grid_positions(g_t), g_t->u, g->N, NULL ); */
+
+  gnuplot_plot_xy( handler, h_get_grid_positions(g_t), h_get_grid_values(g_t, 0), g->N, NULL );
+
+  sleep (1);
+  
+  gnuplot_close( handler );
+
+  H_DBL *x, *u, *udot;
+  x= h_get_grid_positions(g_t);
+  u= h_get_grid_values(g_t, 0);
+  udot= h_get_grid_values(g_t, 1);
+
+  printf("TEST\n\n");
+  
+  for (i = 0; i < g_t->N; i++) {
+      VL(("main.c i=%d, x[i]=%e, u[i]=%f, udot[i]=%f\n",
+          i, x[i], u[i], udot[i] ));
+  }
+
+  x= h_get_grid_positions_wghosts(g_t);
+  u= h_get_grid_values_wghosts(g_t, 0);
+  udot= h_get_grid_values_wghosts(g_t, 1);
+
+  printf("TEST\n\n");
+  
+  for (i = 0; i < g_t->N+g_t->Lghost+g_t->Rghost; i++) {
+      VL(("main.c i=%d, x[i]=%e, u[i]=%f, udot[i]=%f\n",
+          i, x[i], u[i], udot[i] ));
+  }
+
+  h_1D_plot_one_grid ( g_t, 0, H_FALSE, "h_1D_plot_one_grid", -1 );
+  h_1D_plot_one_grid ( g_t, 1, H_FALSE, "h_1D_plot_one_grid", -1 );
+
+  h_1D_plot_set_of_grids ( g, 1, "h_1D_plot_set_of_grids", -1 );
 
   
   free ( idL );

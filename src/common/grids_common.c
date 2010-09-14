@@ -14,6 +14,7 @@ h_grid * h_alloc_grid ( void )
   else {
       g->x = NULL;
       g->u = NULL;
+      g->master = NULL;
       g->offspring = NULL;
       g->sibling = NULL;
       g->parent = NULL;
@@ -21,7 +22,8 @@ h_grid * h_alloc_grid ( void )
       g->Lsibling = NULL;
       g->Rsibling = NULL;
       g->children = NULL;
-
+      g->is_master = H_FALSE;
+      
       _STAT_MSG ( "Allocating grid",
                   NULL,
                   OK, 0 );
@@ -132,8 +134,57 @@ void h_init_coarse_grid ( h_grid * g, H_DBL xL, H_DBL xR,
 }
 
 
+H_DBL *h_get_grid_positions ( h_grid *g )
+{
+  int Lghost = g->Lghost;
+  /* H_DBL *xptr = g->x+Lghost; */
+
+  /* xptr+=Lghost; */
+
+  return g->x+Lghost;
+}
+
+
+H_DBL *h_get_grid_positions_wghosts ( h_grid *g )
+{
+  return g->x;
+}
+
+
+H_DBL *h_get_grid_values ( h_grid *g, int rank )
+{
+  int N = g->N;
+  int Lghost = g->Lghost;
+  int Rghost = g->Rghost;
+  int Ntotal = N+Lghost+Rghost;
+
+  /* H_DBL *uptr = &g->u[0]; */
+
+  /* uptr+=rank*Ntotal+Lghost; */
+
+  return g->u+rank*Ntotal+Lghost;
+}
+
+
+H_DBL *h_get_grid_values_wghosts ( h_grid *g, int rank )
+{ 
+  int N = g->N;
+  int Lghost = g->Lghost;
+  int Rghost = g->Rghost;
+  int Ntotal = N+Lghost+Rghost;
+
+  /* H_DBL *uptr = &g->u[0]; */
+
+  /* uptr+=rank*Ntotal; */
+
+  return g->u+rank*Ntotal;
+}
+
+
 void h_free_grid ( h_grid * g )
 {
+  char *fnc_msg;
+  
   if ( g != NULL ) {
       if ( g->x != NULL )
           free ( g->x );
@@ -144,17 +195,18 @@ void h_free_grid ( h_grid * g )
       if ( g->children != NULL ) {
           for (int i = 0; i < g->Nchildren; i++) {
               h_free_grid ( g->children[i] );
-
           }
           free ( g->children );
       }
-      
+      fnc_msg = (char*) malloc( 35*sizeof(char) );
+      sprintf(fnc_msg, "Feeing grid l=%d, m=%d", g->l, g->m);
       free( g );
-      _STAT_MSG ( "Feeing grid",
+      g = NULL;
+      _STAT_MSG ( fnc_msg,
                   NULL,
                   OK, 0 );
+      free( fnc_msg );
   }
-  
   else
       _STAT_MSG ( "Feeing grid",
                   "grid was not allocated",

@@ -1,5 +1,5 @@
-#ifndef _FLAG_TEST_H_
-#define _FLAG_TEST_H_
+#ifndef _CREATE_TEST_H_
+#define _CREATE_TEST_H_
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -27,5 +27,6 @@
 H_DBL zero_ ( H_DBL x, void *params );
 H_DBL one_ ( H_DBL x, void *params );
 H_DBL sin_ ( H_DBL x, void *params );
-    
-#endif /* _FLAG_TEST_H_ */
+
+
+#endif /* _CREATE_TEST_H_ */

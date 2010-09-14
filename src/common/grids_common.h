@@ -23,6 +23,7 @@ typedef struct
   
   void *offspring;
   void *sibling;
+  
   void *parent;
   void *neighbour;
 
@@ -52,6 +53,14 @@ void h_init_grid ( h_grid *g, H_DBL xL, H_DBL xR,
 void h_init_coarse_grid ( h_grid *g, H_DBL xL, H_DBL xR,
                           int N, int rank );
 
-void h_free_grid ( h_grid * g );
+H_DBL *h_get_grid_positions ( h_grid *g );
+
+H_DBL *h_get_grid_positions_wghosts ( h_grid *g );
+
+H_DBL *h_get_grid_values ( h_grid *g, int rank );
+
+H_DBL *h_get_grid_values_wghosts ( h_grid *g, int rank );
+
+void h_free_grid ( h_grid *g );
 
 #endif /* _H_GRIDS_COMMON_H_ */

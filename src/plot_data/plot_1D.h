@@ -16,10 +16,16 @@
 void _h_1D_set_plot_options ( gnuplot_ctrl * h, const char * title,
                               const H_DBL time );
 
-void h_1D_plot_one_grid ( const h_grid * g, const char* title,
-                          int sleep_time );
+void _h_1D_add_plot_options ( gnuplot_ctrl * h, const char *option );
 
-void h_1D_plot_set_of_grids ( const h_grid * cg, int lmax, char* title,
+void _h_1D_plot_set_of_grids_recursion ( const h_grid * g,
+                                         gnuplot_ctrl * handler );
+
+
+void h_1D_plot_one_grid ( const h_grid * g, int rank, int wghosts,
+                          const char* title, int sleep_time );
+
+void h_1D_plot_set_of_grids ( const h_grid * cg, int lmax, const char* title,
                               int sleep_time );
 
 

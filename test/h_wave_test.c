@@ -118,7 +118,7 @@ int main (void)
         }
         fprintf(fp, "\n\n");
         
-        h_1D_plot_one_grid ( g, NULL, 2 );
+        h_1D_plot_one_grid ( g, 0, H_FALSE, NULL, 2 );
 
         h_1D_plot_set_of_grids ( g, p->lmax, NULL, 10 );
         

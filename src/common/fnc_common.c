@@ -56,7 +56,7 @@ void h_free_fnc ( h_fnc *f )
 {
   if ( f != NULL ) {
       if ( f->C_da != NULL ) {
-          VL(("f->C_da != NULL\n" ));
+          /* VL(("f->C_da != NULL\n" )); */
           free ( f->C_da );
       }
       
