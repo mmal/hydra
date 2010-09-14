@@ -87,8 +87,8 @@ void h_init_grid ( h_grid * g, H_DBL xL, H_DBL xR,
       for (i = 0; i < Lghost; i++) {
           g->x[i] = xL  - (Lghost-i)*g->h;
       }
-      for (i = Lghost; i < N+Lghost; i++)  {
-          g->x[i] = xL + i*(xR-xL)/(N-1);
+      for (i = 0; i < N; i++)  {
+          g->x[i+Lghost] = xL + i*g->h;
       }
       for (i = 0; i < Rghost; i++) {
           g->x[N+Lghost+i] = xR + (i+1)*g->h;

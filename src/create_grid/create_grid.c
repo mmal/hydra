@@ -15,10 +15,10 @@ void _h_create_child_grid ( h_grid *parent, h_grid **child,
 
   int N_c = (idR-idL)*rr+1; /* number of child grid points */ 
   
-  int Lghost_p = parent->Lghost; /* number of left ghost
-                                  * points of the parent grid */ 
-  int Rghost_p = parent->Rghost; /* number of right ghost
-                                  * points of the parent grid */ 
+  /* int Lghost_p = parent->Lghost; /\* number of left ghost */
+  /*                                 * points of the parent grid *\/  */
+  /* int Rghost_p = parent->Rghost; /\* number of right ghost */
+  /*                                 * points of the parent grid *\/  */
   
   int Lghost_c = 0, Rghost_c = 0; /* left and right ghost points of the child grid */
 
@@ -105,54 +105,123 @@ void _h_create_offspring_grids ( h_grid *cg, h_amrp *p,
 }
 
 
-void _h_assign_cauchy_data ( h_grid *cg, h_amrp *p, void *params, int rank, ...)
+void _h_acd_to_one_grid ( h_grid *g, h_fnc *f )
 {
-  /* int i, j, l, N; */
+  int i, j, N;
+
+  int Lghost, Rghost, Ntotal;
+
+  _fnc_1D fnc_ptr;
+
+ 
+  if ( g == NULL || g->x == NULL || g->u == NULL )
+      _STAT_MSG ( "Assign Cauchy data to one grid",
+                  "grid structure is not allocated",
+                  ERROR, 0 );
+  
+  if ( g->rank != f->rank )
+      _STAT_MSG ( "Assign Cauchy data: using given initial conditions",
+                  "ranks of grid and fnc structures are not equal",
+                  ERROR, 0 );
+  
+  N = g->N;
+  Lghost = g->Lghost;
+  Rghost = g->Rghost;
+  Ntotal = N+Lghost+Rghost;
+          
+
+  for (i = 0; i < f->rank; i++) { /* loop through initial functions */
+
+      fnc_ptr = f->C_da[i];
+      
+      for (j = 0; j < Ntotal; j++) { /* loop through the grid points */
+          g->u[i*Ntotal+j] = fnc_ptr( g->x[j], f->params );
+      }
+
+  }
+  
+}
+
+
+
+void _h_assign_cauchy_data ( h_grid *g, h_amrp *p, h_fnc *f )
+{
+  /* int i, j; */
+  /* int l=0, N; */
 
   /* int lmax = p->lmax; */
 
   /* int Lghost, Rghost, Ntotal; */
 
-  /* va_list arguments; */
+  /* _fnc_1D fnc_ptr; */
 
-  /* H_DBL (*fnc_ptr)( H_DBL, void * ); */
+  int m;
+  
+  h_grid **child;
 
-  /* h_grid * g_m, g_c; */
-
-  /* if ( g == NULL || g->x == NULL || g->u == NULL ) */
-  /*     _STAT_MSG ( "Assign Cauchy data: using given initial conditions", */
-  /*                 "grid non allocated", */
-  /*                 ERROR, 0 ); */
+  if ( g == NULL || g->x == NULL || g->u == NULL )
+      _STAT_MSG ( "Assign Cauchy data: using given initial conditions",
+                  "grid non allocated",
+                  ERROR, 0 );
 
   /* if ( g->is_master != H_TRUE  ) */
   /*     _STAT_MSG ( "Assign Cauchy data: using given initial conditions", */
   /*                 "passed grid is not master grid", */
   /*                 ERROR, 0 ); */
 
-  /* if ( g->rank != rank ) */
-  /*     _STAT_MSG ( "Assign Cauchy data: using given initial conditions", */
-  /*                 "ranks are not equal", */
-  /*                 ERROR, 0 ); */
+  if ( g->rank != f->rank )
+      _STAT_MSG ( "Assign Cauchy data: using given initial conditions",
+                  "ranks are not equal",
+                  ERROR, 0 );
 
-  /* va_start ( arguments, rank ); */
 
-  /* for ( i = 0; i < rank; i++ ) { */
-  /*     fnc_ptr = va_arg ( arguments, H_DBL (*)(H_DBL, void*) ); */
-  /*     if ( fnc_ptr == NULL ) { */
-  /*         va_end ( arguments ); */
-  /*         _STAT_MSG ( "Assign Cauchy data: using given initial conditions", */
-  /*                     "number of arguments is not equal to rank", */
-  /*                     ERROR, 0 ); */
-  /*     } */
-  /*     else { */
-  /*         N = g->N; */
-  /*         Lghost = g->Lghost; */
-  /*         Rghost = g->Rghost; */
-  /*         Ntotal = N+Lghost+Rghost; */
+  _h_acd_to_one_grid( g, f );
+
+  if ( g->children == NULL )
+      printf("\n\n g->children == NULL \n\n");
+  else
+      printf("\n\n g->children != NULL \n\n");
+  
+  if ( g->children != NULL ) {
+      child = (h_grid **) g->children;
+  
+      for (m = 0; m < g->Nchildren; m++) {
+          _h_assign_cauchy_data ( child[m], p, f );
           
-  /*         for (l = 0; l < lmax; l++) { /\* loop for all grids hierarchy *\/  */
-              
-  /*             if( g_m->is_master == H_TRUE ) { */
+      }
+  }
+  
+
+
+  /* /\* for ( i = 0; i < rank; i++ ) { *\/ */
+  /* /\*     fnc_ptr = va_arg ( arguments, H_DBL (*)(H_DBL, void*) ); *\/ */
+  /* /\*     if ( fnc_ptr == NULL ) { *\/ */
+  /* /\*         va_end ( arguments ); *\/ */
+  /* /\*         _STAT_MSG ( "Assign Cauchy data: using given initial conditions", *\/ */
+  /* /\*                     "number of arguments is not equal to rank", *\/ */
+  /* /\*                     ERROR, 0 ); *\/ */
+  /* /\*     } *\/ */
+  /* /\*     else { *\/ */
+
+  /* N = g->N; */
+  /* Lghost = g->Lghost; */
+  /* Rghost = g->Rghost; */
+  /* Ntotal = N+Lghost+Rghost; */
+          
+  /* /\* for (l = 0; l < lmax; l++) { /\\* loop for all grids hierarchy *\\/ *\/ */
+
+  /* while ( l ) { */
+  /*     _h_acd_to_one_grid( g, p, f ); */
+      
+  /*     for (i = 0; i < f->rank; i++) { */
+  /*         fnc_ptr = f->C_da[i]; */
+
+  /*         for (j = 0; j < Ntotal; j++) { */
+  /*             g->u[i*Ntotal+j] = fnc_ptr( g->x[j], params ); */
+  /*         } */
+  /*     } */
+
+  /* if( g_m->is_master == H_TRUE ) { */
   /*                 for (j = 0; j < Ntotal; j++) { */
   /*                     g->u[i*Ntotal+j] = fnc_ptr( g->x[j], params ); */
   /*                 } */
@@ -172,11 +241,10 @@ void _h_assign_cauchy_data ( h_grid *cg, h_amrp *p, void *params, int rank, ...)
   /*         g = cg; */
   /*     } */
 
-  /* va_end ( arguments ); */
 
-  /* _STAT_MSG ( "Assign Cauchy data: using given initial conditions", */
-  /*             NULL, */
-  /*             OK, 0 ); */
+  _STAT_MSG ( "Assign Cauchy data: using given initial conditions",
+              NULL,
+              OK, 0 );
 }
 
 
