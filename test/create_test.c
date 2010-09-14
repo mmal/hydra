@@ -45,7 +45,7 @@ int main ( void )
   p->rr = 2;
   p->buf = 1;
   p->sp = 2;
-  p->lmax = 2;
+  p->lmax = 3;
   p->lmbd = 4;
   p->errt = 9.;
 

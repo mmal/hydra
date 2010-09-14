@@ -47,8 +47,10 @@ void _h_create_child_grid ( h_grid *parent, h_grid **child,
       master_grid = (h_grid *) parent->master;
       VL(("create_grid.c _h_create_child_grid TEST parent->is_master != H_TRUE 2\n"));
 
-      xL_m = master_grid->xL;
-      xR_m = master_grid->xR;
+      /* xL_m = master_grid->xL; */
+      /* xR_m = master_grid->xR; */
+      xL_m = -1.;  /* TODO: */
+      xR_m = 1.;
       VL(("create_grid.c _h_create_child_grid TEST parent->is_master != H_TRUE 3\n"));
   }
 
