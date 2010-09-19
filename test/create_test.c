@@ -26,7 +26,7 @@ H_DBL sin_ ( H_DBL x, void *params )
 }
 
 
-int main ( void )
+int main( int argc, char *argv[] )
 {
   const int rank = 2;
 
@@ -42,10 +42,12 @@ int main ( void )
 
   h_fnc * f = h_alloc_fnc ( NULL, rank, sin_, one_ );
 
+  /* h_init_amrp ( p, argc, argv ); */
+
   p->rr = 2;
   p->buf = 1;
   p->sp = 2;
-  p->lmax = 3;
+  p->lmax = 6;
   p->lmbd = 4;
   p->errt = 9.;
 
@@ -53,7 +55,10 @@ int main ( void )
 
   _h_create_set_of_grids ( g, p, f );
 
-  h_1D_plot_set_of_grids ( g, 0, "h_1D_plot_set_of_grids", -1 );
+  h_1D_plot_set_of_grids_2 ( g, 0, H_TRUE, "h_1D_plot_set_of_grids", -1 );
+
+  h_1D_plot_set_of_grids_2 ( g, 0, H_FALSE, "h_1D_plot_set_of_grids", -1 );
+  
   
   h_free_fnc( f );
   h_free_grid ( g );

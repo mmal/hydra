@@ -2,6 +2,9 @@
 #define _H_AMRP_H_
 
 
+#include <argtable2.h>
+
+
 #include "src/common/types.h"
 #include "src/stat_log/stat_msg.h"
 
@@ -22,6 +25,8 @@ typedef struct
 
 
 h_amrp *h_alloc_amrp ( void );
+
+void h_init_amrp ( h_amrp *p, int argc, char *argv[] );
 
 void h_free_amrp ( h_amrp *p );
 

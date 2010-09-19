@@ -16,7 +16,7 @@ INCLUDE_DIRECTORIES(
 # SET(EXAMPLE_SRC h_grid_alloc_test.c)
 
 # define executable
-SET(CMAKE_REQUIRED_LIBRARIES "hydra-lib;${GSL_LIBRARIES};${GSLCBLAS_LIBRARIES};${CMAKE_REQUIRED_LIBRARIES}")
+SET(CMAKE_REQUIRED_LIBRARIES "hydra-lib;${GSL_LIBRARIES};${GSLCBLAS_LIBRARIES};${ARGTABLE2_LIBRARY}${CMAKE_REQUIRED_LIBRARIES}")
 
 # compiler switches
 SET(w_flags "-ansi -pedantic -Wall -Wshadow -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wnested-externs -fshort-enums -fno-common -Dinline=")

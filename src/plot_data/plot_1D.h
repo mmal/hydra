@@ -28,5 +28,7 @@ void h_1D_plot_one_grid ( const h_grid * g, int rank, int wghosts,
 void h_1D_plot_set_of_grids ( const h_grid * cg, int lmax, const char* title,
                               int sleep_time );
 
+void h_1D_plot_set_of_grids_2 ( const h_grid * cg, int rank, int wghosts,
+                              const char* title, int sleep_time );
 
 #endif /* _PLOT_1D_H_ */
