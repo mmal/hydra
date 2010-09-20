@@ -43,14 +43,14 @@ int main( int argc, char *argv[] )
 
   h_fnc * f = h_alloc_fnc ( NULL, rank, sin_, one_ );
 
-  /* h_init_amrp ( p, argc, argv ); */
+  h_init_amrp ( p, argc, argv );
 
-  p->rr = 10;
-  p->buf = 1;
-  p->sp = 2;
-  p->lmax = 1;
-  p->lmbd = 4;
-  p->errt = 9.;
+  /* p->rr = 10; */
+  /* p->buf = 1; */
+  /* p->sp = 2; */
+  /* p->lmax = 1; */
+  /* p->lmbd = 4; */
+  /* p->errt = 9.; */
 
   p->ngh = (p->sp)*(p->rr)*4;
   

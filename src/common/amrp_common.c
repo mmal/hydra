@@ -21,64 +21,124 @@ h_amrp *h_alloc_amrp ( void )
 
 void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
 {
-  int nerrors;
+  int i, nerrors;
 
-  struct arg_lit  *help = arg_lit0("h","help","shows this output and exits");
+  struct arg_lit  *help = arg_lit0("h","help",                    "shows this output and exits");
+  struct arg_int  *rr = arg_int1("r","rr,refratio","<n>",          "refinement ratio (defaults to 2)");
+  struct arg_int  *buf = arg_int1("b","buf,bufor","<n>",          "bufor size (defaults to 1)");
+  struct arg_int  *sp = arg_int1("p",NULL,"<n>",                  "scheme points (defaults to 2)");
+  struct arg_int  *lmax = arg_int1(NULL,"lmax,level_max","<n>",   "maximal refinement level (defaults to 1)");
+  struct arg_int  *lmbd = arg_int1(NULL,"lambda","<n>",           "Courant–Friedrichs–Lewy condition, Courant Number (defaults to 4)");
+  struct arg_dbl  *errt = arg_dbl1("e","error","<n>",             "error tolerance (defaults to 9.0)");
+  struct arg_lit  *version = arg_lit0(NULL,"version",             "print version information and exit");
+  struct arg_end  *end = arg_end(20);
 
-  struct arg_int  *rr = arg_int1("r","rr,refratio","<n>","refinement ratio");
+  void *argtable[] = {help,rr,buf,sp,lmax,lmbd,errt,version,end};
 
-  struct arg_int  *buf = arg_int1("b","buf,bufor","<n>","bufor size");
+  rr->hdr.flag |= ARG_HASOPTVALUE;
+  buf->hdr.flag |= ARG_HASOPTVALUE;
+  sp->hdr.flag |= ARG_HASOPTVALUE;
+  lmax->hdr.flag |= ARG_HASOPTVALUE;
+  lmbd->hdr.flag |= ARG_HASOPTVALUE;
+  errt->hdr.flag |= ARG_HASOPTVALUE;
 
-  struct arg_int  *sp = arg_int1("p",NULL,"<n>","scheme points");
+  /* verify the argtable[] entries were allocated sucessfully */
+  if (arg_nullcheck(argtable) != 0)
+    {
+        /* NULL entries were detected, some allocations must have failed */
+        printf("insufficient memory\n");
+        goto exit;
+    }
+  
+  /* set refinement ratio default value to 2 */
+  for (i = 0; i < rr->hdr.maxcount; i++)
+      rr->ival[i]=2;
+  
+  /* set bufor size default value to 1 */
+  for (i = 0; i < buf->hdr.maxcount; i++)
+      buf->ival[i]=1;
+  
+  /* set scheme points default value to 2 */
+  for (i = 0; i < sp->hdr.maxcount; i++)
+      sp->ival[i]=2;
+  
+  /* set maximal refinement level default value to 1 */
+  for (i = 0; i < buf->hdr.maxcount; i++)
+      lmax->ival[i]=1;
 
-  struct arg_int  *lmax = arg_int1(NULL,"lmax,level_max","<n>","maximal refinement level");
+  /* set Courant number default value to 4 */
+  for (i = 0; i < lmbd->hdr.maxcount; i++)
+      lmbd->ival[i]=4;
 
-  struct arg_int  *lmbd = arg_int1(NULL,"lambda","<n>",
-                                   "Courant–Friedrichs–Lewy conditio, Courant Number");
-
-  struct arg_dbl  *errt = arg_dbl1("e","error","<n>","error tolerance");
-
-  struct arg_end  *end = arg_end(12);
-
-  void *argtable[] = {help,rr,buf,sp,lmax,lmbd,errt,end};
-
-
+  /* set error tolerance default value to 9.0 */
+  for (i = 0; i < errt->hdr.maxcount; i++)
+      errt->dval[i]=9.0;
+  
   if ( p==NULL )
       _STAT_MSG ( "Initializing amrp",
                   "amrp was not allocated",
                   ERROR, 0 );
   
-  if ( arg_nullcheck( argtable ) != 0 )
-      printf("error: insufficient memory\n");
-
-  nerrors = arg_parse ( argc, argv, argtable );
-
-  if ( nerrors == 0 ) {
-      p->rr = rr->ival[0];
-      p->buf = buf->ival[0];
-      p->sp = buf->ival[0];
-      p->lmax = lmax->ival[0];
-      p->lmbd = lmbd->ival[0];
-      p->errt = errt->dval[0];
-  }
-  else {
-      arg_print_errors ( stdout, end, argv[0] );
-      printf("\n Try '%s -h, --help' for more information.\n", argv[0] );
-      exit(0);
-  }
+  /* Parse the command line as defined by argtable[] */
+  nerrors = arg_parse(argc,argv,argtable);
   
-  if ( help->count != 0 ) {
-      printf(" Usage: %s", argv[0]);
-      
-      arg_print_syntaxv ( stdout, argtable, "\n" );
-      
-      printf("\n %-30s  %s\n", "Option", "Meaning");
-      
-      arg_print_glossary ( stdout, argtable, "  %-30s %s\n" );
-  }
+  /* special case: '--help' takes precedence over error reporting */
+  if (help->count > 0)
+    {
+        printf(" Usage: %s", argv[0]);
+        arg_print_syntaxv ( stdout, argtable, "\n" );
+        printf("\n %-30s  %s\n", "Option", "Meaning");
+        arg_print_glossary ( stdout, argtable, "  %-30s %s\n" );
+        goto exit;
+    }
   
-  arg_freetable ( argtable, sizeof(argtable)/sizeof(argtable[0]) );
+  /* special case: '--version' takes precedence error reporting */
+  if (version->count > 0)
+    {
+        printf("'%s' example program for the \"argtable\" command line argument parser.\n",argv[0]);
+        printf("September 2010, Maciej Maliborski\n");
+        goto exit;
+    }
+  
+  /* If the parser returned any errors then display them and exit */
+  if (nerrors > 0)
+    {
+        /* Display the error details contained in the arg_end struct.*/
+        arg_print_errors(stdout,end,argv[0]);
+        printf("Try '%s --help' for more information.\n",argv[0]);
+        goto exit;
+    }
+  
+  /* special case: uname with no command line options induces brief help */
+  if (argc==1)
+    {
+        printf("Try '%s --help' for more information.\n",argv[0]);
+        goto exit;
+    }
+  
+  /* command line arguments are successfully parsed at this point. */
+  /* print what we have parsed */
+  p->rr = rr->ival[0];
+  p->buf = buf->ival[0];
+  p->sp = buf->ival[0];
+  p->lmax = lmax->ival[0];
+  p->lmbd = lmbd->ival[0];
+  p->errt = errt->dval[0];
 
+
+  /* printf("%d instances of --foo detected on command line\n", foo->count); */
+  /* for (i=0; i<foo->hdr.maxcount; i++) */
+  /*     printf("foo[%d] = %d\n", i, foo->ival[i]);          */
+  /* printf("%d instances of --bar detected on command line\n", bar->count); */
+  /* for (i=0; i<bar->hdr.maxcount; i++) */
+  /*     printf("bar[%d] = %d\n", i, bar->ival[i]);          */
+  
+  exit:
+  /* deallocate each non-null entry in argtable[] */
+  arg_freetable(argtable,sizeof(argtable)/sizeof(argtable[0]));
+
+  printf("p->rr=%d\n", p->rr );
+  exit( 0 );
 }
 
 
