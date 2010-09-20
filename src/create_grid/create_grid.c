@@ -15,11 +15,6 @@ void _h_create_child_grid ( h_grid *parent, h_grid **child,
 
   int N_c = (idR-idL)*rr+1; /* number of child grid points */ 
   
-  /* int Lghost_p = parent->Lghost; /\* number of left ghost */
-  /*                                 * points of the parent grid *\/  */
-  /* int Rghost_p = parent->Rghost; /\* number of right ghost */
-  /*                                 * points of the parent grid *\/  */
-  
   int Lghost_c = 0, Rghost_c = 0; /* left and right ghost points of the child grid */
 
   H_DBL h_p = parent->h; /* spatial spacing of parent grid */
@@ -32,29 +27,26 @@ void _h_create_child_grid ( h_grid *parent, h_grid **child,
   
   h_grid *fine_grid = h_alloc_grid ( );
 
-  h_grid *master_grid;
+  h_grid *master_grid = h_alloc_grid ( );
 
-  VL(("create_grid.c _h_create_child_grid TEST\n"));
-  
   if ( parent->is_master == H_TRUE  ) { /* parent grid is a master grid */
-      VL(("create_grid.c _h_create_child_grid TEST parent->is_master == H_TRUE\n"));
+
       xL_m = parent->xL;
       xR_m = parent->xR;
-      VL(("create_grid.c _h_create_child_grid TEST parent->is_master == H_TRUE 2\n"));
+      fine_grid->master = parent; /* this was */
+      master_grid = (h_grid*) parent; /* missing */
+
   }
   else { /* parent grid is not a master grid */
-      VL(("create_grid.c _h_create_child_grid TEST parent->is_master != H_TRUE\n"));
+
       master_grid = (h_grid *) parent->master;
-      VL(("create_grid.c _h_create_child_grid TEST parent->is_master != H_TRUE 2\n"));
-
-      /* xL_m = master_grid->xL; */
-      /* xR_m = master_grid->xR; */
-      xL_m = -1.;  /* TODO: */
-      xR_m = 1.;
-      VL(("create_grid.c _h_create_child_grid TEST parent->is_master != H_TRUE 3\n"));
+      
+      /* if( master_grid == NULL ) VL(("l=%d master_grid == NULL\n", parent->l)); */
+      /* else VL(("l=%d master_grid != NULL\n", parent->l)); */
+      
+      xL_m = master_grid->xL;
+      xR_m = master_grid->xR;
   }
-
-  VL(("create_grid.c _h_create_child_grid TEST 2\n"));
 
   
   for (i = 1; i <= sp; i++) {
@@ -63,23 +55,22 @@ void _h_create_child_grid ( h_grid *parent, h_grid **child,
       if (xR_c + i*h_p/rr < xR_m)
           Rghost_c++;
   }
+  
+  /* VL(( "create_grid.c xL_m=%f, xR_m=%f\n", xL_m, xR_m )); */
+  /* VL(( "create_grid.c m=%d: Lghost=%d, Rghost=%d\n", m, Lghost_c, Rghost_c )); */
+  
 
-  VL(("floor_sqrt(%d) == %d\n", 0, 1));  /* logs a printf style message */
-  
-  VL(( "create_grid.c xL_m=%f, xR_m=%f\n", xL_m, xR_m ));
-  
-  VL(( "create_grid.c m=%d: Lghost=%d, Rghost=%d\n", m, Lghost_c, Rghost_c ));
-  
+  /* initializing fine grid */
   h_init_grid ( fine_grid, xL_c, xR_c, N_c, Lghost_c, Rghost_c, parent->rank, (parent->l)+1, m );
+
   
-  /* if( m != 0 ) */
-  /*     fineg->Lsibling = parent->children[m]; */
-  /* if( m != parent->Nchildren-1 ) */
-  /*     fineg->Rsibling = parent->children[m+1]; */
-  VL(("create_grid.c m=%d, fine_grid->xL=%f, fine_grid->xR=%f\n",
-      m, fine_grid->xL, fine_grid->xR ));
+
+  /* VL(("create_grid.c m=%d, fine_grid->xL=%f, fine_grid->xR=%f\n", */
+  /*     m, fine_grid->xL, fine_grid->xR )); */
   
-  fine_grid->parent = (h_grid*) parent;
+  fine_grid->master = (void *) master_grid;
+
+  fine_grid->parent = (void *) parent;
 
   *child = fine_grid;
 }
@@ -97,9 +88,10 @@ void _h_create_offspring_grids ( h_grid *cg, h_amrp *p,
   /* for (m = 0; m < Ngrids; m++) { */
   /*     child[m] = h_alloc_grid ( ); */
   /* } */
-  VL(("create_grid.c _h_create_offspring_grids TEST\n"));
+  /* VL(("create_grid.c _h_create_offspring_grids TEST\n")); */
   for (m = 0; m < Ngrids; m++) {
-      VL(("create_grid.c _h_create_offspring_grids m=%d TEST\n", m));
+      /* VL(("create_grid.c _h_create_offspring_grids m=%d TEST\n", m)); */
+      child[m] = h_alloc_grid();
       _h_create_child_grid ( cg, &child[m], p, m, idL[m], idR[m] );
   }
   
@@ -131,7 +123,7 @@ void _h_create_set_of_grids ( h_grid *g, h_amrp *p, h_fnc *f )
 
   h_grid *g_c;
 
-  VL(("l=%d, lmax=%d\n", l, lmax));
+  /* VL(("l=%d, lmax=%d\n", l, lmax)); */
   
   _h_acd_to_one_grid ( g, f );
 
@@ -145,7 +137,7 @@ void _h_create_set_of_grids ( h_grid *g, h_amrp *p, h_fnc *f )
 
           if( id_fp!=NULL )
               free( id_fp );
-          VL(("create_grid TEST\n")); /****/
+          /* VL(("create_grid TEST\n")); /\****\/ */
           _h_create_offspring_grids ( g, p, idL, idR, Ngrids );
 
             if( idL!=NULL )

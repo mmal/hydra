@@ -17,6 +17,8 @@ typedef struct
   int lmax;                     /**< number of grids levels */
   int lmbd;                     /**< CFL condition constant */
 
+  int ngh;                      /**< number of ghost cells */
+  
   int gme;                      /**< grids move every */
   
   H_DBL errt;                   /**< error tolerance */

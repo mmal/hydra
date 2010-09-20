@@ -107,13 +107,13 @@ void h_init_grid ( h_grid * g, H_DBL xL, H_DBL xR,
                   ERROR, 0 );
   }
 
-  g->master = NULL;
+  /* g->master = NULL; */
   
-  g->offspring = NULL;
-  g->sibling = NULL;
-  g->parent = NULL;
-  g->neighbour = NULL;
-  g->children = NULL;
+  /* g->offspring = NULL; */
+  /* g->sibling = NULL; */
+  /* g->parent = NULL; */
+  /* g->neighbour = NULL; */
+  /* g->children = NULL; */
 
   
   _STAT_MSG ( fnc_msg,

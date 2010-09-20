@@ -2,6 +2,7 @@
 
 #include "create_test.h"
 
+
 H_DBL zero_ ( H_DBL x, void *params )
 {
   void *newp;
@@ -44,13 +45,15 @@ int main( int argc, char *argv[] )
 
   /* h_init_amrp ( p, argc, argv ); */
 
-  p->rr = 2;
+  p->rr = 10;
   p->buf = 1;
   p->sp = 2;
-  p->lmax = 6;
+  p->lmax = 1;
   p->lmbd = 4;
   p->errt = 9.;
 
+  p->ngh = (p->sp)*(p->rr)*4;
+  
   h_init_coarse_grid ( g, xL, xR, N, rank );
 
   _h_create_set_of_grids ( g, p, f );
