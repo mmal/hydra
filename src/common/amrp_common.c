@@ -24,23 +24,23 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
   int i, nerrors;
 
   struct arg_lit  *help = arg_lit0("h","help",                    "shows this output and exits");
-  struct arg_int  *rr = arg_int1("r","rr,refratio","<n>",          "refinement ratio (defaults to 2)");
-  struct arg_int  *buf = arg_int1("b","buf,bufor","<n>",          "bufor size (defaults to 1)");
-  struct arg_int  *sp = arg_int1("p",NULL,"<n>",                  "scheme points (defaults to 2)");
-  struct arg_int  *lmax = arg_int1(NULL,"lmax,level_max","<n>",   "maximal refinement level (defaults to 1)");
-  struct arg_int  *lmbd = arg_int1(NULL,"lambda","<n>",           "Courant–Friedrichs–Lewy condition, Courant Number (defaults to 4)");
-  struct arg_dbl  *errt = arg_dbl1("e","error","<n>",             "error tolerance (defaults to 9.0)");
+  struct arg_int  *rr = arg_int0("r","rr,refratio","<n>",          "refinement ratio (defaults to 2)");
+  struct arg_int  *buf = arg_int0("b","buf,bufor","<n>",          "bufor size (defaults to 1)");
+  struct arg_int  *sp = arg_int0("p",NULL,"<n>",                  "scheme points (defaults to 2)");
+  struct arg_int  *lmax = arg_int0(NULL,"lmax,level_max","<n>",   "maximal refinement level (defaults to 1)");
+  struct arg_int  *lmbd = arg_int0(NULL,"lambda","<n>",           "Courant–Friedrichs–Lewy condition, Courant Number (defaults to 4)");
+  struct arg_dbl  *errt = arg_dbl0("e","error","<n>",             "error tolerance (defaults to 9.0)");
   struct arg_lit  *version = arg_lit0(NULL,"version",             "print version information and exit");
   struct arg_end  *end = arg_end(20);
 
   void *argtable[] = {help,rr,buf,sp,lmax,lmbd,errt,version,end};
 
-  rr->hdr.flag |= ARG_HASOPTVALUE;
-  buf->hdr.flag |= ARG_HASOPTVALUE;
-  sp->hdr.flag |= ARG_HASOPTVALUE;
-  lmax->hdr.flag |= ARG_HASOPTVALUE;
-  lmbd->hdr.flag |= ARG_HASOPTVALUE;
-  errt->hdr.flag |= ARG_HASOPTVALUE;
+  /* rr->hdr.flag |= ARG_HASOPTVALUE; */
+  /* buf->hdr.flag |= ARG_HASOPTVALUE; */
+  /* sp->hdr.flag |= ARG_HASOPTVALUE; */
+  /* lmax->hdr.flag |= ARG_HASOPTVALUE; */
+  /* lmbd->hdr.flag |= ARG_HASOPTVALUE; */
+  /* errt->hdr.flag |= ARG_HASOPTVALUE; */
 
   /* verify the argtable[] entries were allocated sucessfully */
   if (arg_nullcheck(argtable) != 0)
@@ -110,11 +110,11 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
     }
   
   /* special case: uname with no command line options induces brief help */
-  if (argc==1)
-    {
-        printf("Try '%s --help' for more information.\n",argv[0]);
-        goto exit;
-    }
+  /* if (argc==1) */
+  /*   { */
+  /*       printf("Try '%s --help' for more information.\n",argv[0]); */
+  /*       goto exit; */
+  /*   } */
   
   /* command line arguments are successfully parsed at this point. */
   /* print what we have parsed */
@@ -137,8 +137,8 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
   /* deallocate each non-null entry in argtable[] */
   arg_freetable(argtable,sizeof(argtable)/sizeof(argtable[0]));
 
-  printf("p->rr=%d\n", p->rr );
-  exit( 0 );
+  /* printf("p->rr=%d\n", p->rr ); */
+  /* exit( 0 ); */
 }
 
 

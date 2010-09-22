@@ -14,9 +14,7 @@
 
 
 
-void h_flagging_points ( h_grid *g, h_amrp *p,
-                         int (*flagging_criterion)( h_grid *, h_amrp *, H_DBL * ),
-                         int **id_fp, int *Nfp )
+void h_flagging_points ( h_hms *m, int **id_fp, int *Nfp )
 {
   int i, N, stat;
 
@@ -27,21 +25,26 @@ void h_flagging_points ( h_grid *g, h_amrp *p,
   H_DBL *tau;
 
 
-  if ( g==NULL || p==NULL || flagging_criterion==NULL ) {
+  if ( m->g==NULL || m->p==NULL || m->f->fc==NULL ) {
       _STAT_MSG("Flagging points","empty parameters",ERROR,0);
   }
 
-  N = g->N;
-  err_tol = p->errt;
+  N = m->g->N;
+  err_tol = m->p->errt;
 
-  printf("TEST g->N=%d\n", g->N);
   tau = (H_DBL*) malloc( N*sizeof( H_DBL ) );
 
   if ( tau==NULL ) {
       _STAT_MSG("Flagging points","cannot allocate memory for tau",ERROR,0);
   }
   
-  stat = flagging_criterion ( g, p, tau );
+  _flag_crit _fc;
+
+  _fc = m->f->fc;
+  
+  stat = _fc(  m, tau );
+
+  printf("TEST g->N=%d\n", m->g->N);
 
   if ( stat!=H_OK ) {
       _STAT_MSG("Flagging points","flagging criterion failed",ERROR,0);
@@ -72,7 +75,7 @@ void h_flagging_points ( h_grid *g, h_amrp *p,
 
   *id_fp = id_fp_t;
 
-  printf("flagging.c TEST\n");
+  printf("flagging.c TEST  g->N=%d\n", N);
 
   free( tau );
 }

@@ -198,6 +198,7 @@ void h_free_grid ( h_grid * g )
           }
           free ( g->children );
       }
+          
       fnc_msg = (char*) malloc( 35*sizeof(char) );
       sprintf(fnc_msg, "Feeing grid l=%d, m=%d", g->l, g->m);
       free( g );

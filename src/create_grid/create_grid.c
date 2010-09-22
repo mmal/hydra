@@ -61,7 +61,8 @@ void _h_create_child_grid ( h_grid *parent, h_grid **child,
   
 
   /* initializing fine grid */
-  h_init_grid ( fine_grid, xL_c, xR_c, N_c, Lghost_c, Rghost_c, parent->rank, (parent->l)+1, m );
+  h_init_grid ( fine_grid, xL_c, xR_c, N_c, Lghost_c, Rghost_c,
+                parent->rank, (parent->l)+1, m );
 
   
 
@@ -111,9 +112,9 @@ void _h_create_offspring_grids ( h_grid *cg, h_amrp *p,
 }
 
 
-void _h_create_set_of_grids ( h_grid *g, h_amrp *p, h_fnc *f )
+void _h_create_set_of_grids ( h_hms *m )
 {
-  int i, l=g->l, lmax = p->lmax;
+  int i, l=m->g->l, lmax = m->p->lmax, mm=m->g->m;
   
   int *id_fp;
 
@@ -123,22 +124,31 @@ void _h_create_set_of_grids ( h_grid *g, h_amrp *p, h_fnc *f )
 
   h_grid *g_c;
 
-  /* VL(("l=%d, lmax=%d\n", l, lmax)); */
+  h_hms *m_c = (h_hms*) malloc( sizeof(h_hms*) );
+
+  VL(("TEST1 l=%d, lmax=%d m=%d\n", l, lmax, mm));
   
-  _h_acd_to_one_grid ( g, f );
+  _h_acd_to_one_grid ( m->g, m->f );
+
+  VL(("TEST2 l=%d, lmax=%d m=%d\n", l, lmax, mm));
 
   if ( l < lmax ) {
       
-      h_flagging_points ( g, p, h_fc_Test, &id_fp, &Nfp );
+      h_flagging_points ( m, &id_fp, &Nfp );
 
+      VL(("TEST3 l=%d, lmax=%d m=%d\n", l, lmax, mm));
+
+      VL(("l=%d Nfp=%d", l, Nfp));
+      
       if ( Nfp > 0 ) {
       
-          h_clustering_flagged ( id_fp, Nfp, p->buf, g->N, &idL, &idR, &Ngrids );
+          h_clustering_flagged ( id_fp, Nfp, m->p->buf, m->g->N,
+                                 &idL, &idR, &Ngrids );
 
           if( id_fp!=NULL )
               free( id_fp );
           /* VL(("create_grid TEST\n")); /\****\/ */
-          _h_create_offspring_grids ( g, p, idL, idR, Ngrids );
+          _h_create_offspring_grids ( m->g, m->p, idL, idR, Ngrids );
 
             if( idL!=NULL )
                 free( idL );
@@ -146,8 +156,12 @@ void _h_create_set_of_grids ( h_grid *g, h_amrp *p, h_fnc *f )
                 free( idR );
 
             for (i = 0; i < Ngrids; i++) {
-                g_c = g->children[i];
-                _h_create_set_of_grids ( g_c, p, f );
+                /* g_c = m->g->children[i]; */
+                m_c->g = m->g->children[i];
+                m_c->p = m->p;
+                m_c->f = m->f;
+                /* m->g = g_c; */ 
+                _h_create_set_of_grids ( m_c );
             }
       }
       else {
@@ -156,8 +170,15 @@ void _h_create_set_of_grids ( h_grid *g, h_amrp *p, h_fnc *f )
                       WARNING, 0 );
       }
   }
+  /* if( m_c->g->master != NULL ) { */
+  /*     m_c->g= m->g->master; */
+  /*     printf("m_c->g->master != NULL\n"); */
+  /* } */
+  /* else { */
+  /*     m_c->g= m_c->g->parent; */
+  /*     printf("m_c->g->master == NULL\n"); */
+  /* } */
 }
-
 
 void _h_acd_to_one_grid ( h_grid *g, h_fnc *f )
 {
@@ -167,7 +188,6 @@ void _h_acd_to_one_grid ( h_grid *g, h_fnc *f )
 
   _fnc_1D fnc_ptr;
 
- 
   if ( g == NULL || g->x == NULL || g->u == NULL )
       _STAT_MSG ( "Assign Cauchy data to one grid",
                   "grid structure is not allocated",
@@ -191,8 +211,8 @@ void _h_acd_to_one_grid ( h_grid *g, h_fnc *f )
       for (j = 0; j < Ntotal; j++) { /* loop through the grid points */
           g->u[i*Ntotal+j] = fnc_ptr( g->x[j], f->params );
       }
-
   }
+
 }
 
 

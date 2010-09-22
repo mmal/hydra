@@ -3,6 +3,7 @@
 
 
 #include <stdarg.h>
+#include <gsl/gsl_odeiv.h>
 
 
 #include "src/common/types.h"
@@ -13,9 +14,9 @@
 
 typedef H_DBL (*_fnc_1D)(H_DBL, void*);
 
-typedef H_DBL (*_deriv_1D)(H_DBL, void*);
+typedef int (*_deriv_1D)(H_DBL, H_DBL*, H_DBL*, H_DBL*, int, int, void*);
 
-typedef int (*_flag_crit)(h_grid *, h_amrp *, H_DBL *);
+typedef int (*_flag_crit)(void *, H_DBL *);
 
 
 typedef struct
@@ -27,7 +28,9 @@ typedef struct
 
   _deriv_1D *deriv;
 
-  _flag_crit fc;
+  _flag_crit *fc;
+
+  gsl_odeiv_step_type * step_T;
   
   void *params;
   
@@ -35,13 +38,17 @@ typedef struct
 
 
 
-h_fnc *h_alloc_fnc ( void *params, int rank, ... );
+h_fnc *h_alloc_fnc ( void );
 
+int h_init_fnc_cauchy_data ( h_fnc *f, void *params, int rank, ... );
 
-void h_init_fnc_Cdata ( int rank, ... );
+int h_init_fnc_derivs ( h_fnc *f, int ISN, ... );
 
-void h_init_fnc_derivs ( int rank, ... );
+int h_init_fnc_flag_crit ( h_fnc *f, _flag_crit fc );
+
+int h_init_fnc_step_type ( h_fnc *f, gsl_odeiv_step_type *s );
 
 void h_free_fnc ( h_fnc *f );
+
 
 #endif /* _FNC_COMMON_H_ */

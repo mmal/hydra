@@ -13,11 +13,15 @@
 #include "flag_criterion.h"
 
 
-int h_fc_Test ( h_grid * g, h_amrp * p, H_DBL * tau )
+int h_fc_Test ( void *vm, H_DBL * tau )
 {
-  int i;
+  int i ,N;
+
+  h_hms *m = (h_hms *)vm;
+
+  printf("\nh_fc_Test\n\n");
   
-  int N = g->N;
+  N = m->g->N;
 
   for (i = 0; i < N; i++) {
       tau[i] = sin(2*i)*10;
