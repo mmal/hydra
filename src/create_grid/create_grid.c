@@ -11,7 +11,7 @@ void _h_create_child_grid ( h_grid *parent, h_grid **child,
 
   int rr = p->rr; /* refinement ratio */
 
-  int sp = p->sp;
+  int sp = p->ngh; /* ngh number of ghosts points */
 
   int N_c = (idR-idL)*rr+1; /* number of child grid points */ 
   
@@ -122,7 +122,7 @@ void _h_create_set_of_grids ( h_hms *m )
 
   int *idL, *idR, Ngrids;
 
-  h_grid *g_c;
+  /* h_grid *g_c; */
 
   h_hms *m_c = (h_hms*) malloc( sizeof(h_hms*) );
 
@@ -179,6 +179,7 @@ void _h_create_set_of_grids ( h_hms *m )
   /*     printf("m_c->g->master == NULL\n"); */
   /* } */
 }
+
 
 void _h_acd_to_one_grid ( h_grid *g, h_fnc *f )
 {

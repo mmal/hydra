@@ -39,6 +39,7 @@ typedef struct
   H_DBL *u;
 
   int Lghost, Rghost;
+  int Ntotal;
   
 } h_grid;
 

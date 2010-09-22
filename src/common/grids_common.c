@@ -65,7 +65,8 @@ void h_init_grid ( h_grid * g, H_DBL xL, H_DBL xR,
   g->N = N;
   g->Lghost = Lghost;
   g->Rghost = Rghost;
-
+  g->Ntotal = N+Lghost+Rghost;
+  
   g->l = l;
   g->m = m;
     

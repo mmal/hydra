@@ -27,10 +27,11 @@ typedef struct
   _fnc_1D *C_da;
 
   _deriv_1D *deriv;
-
+  int ISN;
+  
   _flag_crit *fc;
 
-  gsl_odeiv_step_type * step_T;
+  const gsl_odeiv_step_type * step_T;
   
   void *params;
   

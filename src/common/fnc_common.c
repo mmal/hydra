@@ -89,7 +89,7 @@ int h_init_fnc_derivs ( h_fnc *f, int ISN, ... ) /* Independent Stencil Number *
       _STAT_MSG ( "Initializing derivs fnc",
                   "cannot allocate deriv pointer",
                   ERROR, 0 );
-  
+
   va_start ( arguments, ISN );
   
   for (i = 0; i < ISN; i++) {
@@ -106,6 +106,8 @@ int h_init_fnc_derivs ( h_fnc *f, int ISN, ... ) /* Independent Stencil Number *
       }
   }
 
+  f->ISN = ISN;
+  
   _STAT_MSG ( "Initializing derivs fnc",
               NULL,
               OK, 0 );
@@ -123,7 +125,7 @@ int h_init_fnc_flag_crit ( h_fnc *f, _flag_crit fc )
                   "fnc not allocated",
                   ERROR, 0 );
   else {
-      f->fc = fc;
+      f->fc = fc; /* TODO: */
       _STAT_MSG ( fnc_msg,
                   NULL,
                   OK, 0 );

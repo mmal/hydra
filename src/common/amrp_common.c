@@ -21,7 +21,7 @@ h_amrp *h_alloc_amrp ( void )
 
 void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
 {
-  int i, nerrors;
+  int i, nerrors, exit_stat=1;
 
   struct arg_lit  *help = arg_lit0("h","help",                    "shows this output and exits");
   struct arg_int  *rr = arg_int0("r","rr,refratio","<n>",          "refinement ratio (defaults to 2)");
@@ -47,6 +47,7 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
     {
         /* NULL entries were detected, some allocations must have failed */
         printf("insufficient memory\n");
+        exit_stat=0;
         goto exit;
     }
   
@@ -72,7 +73,7 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
 
   /* set error tolerance default value to 9.0 */
   for (i = 0; i < errt->hdr.maxcount; i++)
-      errt->dval[i]=9.0;
+      errt->dval[i]=1.e-2;
   
   if ( p==NULL )
       _STAT_MSG ( "Initializing amrp",
@@ -89,6 +90,7 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
         arg_print_syntaxv ( stdout, argtable, "\n" );
         printf("\n %-30s  %s\n", "Option", "Meaning");
         arg_print_glossary ( stdout, argtable, "  %-30s %s\n" );
+        exit_stat=0;
         goto exit;
     }
   
@@ -97,6 +99,7 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
     {
         printf("'%s' example program for the \"argtable\" command line argument parser.\n",argv[0]);
         printf("September 2010, Maciej Maliborski\n");
+        exit_stat=0;
         goto exit;
     }
   
@@ -106,6 +109,7 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
         /* Display the error details contained in the arg_end struct.*/
         arg_print_errors(stdout,end,argv[0]);
         printf("Try '%s --help' for more information.\n",argv[0]);
+        exit_stat=0;
         goto exit;
     }
   
@@ -120,11 +124,13 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
   /* print what we have parsed */
   p->rr = rr->ival[0];
   p->buf = buf->ival[0];
-  p->sp = buf->ival[0];
+  p->sp = sp->ival[0];
   p->lmax = lmax->ival[0];
   p->lmbd = lmbd->ival[0];
   p->errt = errt->dval[0];
+  p->ngh = (p->sp)*(p->rr)*4;
 
+  exit_stat=1;
 
   /* printf("%d instances of --foo detected on command line\n", foo->count); */
   /* for (i=0; i<foo->hdr.maxcount; i++) */
@@ -136,9 +142,9 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
   exit:
   /* deallocate each non-null entry in argtable[] */
   arg_freetable(argtable,sizeof(argtable)/sizeof(argtable[0]));
-
+  if ( exit_stat != 1 )
+       exit( 0 );
   /* printf("p->rr=%d\n", p->rr ); */
-  /* exit( 0 ); */
 }
 
 

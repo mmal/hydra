@@ -64,6 +64,7 @@ void h_flagging_points ( h_hms *m, int **id_fp, int *Nfp )
           /* flag i-th point  */
           ++*Nfp;
           printf(" Nfp=%d\n", *Nfp);
+          printf("  tau[%d] = %e, %e\n", i, tau[i], err_tol);
           id_fp_t = (int *) realloc( id_fp_t, (*Nfp)*sizeof(int) );
           id_fp_t[(*Nfp)-1] = i;
       }
