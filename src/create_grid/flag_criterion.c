@@ -55,12 +55,46 @@ int equation ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
   int (*deriv_ptr)(H_DBL, H_DBL*, H_DBL*, H_DBL*, int, int, void*);
   int N = m->g->Ntotal;
   int ISN = m->f->ISN;
-  H_DBL h = m->g->h;
+  int Ncalls;
   
-  H_DBL *yptr = y;
+  int ngh = m->p->ngh;
+  int sp = m->p->sp;
 
+  
+  int Lghost = m->g->Lghost;
+  int Rghost = m->g->Rghost;
+
+  int Lmove, Rmove;
+  
+  H_DBL h = m->g->h;
+
+  H_DBL xL_m, xR_m;
+  
+  H_DBL *yptr = &y[0];
+
+  H_DBL *xptr = m->g->x;
+  
+  h_grid *master_grid = h_alloc_grid ( );
+
+  
+  /* if( t == m->g->tlast+m->g->dt/2 && t == m->g->tlast + m->g->dt ) */
+  /*   { */
+  /*       m->g->Ncalls++; */
+  /*       Ncalls = m->g->Ncalls; */
+  /*   } */
+
+  ( m->g->Ncalls++ );
+  
+  Ncalls = m->g->Ncalls;
+
+  if ( Ncalls == 4 ) {
+      m->g->tlast = t;
+      m->g->Ncalls = 0;
+  }
+
+  
   printf(" wywołana prawa strona równania"
-         ", stepper %s, order=%u, t=%f, ISN=%d, N=%d\n", m->f->step_T->name, (*m->f->step_T->order)(NULL), t, ISN, N );
+         ", stepper %s, order=%u, t=%f, Ncalls=%d\n", m->f->step_T->name, (*m->f->step_T->order)(NULL), t, Ncalls );
   sleep( 0 );
   
   if ( m->g->is_master == H_TRUE )
@@ -68,7 +102,7 @@ int equation ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
         for (i = 0; i < N; i++) {
             if (i<ISN) {
                 deriv_ptr = m->f->deriv[i];
-                status = (*m->f->deriv[i])(t, m->g->x, yptr, f, i, N, &h);
+                status = deriv_ptr(t, m->g->x, yptr, f, i, N, &h);
             }
             else if ( i>N-ISN ) {
                 status = (*m->f->deriv[N-1-i])(t, m->g->x, yptr, f, -i, N, &h);
@@ -78,9 +112,51 @@ int equation ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
         }
     }
   else {
-      printf("  Grid is not master\n\n\n!");
-      exit(0);
+      VL(("  Grid is not master\n\n\n!"));
+
+      master_grid = (h_grid *) m->g->master;
+      
+      xL_m = master_grid->xL;
+      xR_m = master_grid->xR;
+
+      if ( Lghost < ngh - (Ncalls-1)*sp  ) {
+          Lmove = 0;
+      }
+      else {
+          Lmove = (Ncalls-1)*sp;
+      }
+      
+      if ( Rghost < ngh - (Ncalls-1)*sp  ) {
+          Rmove = 0;
+      }
+      else {
+          Rmove = (Ncalls-1)*sp;
+      }
+
+      N = N-Lmove-Rmove;
+
+      VL(("  Grid is not master 2, Lmove=%d, Rmove=%d\n\n", Lmove, Rmove));
+      VL(("  Grid is not master 3, x[0]=%f, x[N]=%f\n\n", xptr[0], xptr[N-1]));
+
+      yptr+Lmove;
+      xptr+Lmove;
+
+
+      for (i = 0; i < N; i++) {
+
+          if ( i<ISN && ( xptr[i] == xL_m + i*h ) ) {
+              status = (*m->f->deriv[i])(t, xptr, yptr, f, i, N, &h);
+          }
+          else if ( i>N-ISN && ( xptr[i] == xR_m - i*h ) ) {
+              status = (*m->f->deriv[N-1-i])(t, xptr, yptr, f, -i, N, &h);
+          }
+          else 
+              status = (*m->f->deriv[ISN-1])(t, xptr, yptr, f, i, N, &h);
+      }
+      
+      /* exit(0); */
   }
+  
   
   return GSL_SUCCESS;
 }
@@ -160,6 +236,7 @@ int _h_fc_integrate ( H_DBL t0, H_DBL t1, H_DBL dt, H_DBL *u, h_hms *m )
       memcpy( dydt_in, dydt_out, (rank*N)*sizeof(H_DBL) );
      
       t0 += dt;
+      /* h_1D_plot_set_of_grids_2 ( m->g, 0, H_TRUE, "main integrated rank 0", 2 ); */
   }
   
   gsl_odeiv_step_free ( s );
@@ -201,7 +278,7 @@ int h_fc_Richardson ( void *vm, H_DBL * tau )
 
   for (i = m->g->Lghost; i < m->g->N+m->g->Lghost; i++) {
       tau[i] = fabs( (u2[2*i]-u1[i])/(pow(2., q)-1.)/2. );
-      printf("  tau[%d] = %e\n", i, tau[i]);
+      /* printf("  tau[%d] = %e\n", i, tau[i]); */
   }
   
   return H_OK;

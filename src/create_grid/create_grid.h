@@ -21,7 +21,6 @@ void _h_create_offspring_grids ( h_grid *cg, h_amrp *p,
                                  int *idL, int *idR, int Ngrids );
 
 void _h_create_set_of_grids ( h_hms *m );
-/* void _h_create_set_of_grids ( h_grid *g, h_amrp *p, h_fnc *f ); */
 
 void _h_acd_to_one_grid ( h_grid *g, h_fnc *f );
 

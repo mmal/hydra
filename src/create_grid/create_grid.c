@@ -126,19 +126,21 @@ void _h_create_set_of_grids ( h_hms *m )
 
   h_hms *m_c = (h_hms*) malloc( sizeof(h_hms*) );
 
-  VL(("TEST1 l=%d, lmax=%d m=%d\n", l, lmax, mm));
+  /* VL(("TEST1 l=%d, lmax=%d m=%d\n", l, lmax, mm)); */
+
+  m->g->dt = (m->g->h)/(m->p->lmbd); /* setting time step size */
   
   _h_acd_to_one_grid ( m->g, m->f );
 
-  VL(("TEST2 l=%d, lmax=%d m=%d\n", l, lmax, mm));
+  /* VL(("TEST2 l=%d, lmax=%d m=%d\n", l, lmax, mm)); */
 
   if ( l < lmax ) {
       
       h_flagging_points ( m, &id_fp, &Nfp );
 
-      VL(("TEST3 l=%d, lmax=%d m=%d\n", l, lmax, mm));
+      /* VL(("TEST3 l=%d, lmax=%d m=%d\n", l, lmax, mm)); */
 
-      VL(("l=%d Nfp=%d", l, Nfp));
+      /* VL(("l=%d Nfp=%d", l, Nfp)); */
       
       if ( Nfp > 0 ) {
       

@@ -24,9 +24,9 @@ h_grid * h_alloc_grid ( void )
       g->children = NULL;
       g->is_master = H_FALSE;
       
-      _STAT_MSG ( "Allocating grid",
-                  NULL,
-                  OK, 0 );
+      /* _STAT_MSG ( "Allocating grid", */
+      /*             NULL, */
+      /*             OK, 0 ); */
   }
   return g;
 }
@@ -71,7 +71,9 @@ void h_init_grid ( h_grid * g, H_DBL xL, H_DBL xR,
   g->m = m;
     
   g->t = 0.;
-
+  g->tlast = 0.;
+  g->Ncalls = 0;
+  
   g->x = ( H_DBL *) malloc ( (N+Lghost+Rghost)*sizeof( H_DBL ) );
 
   if (g->x == NULL ) {

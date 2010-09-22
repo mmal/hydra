@@ -13,7 +13,7 @@
 typedef struct
 {
   int N, l, m;
-  int rank;
+  int rank;                     /**< rank of the equation */
   
   H_DBL xL, xR;
   H_DBL h, dt;
@@ -33,11 +33,12 @@ typedef struct
   void **children;
   int Nchildren;
   
-  H_DBL t;
+  H_DBL t, tlast;
+  int Ncalls;                   /**< number of calls */
   
   H_DBL *x;
   H_DBL *u;
-
+  
   int Lghost, Rghost;
   int Ntotal;
   

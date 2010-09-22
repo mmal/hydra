@@ -24,6 +24,8 @@ void h_flagging_points ( h_hms *m, int **id_fp, int *Nfp )
 
   H_DBL *tau;
 
+  _flag_crit _fc;
+
 
   if ( m->g==NULL || m->p==NULL || m->f->fc==NULL ) {
       _STAT_MSG("Flagging points","empty parameters",ERROR,0);
@@ -38,8 +40,6 @@ void h_flagging_points ( h_hms *m, int **id_fp, int *Nfp )
       _STAT_MSG("Flagging points","cannot allocate memory for tau",ERROR,0);
   }
   
-  _flag_crit _fc;
-
   _fc = m->f->fc;
   
   stat = _fc(  m, tau );
@@ -63,20 +63,20 @@ void h_flagging_points ( h_hms *m, int **id_fp, int *Nfp )
       if ( tau[i] > err_tol ) {
           /* flag i-th point  */
           ++*Nfp;
-          printf(" Nfp=%d\n", *Nfp);
-          printf("  tau[%d] = %e, %e\n", i, tau[i], err_tol);
+          /* printf(" Nfp=%d\n", *Nfp); */
+          /* printf("  tau[%d] = %e, %e\n", i, tau[i], err_tol); */
           id_fp_t = (int *) realloc( id_fp_t, (*Nfp)*sizeof(int) );
           id_fp_t[(*Nfp)-1] = i;
       }
   }
 
-  for (i = 0; i < *Nfp; i++) {
-      printf("i=%d, id_fp=%d\n", i, id_fp_t[i]);
-  }
+  /* for (i = 0; i < *Nfp; i++) { */
+  /*     printf("i=%d, id_fp=%d\n", i, id_fp_t[i]); */
+  /* } */
 
   *id_fp = id_fp_t;
 
-  printf("flagging.c TEST  g->N=%d\n", N);
+  /* printf("flagging.c TEST  g->N=%d\n", N); */
 
   free( tau );
 }
@@ -96,7 +96,7 @@ void h_clustering_flagged ( int *id_fp , int Nfp, int buf, int Ncoarse,
   *Ngrids = 0;
   
   for (i = 0; i < Nfp; i++) {
-      printf(" TEST i=%d\n", i);
+      /* printf(" TEST i=%d\n", i); */
       if (in_grid==0 && (id_fp[i]-buf)<=0) {
           idL_t = (int*) realloc( idL_t, int_size );
 

@@ -64,7 +64,7 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
       sp->ival[i]=2;
   
   /* set maximal refinement level default value to 1 */
-  for (i = 0; i < buf->hdr.maxcount; i++)
+  for (i = 0; i < lmax->hdr.maxcount; i++)
       lmax->ival[i]=1;
 
   /* set Courant number default value to 4 */
