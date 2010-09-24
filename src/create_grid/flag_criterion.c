@@ -74,7 +74,7 @@ int equation ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
 
   H_DBL *xptr = m->g->x;
   
-  h_grid *master_grid = h_alloc_grid ( );
+  /* h_grid *master_grid = h_alloc_grid ( ); */
 
   
   /* if( t == m->g->tlast+m->g->dt/2 && t == m->g->tlast + m->g->dt ) */
@@ -93,9 +93,10 @@ int equation ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
   }
 
   
-  printf(" wywołana prawa strona równania"
-         ", stepper %s, order=%u, t=%f, Ncalls=%d\n", m->f->step_T->name, (*m->f->step_T->order)(NULL), t, Ncalls );
-  sleep( 0 );
+  /* printf(" wyw. p. s. r. dt=%e" */
+  /*        ", stepper %s, order=%u, t=%f, Ncalls=%d\n", m->g->dt, */
+  /*        m->f->step_T->name, (*m->f->step_T->order)(NULL), t, Ncalls ); */
+  /* sleep( 0 ); */
   
   if ( m->g->is_master == H_TRUE )
     {
@@ -112,12 +113,16 @@ int equation ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
         }
     }
   else {
-      VL(("  Grid is not master\n\n\n!"));
+      VL(("  Grid is not master\n"));
 
-      master_grid = (h_grid *) m->g->master;
+      /* master_grid = (h_grid *) m->g->master; */ /* TODO: */
+      VL(("  Grid is not master 1a\n"));
+      /* xL_m = master_grid->xL; */
+      /* xR_m = master_grid->xR; */
+      xL_m = -1.;
+      xR_m = 1.;
       
-      xL_m = master_grid->xL;
-      xR_m = master_grid->xR;
+      VL(("  Grid is not master 1b\n"));
 
       if ( Lghost < ngh - (Ncalls-1)*sp  ) {
           Lmove = 0;
@@ -135,28 +140,30 @@ int equation ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
 
       N = N-Lmove-Rmove;
 
-      VL(("  Grid is not master 2, Lmove=%d, Rmove=%d\n\n", Lmove, Rmove));
-      VL(("  Grid is not master 3, x[0]=%f, x[N]=%f\n\n", xptr[0], xptr[N-1]));
+      VL(("  Grid is not master 2, Lmove=%d, Rmove=%d\n", Lmove, Rmove));
+      VL(("  Grid is not master 3, Lghost=%d, Rghost=%d\n", Lghost, Rghost));
+      VL(("  Grid is not master 4, x[0]=%f, x[N-1]=%f\n", xptr[0], xptr[N-1]));
 
       yptr+Lmove;
       xptr+Lmove;
 
 
       for (i = 0; i < N; i++) {
-
+          /* VL(("i=%d\n", i)); */
           if ( i<ISN && ( xptr[i] == xL_m + i*h ) ) {
               status = (*m->f->deriv[i])(t, xptr, yptr, f, i, N, &h);
           }
           else if ( i>N-ISN && ( xptr[i] == xR_m - i*h ) ) {
               status = (*m->f->deriv[N-1-i])(t, xptr, yptr, f, -i, N, &h);
           }
-          else 
+          else
               status = (*m->f->deriv[ISN-1])(t, xptr, yptr, f, i, N, &h);
       }
       
       /* exit(0); */
   }
-  
+
+  /* h_free_grid ( master_grid ); */
   
   return GSL_SUCCESS;
 }
@@ -187,6 +194,8 @@ h_hms *_condense_grid ( h_hms *m, int factor )
                 m->g->rank, m->g->l, m->g->m );
 
   mfine->g->is_master = m->g->is_master;
+
+  mfine->g->dt = m->g->dt/factor;
   
   if ( m->g->t == 0.0 )
       _h_acd_to_one_grid ( mfine->g, mfine->f );
@@ -213,19 +222,19 @@ int _h_fc_integrate ( H_DBL t0, H_DBL t1, H_DBL dt, H_DBL *u, h_hms *m )
      
   gsl_odeiv_system sys = {equation, jac_null, rank*N, m};
 
-  H_DBL * dydt_in  = ( H_DBL* ) malloc( rank*N*sizeof( H_DBL ) );
-  H_DBL * dydt_out = ( H_DBL* ) malloc( rank*N*sizeof( H_DBL ) );
+  H_DBL * dydt_in  =  ( H_DBL* ) malloc( rank*N*sizeof( H_DBL ) );
+  H_DBL * dydt_out =  ( H_DBL* ) malloc( rank*N*sizeof( H_DBL ) );
   H_DBL * y_err = ( H_DBL* ) malloc( rank*N*sizeof( H_DBL ) );
 
   /* initialise dydt_in from system parameters */
-  GSL_ODEIV_FN_EVAL(&sys, t0, u, dydt_in);
+  /* GSL_ODEIV_FN_EVAL(&sys, t0, u, dydt_in); */
      
   while (t0 < t1) {
       VL(("Integrating\n"));
       status = gsl_odeiv_step_apply ( s, t0, dt,
                                       u, y_err,
-                                      dydt_in,
-                                      dydt_out,
+                                      NULL,
+                                      NULL,
                                       &sys );
       
       if (status != GSL_SUCCESS) {
@@ -240,7 +249,7 @@ int _h_fc_integrate ( H_DBL t0, H_DBL t1, H_DBL dt, H_DBL *u, h_hms *m )
   }
   
   gsl_odeiv_step_free ( s );
-  
+
   return status;
 }
 
@@ -290,9 +299,26 @@ int h_fc_Richardson ( void *vm, H_DBL * tau )
 /*   return H_ER; */
 /* } */
 
-/* int h_fc_SV ( void *vm, H_DBL * tau ){ */
-/*   return H_ER; */
-/* } */
+int h_fc_SV ( void *vm, H_DBL * tau )
+{
+  h_hms *m = (h_hms *) vm;
+
+  int i, N = m->g->N;
+
+  H_DBL *u = h_get_grid_values ( m->g, 0 );
+  H_DBL h = m->g->h;
+
+  for (i = 2; i < N-2; i++) {
+      tau[i] = fabs ( ( u[i-2]-8*u[i-1]+8*u[i+1]-u[i+2] )/( 12*h ) );
+  }
+
+  tau[0] = 0.;
+  tau[1] = 0.;
+  tau[N-2] = 0.;
+  tau[N-1] = 0.;
+
+  return H_OK;
+}
 
 /* int h_fc_TV ( void *vm, H_DBL * tau ){ */
 /*   return H_ER; */

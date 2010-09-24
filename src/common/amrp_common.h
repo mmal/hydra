@@ -26,7 +26,7 @@ typedef struct
 } h_amrp;
 
 
-h_amrp *h_alloc_amrp ( void );
+h_amrp * h_alloc_amrp ( void );
 
 void h_init_amrp ( h_amrp *p, int argc, char *argv[] );
 

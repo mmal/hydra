@@ -28,23 +28,21 @@ h_hms *h_alloc_hms ( void )
 
 void h_free_hms ( h_hms *m )
 {
-  if ( m!=NULL )
-    {
-        if ( m->g!=NULL)
-          {
-             h_free_grid ( m->g );
-          }
-
-        if ( m->p!=NULL)
-          {
-             h_free_amrp ( m->p );
-          }
-
-        if ( m->f!=NULL)
-          {
-             h_free_fnc ( m->f );
-          }
-    }
-
+  if ( m!=NULL ) {
+      if ( m->g!=NULL) {
+          h_free_grid ( m->g );
+      }
+      
+      if ( m->p!=NULL) {
+          h_free_amrp ( m->p );
+      }
+      
+      if ( m->f!=NULL) {
+          h_free_fnc ( m->f );
+      }
+  }
+  
   free ( m );
+  
+  m = NULL;
 }

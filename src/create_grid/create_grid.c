@@ -3,6 +3,8 @@
 #include "create_grid.h"
 
 
+int asd=0;
+
 void _h_create_child_grid ( h_grid *parent, h_grid **child,
                             h_amrp *p, int m, int idL, int idR )
 {
@@ -19,9 +21,15 @@ void _h_create_child_grid ( h_grid *parent, h_grid **child,
 
   H_DBL h_p = parent->h; /* spatial spacing of parent grid */
   
-  H_DBL xL_c = parent->x[idL]; /* coordinate of the left end of the child grid */
+  H_DBL *x_c = h_get_grid_positions ( parent ); /* TODO: there was mistake ! */
 
-  H_DBL xR_c = parent->x[idR]; /* coordinate of the right end of the child grid */
+  H_DBL xL_c = x_c[idL]; /* coordinate of the left end of the child grid */
+
+  H_DBL xR_c = x_c[idR]; /* coordinate of the right end of the child grid */
+
+  /* H_DBL xL_c = parent->x[idL]; /\* coordinate of the left end of the child grid *\/ */
+
+  /* H_DBL xR_c = parent->x[idR]; /\* coordinate of the right end of the child grid *\/ */
 
   H_DBL xL_m, xR_m; /* coordinates of the ends of the master grid */
   
@@ -114,7 +122,7 @@ void _h_create_offspring_grids ( h_grid *cg, h_amrp *p,
 
 void _h_create_set_of_grids ( h_hms *m )
 {
-  int i, l=m->g->l, lmax = m->p->lmax, mm=m->g->m;
+  int i, l=m->g->l, lmax = m->p->lmax;
   
   int *id_fp;
 
@@ -124,8 +132,10 @@ void _h_create_set_of_grids ( h_hms *m )
 
   /* h_grid *g_c; */
 
-  h_hms *m_c = (h_hms*) malloc( sizeof(h_hms*) );
+  /* h_hms *m_c = (h_hms*) malloc( sizeof(h_hms*) ); */
 
+  h_hms *m_c = h_alloc_hms( );
+  
   /* VL(("TEST1 l=%d, lmax=%d m=%d\n", l, lmax, mm)); */
 
   m->g->dt = (m->g->h)/(m->p->lmbd); /* setting time step size */
@@ -159,7 +169,7 @@ void _h_create_set_of_grids ( h_hms *m )
 
             for (i = 0; i < Ngrids; i++) {
                 /* g_c = m->g->children[i]; */
-                m_c->g = m->g->children[i];
+                m_c->g = (h_grid*) m->g->children[i];
                 m_c->p = m->p;
                 m_c->f = m->f;
                 /* m->g = g_c; */ 
@@ -168,18 +178,18 @@ void _h_create_set_of_grids ( h_hms *m )
       }
       else {
           _STAT_MSG ( "Create set of grids",
-                      "no flagged points at leve l=",
+                      "no flagged points at level l=",
                       WARNING, 0 );
       }
   }
-  /* if( m_c->g->master != NULL ) { */
-  /*     m_c->g= m->g->master; */
-  /*     printf("m_c->g->master != NULL\n"); */
-  /* } */
-  /* else { */
-  /*     m_c->g= m_c->g->parent; */
-  /*     printf("m_c->g->master == NULL\n"); */
-  /* } */
+  
+  VL(("asd=%d\n", asd++));
+  /* free ( m_c ); */
+  /* h_free_hms ( m_c ); */
+  
+  /* h_free_grid ( m_c->g ); */
+  /* h_free_amrp( m_c->p ); */
+  /* h_free_fnc( m_c->f ); */
 }
 
 

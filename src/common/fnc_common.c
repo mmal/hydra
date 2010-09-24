@@ -163,12 +163,19 @@ void h_free_fnc ( h_fnc *f )
       if ( f->deriv != NULL ) {
           free ( f->deriv );
       }
+      /* if ( f->fc != NULL ) { */
+      /*     free ( f->fc ); */
+      /* } */
       if ( f->step_T != NULL ) {
-          f->step_T->free;
+          /* f->step_T->free(  ); */
+          /* free ( f->step_T ); */
+      }
+      if ( f->params != NULL ) {
+          free( f->params );
       }
       
       free( f );
-
+      
       f = NULL;
       
       _STAT_MSG ( "Feeing fnc",

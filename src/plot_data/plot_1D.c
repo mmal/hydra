@@ -175,9 +175,9 @@ void _h_1D_save_set_of_grids_recursion ( h_grid *g, int rank, int wghosts )
   xL = g->xL;
   xR = g->xR;
 
-  VL(( "Lghost=%d, Rghost=%d, N=%d\n", g->Lghost, g->Rghost, N ));
+  /* VL(( "Lghost=%d, Rghost=%d, N=%d\n", g->Lghost, g->Rghost, N )); */
   
-  VL(("l=%d xL=%f xLgh=%f xR=%f xRgh=%f\n", l, xL, xLgh, xR, xRgh ));
+  /* VL(("l=%d xL=%f xLgh=%f xR=%f xRgh=%f\n", l, xL, xLgh, xR, xRgh )); */
 
   fprintf( fpos, "%f\t%f\t%d\n" "%f\t%f\t%d\n" "%f\t%f\t%d\n" "%f\t%f\t%d\n\n\n",
            xL, xLgh, l-1, xL, xLgh, l, xR, xRgh, l, xR, xRgh, l-1 );

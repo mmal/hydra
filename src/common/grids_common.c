@@ -12,6 +12,16 @@ h_grid * h_alloc_grid ( void )
                   "cannot allocate grid",
                   ERROR, 0 );
   else {
+      g->N = 0;
+      g->l = 0;
+      g->m = 0;
+      g->rank = 0;
+      g->Nchildren = 0;
+      g->Ncalls = 0;
+      g->Lghost = 0;
+      g->Rghost = 0;
+      g->Ntotal = 0;
+
       g->x = NULL;
       g->u = NULL;
       g->master = NULL;
@@ -23,7 +33,7 @@ h_grid * h_alloc_grid ( void )
       g->Rsibling = NULL;
       g->children = NULL;
       g->is_master = H_FALSE;
-      
+
       /* _STAT_MSG ( "Allocating grid", */
       /*             NULL, */
       /*             OK, 0 ); */
@@ -195,12 +205,12 @@ void h_free_grid ( h_grid * g )
       if ( g->u != NULL )
           free ( g->u );
 
-      if ( g->children != NULL ) {
-          for (int i = 0; i < g->Nchildren; i++) {
-              h_free_grid ( g->children[i] );
-          }
-          free ( g->children );
-      }
+      /* if ( g->children != NULL ) { */
+      /*     for (int i = 0; i < g->Nchildren; i++) { */
+      /*         h_free_grid ( g->children[i] ); */
+      /*     } */
+          /* free ( g->children ); */
+      /* } */
           
       fnc_msg = (char*) malloc( 35*sizeof(char) );
       sprintf(fnc_msg, "Feeing grid l=%d, m=%d", g->l, g->m);

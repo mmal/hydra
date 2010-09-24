@@ -152,11 +152,11 @@ void h_free_amrp ( h_amrp *p )
 {
   if ( p != NULL ) {
       free( p );
+      p = NULL;
       _STAT_MSG ( "Feeing amrp",
                   NULL,
                   OK, 0 );
   }
-  
   else
       _STAT_MSG ( "Feeing amrp",
                   "amrp was not allocated",

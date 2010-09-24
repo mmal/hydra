@@ -31,7 +31,7 @@ ELSE(WIN32)
     SET(GSL_CONFIG_PREFER_PATH "$ENV{GSL_HOME}/bin" CACHE STRING "preferred path to OpenSG (osg-config)")
     FIND_PROGRAM(GSL_CONFIG gsl-config
       ${GSL_CONFIG_PREFER_PATH}
-      /usr/bin/
+      /usr/local/bin/
       )
     # MESSAGE("DBG GSL_CONFIG ${GSL_CONFIG}")
     

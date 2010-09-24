@@ -114,7 +114,7 @@ int main( int argc, char *argv[] )
 
   _h_create_set_of_grids ( m );
 
-  printf("main: l=%d, m=%d\n\n", m->g->l, m->g->l );
+  /* printf("main: l=%d, m=%d\n\n", m->g->l, m->g->l ); */
 
   /* /\* m->g= (h_grid*) m->g->master; *\/ */
   /* /\* h_grid *gc = m->g; *\/ */
@@ -123,8 +123,10 @@ int main( int argc, char *argv[] )
 
   /* printf ("m->g->is_master = %d\n", m->g->is_master ); */
   
-  h_1D_plot_set_of_grids_2 ( m->g, 0, H_TRUE, "h_1D_plot_set_of_grids", -1 );
-  h_1D_plot_set_of_grids_2 ( m->g, 1, H_TRUE, "h_1D_plot_set_of_grids", -1 );
+  h_1D_plot_set_of_grids_2 ( m->g, 0, H_FALSE, "set of grids no gh", -1 );
+  h_1D_plot_set_of_grids_2 ( m->g, 0, H_TRUE, "set of grids with gh", -1 );
+
+  h_1D_plot_set_of_grids_2 ( m->g, 1, H_FALSE, "h_1D_plot_set_of_grids", -1 );
 
 
   /* printf( "   main: integrating\n\n\n"); */
@@ -134,7 +136,8 @@ int main( int argc, char *argv[] )
   /* h_1D_plot_set_of_grids_2 ( m->g, 0, H_TRUE, "main integrated rank 0", -1 ); */
   /* h_1D_plot_set_of_grids_2 ( m->g, 1, H_TRUE, "main integrated rank 1", -1 ); */
 
-  printf("m->g->Ncalls = %d\n", m->g->Ncalls);
+  /* printf("m->g->Ncalls = %d\n", m->g->Ncalls); */
+
   h_free_hms ( m );
 
   VL(( "create_test.c Exiting\n"));
