@@ -166,10 +166,10 @@ void h_free_fnc ( h_fnc *f )
       /* if ( f->fc != NULL ) { */
       /*     free ( f->fc ); */
       /* } */
-      if ( f->step_T != NULL ) {
-          /* f->step_T->free(  ); */
-          /* free ( f->step_T ); */
-      }
+      /* if ( f->step_T != NULL ) { */
+      /*     /\* f->step_T->free(  ); *\/ */
+      /*     free ( f->step_T ); */
+      /* } */
       if ( f->params != NULL ) {
           free( f->params );
       }

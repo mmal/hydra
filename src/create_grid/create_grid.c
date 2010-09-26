@@ -72,8 +72,6 @@ void _h_create_child_grid ( h_grid *parent, h_grid **child,
   h_init_grid ( fine_grid, xL_c, xR_c, N_c, Lghost_c, Rghost_c,
                 parent->rank, (parent->l)+1, m );
 
-  
-
   /* VL(("create_grid.c m=%d, fine_grid->xL=%f, fine_grid->xR=%f\n", */
   /*     m, fine_grid->xL, fine_grid->xR )); */
   
@@ -98,13 +96,31 @@ void _h_create_offspring_grids ( h_grid *cg, h_amrp *p,
   /*     child[m] = h_alloc_grid ( ); */
   /* } */
   /* VL(("create_grid.c _h_create_offspring_grids TEST\n")); */
+
+  /* if ( cg->l > 1 ) { */
+  /*     h_grid *t_Lsibling = &(cg->Lsibling); */
+  /*     int t_Nchildren = t_Lsibling->l;  */
+  /*     /\* int t_m = t_Lsibling->children[t_Nchildren]; *\/ */
+  /*     /\* int t_m = ((h_grid*) ((h_grid*) cg->Lsibling)->children[((h_grid*) cg->Lsibling)->Nchildren-1])->m; *\/ */
+  /*     VL((" *** t_Nchildren=%d\n", t_Lsibling->l)); */
+  /* } */
+
   for (m = 0; m < Ngrids; m++) {
       /* VL(("create_grid.c _h_create_offspring_grids m=%d TEST\n", m)); */
       child[m] = h_alloc_grid();
       _h_create_child_grid ( cg, &child[m], p, m, idL[m], idR[m] );
   }
+
+  /* if ( cg->l > 1 ) { */
+  /*     h_grid *t_sibling = (h_grid*) &(cg->sibling); */
+  /*     child[Ngrids-1]->neighbour = t_sibling->children; */
+  /* } */
   
-  
+  /* for (m = 0; m < Ngrids-1; m++) { */
+  /*     child[m]->sibling =  &child[m+1]; */
+  /*     child[m+1]->Lsibling = &child[m]; */
+  /* } */
+
   cg->children = (void **) child;
   cg->Nchildren = Ngrids;
 
@@ -161,20 +177,20 @@ void _h_create_set_of_grids ( h_hms *m )
               free( id_fp );
           /* VL(("create_grid TEST\n")); /\****\/ */
           _h_create_offspring_grids ( m->g, m->p, idL, idR, Ngrids );
+          
+          if( idL!=NULL )
+              free( idL );
+          if( idR!=NULL )
+              free( idR );
 
-            if( idL!=NULL )
-                free( idL );
-            if( idR!=NULL )
-                free( idR );
-
-            for (i = 0; i < Ngrids; i++) {
-                /* g_c = m->g->children[i]; */
-                m_c->g = (h_grid*) m->g->children[i];
-                m_c->p = m->p;
-                m_c->f = m->f;
-                /* m->g = g_c; */ 
-                _h_create_set_of_grids ( m_c );
-            }
+          for (i = 0; i < Ngrids; i++) {
+              /* g_c = m->g->children[i]; */
+              m_c->g = (h_grid*) m->g->children[i];
+              m_c->p = m->p;
+              m_c->f = m->f;
+              /* m->g = g_c; */ 
+              _h_create_set_of_grids ( m_c );
+          }
       }
       else {
           _STAT_MSG ( "Create set of grids",
@@ -184,7 +200,9 @@ void _h_create_set_of_grids ( h_hms *m )
   }
   
   VL(("asd=%d\n", asd++));
-  /* free ( m_c ); */
+  /* free ( m_c->f ); */
+  free ( m_c );
+  
   /* h_free_hms ( m_c ); */
   
   /* h_free_grid ( m_c->g ); */

@@ -23,6 +23,8 @@
 #include "src/create_grid/flag_criterion.h"
 #include "src/create_grid/create_grid.h"
 
+#include "src/integrate/boialg.h"
+
 
 
 H_DBL zero_ ( H_DBL x, void *params );

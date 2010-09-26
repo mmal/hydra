@@ -51,7 +51,7 @@ void h_init_grid ( h_grid * g, H_DBL xL, H_DBL xR,
   char * fnc_msg = (char*) malloc( 35*sizeof(char) );
 
   sprintf( fnc_msg, "Initializing grid l=%d, m=%d", l, m );
-  
+  VL((" *** m = %d", m));
   if ( g == NULL ) 
       _STAT_MSG ( fnc_msg,
                   "cannot initialize non allocated grid",
@@ -205,12 +205,12 @@ void h_free_grid ( h_grid * g )
       if ( g->u != NULL )
           free ( g->u );
 
-      /* if ( g->children != NULL ) { */
-      /*     for (int i = 0; i < g->Nchildren; i++) { */
-      /*         h_free_grid ( g->children[i] ); */
-      /*     } */
-          /* free ( g->children ); */
-      /* } */
+      if ( g->children != NULL ) {
+          for (int i = 0; i < g->Nchildren; i++) {
+              h_free_grid ( g->children[i] );
+          }
+          free ( g->children );
+      }
           
       fnc_msg = (char*) malloc( 35*sizeof(char) );
       sprintf(fnc_msg, "Feeing grid l=%d, m=%d", g->l, g->m);

@@ -39,7 +39,7 @@ int RHS_centered ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
   /* sleep( 2 ); */
   
   f[abs(i)] = u[N+abs(i)];
-  f[N+abs(i)] = fda_D2_3_inner_node ( u, h, i );
+  f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i );
 
   return H_TRUE;
 }
@@ -81,7 +81,7 @@ int RHS_extern_1 ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
   /* sleep( 1 ); */
   
   f[abs(i)] = u[N+abs(i)];
-  f[N+abs(i)] = fda_D2_3_inner_node ( u, h, abs (i) );
+  f[N+abs(i)] = fda_D2_3_inner_node /* fda_D2_6_extern_1_node */ ( u, h, abs(i) );
   /* fda_D2_5_extern_1_node */
   return H_TRUE;
 }
@@ -91,7 +91,7 @@ int main( int argc, char *argv[] )
 {
   const int rank = 2;
 
-  const int N = 41;
+  const int N = 21;
   
   const H_DBL xL = -1.;
 
@@ -105,7 +105,7 @@ int main( int argc, char *argv[] )
 
   h_init_fnc_step_type ( m->f, gsl_odeiv_step_rk4 );
 
-  h_init_fnc_flag_crit ( m->f, &h_fc_Richardson );
+  h_init_fnc_flag_crit ( m->f, &h_fc_SV );
   
   h_init_amrp ( m->p, argc, argv );
 
@@ -123,10 +123,10 @@ int main( int argc, char *argv[] )
 
   /* printf ("m->g->is_master = %d\n", m->g->is_master ); */
   
-  h_1D_plot_set_of_grids_2 ( m->g, 0, H_FALSE, "set of grids no gh", -1 );
-  h_1D_plot_set_of_grids_2 ( m->g, 0, H_TRUE, "set of grids with gh", -1 );
+  h_1D_plot_set_of_grids_2 ( m->g, 0, H_FALSE, "created set of grids no gh", -1 );
+  /* h_1D_plot_set_of_grids_2 ( m->g, 0, H_TRUE, "set of grids with gh", -1 ); */
 
-  h_1D_plot_set_of_grids_2 ( m->g, 1, H_FALSE, "h_1D_plot_set_of_grids", -1 );
+  /* h_1D_plot_set_of_grids_2 ( m->g, 1, H_FALSE, "h_1D_plot_set_of_grids", -1 ); */
 
 
   /* printf( "   main: integrating\n\n\n"); */
@@ -138,6 +138,18 @@ int main( int argc, char *argv[] )
 
   /* printf("m->g->Ncalls = %d\n", m->g->Ncalls); */
 
+
+  h_boialg ( m );
+
+  h_1D_plot_set_of_grids_2 ( m->g, 0, H_TRUE, "after bioalg with gh", -1 );
+
+  h_1D_plot_set_of_grids_2 ( m->g, 0, H_FALSE, "after bioalg no gh", -1 );
+
+  h_1D_plot_set_of_grids_2 ( m->g, 1, H_FALSE, "after bioalg deriv no gh", -1 );
+
+  h_1D_plot_set_of_grids_2 ( m->g, 1, H_TRUE, "after bioalg deriv with gh", -1 );
+
+  
   h_free_hms ( m );
 
   VL(( "create_test.c Exiting\n"));

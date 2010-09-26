@@ -34,7 +34,7 @@ typedef struct
   int Nchildren;
   
   H_DBL t, tlast;
-  int Ncalls;                   /**< number of calls */
+  int Ncalls;                   /**< number of calls by the RHS equation */
   
   H_DBL *x;
   H_DBL *u;

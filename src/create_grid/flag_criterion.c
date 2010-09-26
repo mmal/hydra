@@ -46,7 +46,9 @@ int jac_null (H_DBL t, const H_DBL y[], H_DBL *dfdy,
   return 0;
 }
 
-int equation ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
+
+int
+equation ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
 {
   int i, status;
   
@@ -70,7 +72,7 @@ int equation ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
 
   H_DBL xL_m, xR_m;
   
-  H_DBL *yptr = &y[0];
+  H_DBL *yptr = y;
 
   H_DBL *xptr = m->g->x;
   
@@ -113,51 +115,74 @@ int equation ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
         }
     }
   else {
-      VL(("  Grid is not master\n"));
+      /* VL(("  Grid is not master\n")); */
 
       /* master_grid = (h_grid *) m->g->master; */ /* TODO: */
-      VL(("  Grid is not master 1a\n"));
+
+      /* VL(("  Grid is not master 1a\n")); */
+
       /* xL_m = master_grid->xL; */
       /* xR_m = master_grid->xR; */
       xL_m = -1.;
       xR_m = 1.;
       
-      VL(("  Grid is not master 1b\n"));
+      /* VL(("  Grid is not master 1b\n")); */
 
-      if ( Lghost < ngh - (Ncalls-1)*sp  ) {
+      if ( Lghost < ngh - (Ncalls-1)*sp  )
           Lmove = 0;
-      }
-      else {
+      else
           Lmove = (Ncalls-1)*sp;
-      }
       
-      if ( Rghost < ngh - (Ncalls-1)*sp  ) {
+      if ( Rghost < ngh - (Ncalls-1)*sp  )
           Rmove = 0;
-      }
-      else {
+      else
           Rmove = (Ncalls-1)*sp;
-      }
 
       N = N-Lmove-Rmove;
 
-      VL(("  Grid is not master 2, Lmove=%d, Rmove=%d\n", Lmove, Rmove));
-      VL(("  Grid is not master 3, Lghost=%d, Rghost=%d\n", Lghost, Rghost));
-      VL(("  Grid is not master 4, x[0]=%f, x[N-1]=%f\n", xptr[0], xptr[N-1]));
+      /* VL(("  Grid is not master 2, Lmove=%d, Rmove=%d\n", Lmove, Rmove)); */
+      /* VL(("  Grid is not master 3, Lghost=%d, Rghost=%d\n", Lghost, Rghost)); */
+      /* VL(("  Grid is not master 4, x[0]=%f, x[N-1]=%f\n", xptr[0], xptr[N-1])); */
+      /* yptr+=Lmove; */
+      /* xptr+=Lmove; */
 
-      yptr+Lmove;
-      xptr+Lmove;
+      /* for (i = Lmove; i < N; i++) { */
+      /*     /\* VL(("i=%d\n", i)); *\/ */
+      /*     if ( i<ISN && ( xptr[i] == xL_m + i*h ) ) { */
+      /*         status = (*m->f->deriv[i])(t, xptr, yptr, f, i, N, &h); */
+      /*     } */
+      /*     else if ( i>N-ISN && ( xptr[i] == xR_m - i*h ) ) { */
+      /*         status = (*m->f->deriv[ISN-1-i])(t, xptr, yptr, f, -i, N, &h); */
+      /*     } */
+      /*     else */
+      /*         status = (*m->f->deriv[ISN-1])(t, xptr, yptr, f, i, N, &h); */
+      /* } */
 
-
-      for (i = 0; i < N; i++) {
-          /* VL(("i=%d\n", i)); */
-          if ( i<ISN && ( xptr[i] == xL_m + i*h ) ) {
-              status = (*m->f->deriv[i])(t, xptr, yptr, f, i, N, &h);
+      for (i = Lmove+1; i < N; i++) {
+          
+          if ( xptr[i]-2*h >= xL_m && xptr[i]+2*h <= xR_m ) {
+              /* centered derivative */
+              status = (*m->f->deriv[2])(t, xptr, yptr, f, i, N, &h);
           }
-          else if ( i>N-ISN && ( xptr[i] == xR_m - i*h ) ) {
-              status = (*m->f->deriv[N-1-i])(t, xptr, yptr, f, -i, N, &h);
+          else if ( xptr[i] - h == xL_m ) {
+              status = (*m->f->deriv[1])(t, xptr, yptr, f, i, N, &h);
           }
-          else
-              status = (*m->f->deriv[ISN-1])(t, xptr, yptr, f, i, N, &h);
+          else if ( xptr[i] + h == xR_m ) {
+              status = (*m->f->deriv[1])(t, xptr, yptr, f, -i, N, &h);
+          }
+          else if ( xptr[i] == xL_m ) {
+              status = (*m->f->deriv[0])(t, xptr, yptr, f, i, N, &h);
+          }
+          else if ( xptr[i] == xR_m ) {
+              status = (*m->f->deriv[0])(t, xptr, yptr, f, -i, N, &h);
+          }
+      }
+      
+      for (i = 0; i < Lmove; i++) {
+          yptr[i] = 0.;
+      }
+      for (i = N+Lmove; i < N + Lmove + Rmove; i++) {
+          yptr[i] = 0.;
       }
       
       /* exit(0); */
@@ -228,9 +253,9 @@ int _h_fc_integrate ( H_DBL t0, H_DBL t1, H_DBL dt, H_DBL *u, h_hms *m )
 
   /* initialise dydt_in from system parameters */
   /* GSL_ODEIV_FN_EVAL(&sys, t0, u, dydt_in); */
-     
+  
   while (t0 < t1) {
-      VL(("Integrating\n"));
+      /* VL(("Integrating\n")); */
       status = gsl_odeiv_step_apply ( s, t0, dt,
                                       u, y_err,
                                       NULL,
@@ -242,7 +267,7 @@ int _h_fc_integrate ( H_DBL t0, H_DBL t1, H_DBL dt, H_DBL *u, h_hms *m )
           break;
       }
 
-      memcpy( dydt_in, dydt_out, (rank*N)*sizeof(H_DBL) );
+      /* memcpy( dydt_in, dydt_out, (rank*N)*sizeof(H_DBL) ); */
      
       t0 += dt;
       /* h_1D_plot_set_of_grids_2 ( m->g, 0, H_TRUE, "main integrated rank 0", 2 ); */
@@ -281,13 +306,20 @@ int h_fc_Richardson ( void *vm, H_DBL * tau )
     
   status = _h_fc_integrate ( t0, t1, dt, u1, m );
 
+  VL(("Integrated l=%d, m=%d\n", m->g->l, m->g->m));
+  
   memcpy( u2, mfine->g->u, (rank*mfine->g->Ntotal)*sizeof(H_DBL) );
 
+  VL(("Before Integrating l=%d, m=%d fine\n", mfine->g->l, mfine->g->m));
+    
   status = _h_fc_integrate ( t0, t1, dt/factor, u2, mfine );
 
-  for (i = m->g->Lghost; i < m->g->N+m->g->Lghost; i++) {
-      tau[i] = fabs( (u2[2*i]-u1[i])/(pow(2., q)-1.)/2. );
-      /* printf("  tau[%d] = %e\n", i, tau[i]); */
+  VL(("Integrated l=%d, m=%d fine\n", mfine->g->l, mfine->g->m));
+
+  for (i = 0; i < m->g->N; i++) {
+      tau[i] = fabs( (u2[2*i+m->g->Lghost]
+                      - u1[i+m->g->Lghost])/(pow(2., q)-1.)/2. );
+      printf("  tau[%d] = %e\n", i, tau[i]);
   }
   
   return H_OK;
