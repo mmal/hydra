@@ -47,7 +47,7 @@ int h_init_fnc_derivs ( h_fnc *f, int ISN, ... );
 
 int h_init_fnc_flag_crit ( h_fnc *f, _flag_crit fc );
 
-int h_init_fnc_step_type ( h_fnc *f, gsl_odeiv_step_type *s );
+int h_init_fnc_step_type ( h_fnc *f, const gsl_odeiv_step_type *s );
 
 void h_free_fnc ( h_fnc *f );
 

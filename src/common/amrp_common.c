@@ -9,19 +9,17 @@ h_amrp *h_alloc_amrp ( void )
   h_amrp * p = (h_amrp*) malloc ( sizeof( h_amrp ) );
 
   if ( p == NULL )
-      _STAT_MSG ( "Allocating amrp",
-                  "cannot allocate amrp",
-                  ERROR, 0 );
-  else
-      _STAT_MSG ( "Allocating amrp",
-                  NULL,
-                  OK, 0 );
+      _STAT_MSG ( "Allocating h_amrp",
+                  "cannot allocate h_amrp",
+                  WARNING, 0 );
   return p;
 }
 
 
 void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
 {
+  char *fnc_msg = "Initializing h_amrp structure";
+  
   int i, nerrors, exit_stat=1;
   
   struct arg_lit  *help = arg_lit0("h","help",                    "shows this output and exits");
@@ -67,8 +65,8 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
       errt->dval[i]=1.e-2;
 
   if ( p==NULL )
-      _STAT_MSG ( "Initializing amrp",
-                  "amrp was not allocated",
+      _STAT_MSG ( fnc_msg,
+                  "h_amrp is unallocated",
                   ERROR, 0 );
   
   /* Parse the command line as defined by argtable[] */
@@ -89,8 +87,12 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
   /* special case: '--version' takes precedence error reporting */
   if (version->count > 0)
     {
-        printf("'%s' program using default \"hydra\" lib command line argument parser.\n",argv[0]);
-        printf("September 2010, Maciej Maliborski\n");
+        printf("Program using the library\n");
+        printf("libhydra version 0.1\n");
+        printf("Copyright (C) September 2010\n");
+        /* printf("'%s' program using default \"hydra\" lib command line argument parser.\n",argv[0]); */
+        printf("\n");
+        printf("Written by Maciej K. Maliborski\n");
         exit_stat=0;
         goto exit;
     }
@@ -126,15 +128,14 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
 
 void h_free_amrp ( h_amrp *p )
 {
+  char *fnc_msg = "Freeing h_amrc structure";
+
   if ( p != NULL ) {
       free( p );
       p = NULL;
-      _STAT_MSG ( "Feeing amrp",
-                  NULL,
-                  OK, 0 );
   }
   else
-      _STAT_MSG ( "Feeing amrp",
-                  "amrp was not allocated",
+      _STAT_MSG ( fnc_msg,
+                  "amrp is unallocated",
                   WARNING, 0 );
 }

@@ -9,8 +9,8 @@ h_hms *h_alloc_hms ( void )
   h_hms * m = (h_hms *) malloc ( sizeof( h_hms ) );
 
   if ( m == NULL ) {
-      _STAT_MSG ( "Allocating hms",
-                  "cannot allocate hms",
+      _STAT_MSG ( "Allocating h_hms",
+                  "cannot allocate h_hms",
                   WARNING, 0 );
   }
   else {
@@ -40,11 +40,10 @@ void h_free_hms ( h_hms *m )
       if ( m->fnc!=NULL) {
           h_free_fnc ( m->fnc );
       }
+
+      free ( m );
+      m = NULL;
   }
-  
-  free ( m );
-  
-  m = NULL;
 }
 
 

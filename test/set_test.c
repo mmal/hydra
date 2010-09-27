@@ -91,8 +91,10 @@ int main( int argc, char *argv[] )
 
   const H_DBL xR = 1.;
   
-
   h_hms *hms = h_alloc_hms( );
+
+  h_init_amrp ( hms->amrp, argc, argv );
+
 
   h_init_fnc_derivs ( hms->fnc, 3, RHS_extern_0, RHS_extern_1, RHS_centered );
 
@@ -100,12 +102,12 @@ int main( int argc, char *argv[] )
 
   h_init_fnc_step_type ( hms->fnc, gsl_odeiv_step_rk4 );
 
+  /* h_init_coarse_grid ( hms->gset->glevel[0]->grid[0], xL, xR, N, rank ); */
+
+
   /* h_init_fnc_flag_crit ( hms->fnc, &h_fc_SV ); */
-  
-  h_init_amrp ( hms->amrp, argc, argv );
 
   h_free_hms ( hms );
-
   
   {
       h_gset *gset = h_alloc_gset( );
@@ -117,8 +119,20 @@ int main( int argc, char *argv[] )
       h_info_gset ( gset );
       
       h_alloc_add_grid( gset, 1, 10);
+
+      h_alloc_add_glevel( gset, 2, 16);
       
       h_info_gset ( gset );
+      
+      h_glevel *glevel = h_point_to_glevel ( gset, 2 );
+
+      h_info_glevel ( glevel );
+
+      h_grid *grid = h_point_to_grid ( gset, 0, 0 );
+
+      h_init_master_grid ( gset->glevel[0]->grid[0], xL, xR, N, rank );
+        
+      h_info_grid ( grid );
       
       h_free_gset ( gset );
   }

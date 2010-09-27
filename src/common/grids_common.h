@@ -59,34 +59,28 @@ typedef struct
 {
   int L;                        /**< actual number of grids levels */
   
-  h_glevel **glevel;              /**< pointer to the table of grids levels */
+  h_glevel **glevel;            /**< pointer to the table of grids levels */
 } h_gset;
 
 
 
 h_grid *h_alloc_grid ( void );
-
-void h_init_grid ( h_grid *g, H_DBL xL, H_DBL xR,
-                   int N, int Lghost, int Rghost,
-                   int rank, int l, int m );
-
-void h_init_coarse_grid ( h_grid *g, H_DBL xL, H_DBL xR,
-                          int N, int rank );
-
+void h_init_grid ( h_grid *g, H_DBL xL, H_DBL xR, int N, int Lghost, int Rghost, int rank, int l, int m );
+void h_init_master_grid ( h_grid *g, H_DBL xL, H_DBL xR, int N, int rank );
 H_DBL *h_get_grid_positions ( h_grid *g );
-
 H_DBL *h_get_grid_positions_wghosts ( h_grid *g );
-
 H_DBL *h_get_grid_values ( h_grid *g, int rank );
-
 H_DBL *h_get_grid_values_wghosts ( h_grid *g, int rank );
-
 void h_free_grid ( h_grid *g );
-
 h_gset *h_alloc_gset ( void );
 void h_free_gset ( h_gset *gset );
 void h_alloc_add_glevel ( h_gset *gset, int l, int M );
 void h_alloc_add_grid ( h_gset *gset, int l, int m );
 void h_info_gset ( h_gset *gset );
+void h_info_glevel ( h_glevel *glevel );
+void h_info_grid ( h_grid *grid );
+h_grid *h_point_to_grid ( h_gset *gset, int l, int m );
+h_glevel *h_point_to_glevel ( h_gset *gset, int l );
+
 
 #endif /* _H_GRIDS_COMMON_H_ */
