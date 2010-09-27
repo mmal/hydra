@@ -18,6 +18,17 @@ typedef struct
 
   h_fnc *f;
 
+} h_hms_old;
+
+
+typedef struct
+{
+
+  h_gset *gset;                 /**< grids set */
+  h_amrp *amrp;                 /**< adaptive mesh refinement
+                                 * algorithm parameters */
+  h_fnc *fnc;                   /**< function structure */
+
 } h_hms;
 
 

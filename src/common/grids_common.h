@@ -45,6 +45,24 @@ typedef struct
 } h_grid;
 
 
+typedef struct
+{
+  int l;                        /**< level of grids */
+  int M;                        /**< actual number of grids in glevel
+                                 * struct */
+  h_grid **grid;                /**< pointer to the table of grids
+                                 * to the same level  */
+} h_glevel;
+
+
+typedef struct
+{
+  int L;                        /**< actual number of grids levels */
+  
+  h_glevel **glevel;              /**< pointer to the table of grids levels */
+} h_gset;
+
+
 
 h_grid *h_alloc_grid ( void );
 
@@ -64,5 +82,11 @@ H_DBL *h_get_grid_values ( h_grid *g, int rank );
 H_DBL *h_get_grid_values_wghosts ( h_grid *g, int rank );
 
 void h_free_grid ( h_grid *g );
+
+h_gset *h_alloc_gset ( void );
+void h_free_gset ( h_gset *gset );
+void h_alloc_add_glevel ( h_gset *gset, int l, int M );
+void h_alloc_add_grid ( h_gset *gset, int l, int m );
+void h_info_gset ( h_gset *gset );
 
 #endif /* _H_GRIDS_COMMON_H_ */

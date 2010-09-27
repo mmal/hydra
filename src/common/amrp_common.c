@@ -3,6 +3,7 @@
 #include "amrp_common.h"
 
 
+
 h_amrp *h_alloc_amrp ( void )
 {
   h_amrp * p = (h_amrp*) malloc ( sizeof( h_amrp ) );
@@ -22,7 +23,7 @@ h_amrp *h_alloc_amrp ( void )
 void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
 {
   int i, nerrors, exit_stat=1;
-
+  
   struct arg_lit  *help = arg_lit0("h","help",                    "shows this output and exits");
   struct arg_int  *rr = arg_int0("r","rr,refratio","<n>",          "refinement ratio (defaults to 2)");
   struct arg_int  *buf = arg_int0("b","buf,bufor","<n>",          "bufor size (defaults to 1)");
@@ -35,13 +36,6 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
 
   void *argtable[] = {help,rr,buf,sp,lmax,lmbd,errt,version,end};
 
-  /* rr->hdr.flag |= ARG_HASOPTVALUE; */
-  /* buf->hdr.flag |= ARG_HASOPTVALUE; */
-  /* sp->hdr.flag |= ARG_HASOPTVALUE; */
-  /* lmax->hdr.flag |= ARG_HASOPTVALUE; */
-  /* lmbd->hdr.flag |= ARG_HASOPTVALUE; */
-  /* errt->hdr.flag |= ARG_HASOPTVALUE; */
-
   /* verify the argtable[] entries were allocated sucessfully */
   if (arg_nullcheck(argtable) != 0)
     {
@@ -50,31 +44,28 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
         exit_stat=0;
         goto exit;
     }
+
+  /* set default values to components of the h_amrp structure */
   
   /* set refinement ratio default value to 2 */
   for (i = 0; i < rr->hdr.maxcount; i++)
-      rr->ival[i]=2;
-  
+      rr->ival[i]=2;  
   /* set bufor size default value to 1 */
   for (i = 0; i < buf->hdr.maxcount; i++)
       buf->ival[i]=1;
-  
   /* set scheme points default value to 2 */
   for (i = 0; i < sp->hdr.maxcount; i++)
       sp->ival[i]=2;
-  
   /* set maximal refinement level default value to 1 */
   for (i = 0; i < lmax->hdr.maxcount; i++)
       lmax->ival[i]=1;
-
   /* set Courant number default value to 4 */
   for (i = 0; i < lmbd->hdr.maxcount; i++)
       lmbd->ival[i]=4;
-
   /* set error tolerance default value to 9.0 */
   for (i = 0; i < errt->hdr.maxcount; i++)
       errt->dval[i]=1.e-2;
-  
+
   if ( p==NULL )
       _STAT_MSG ( "Initializing amrp",
                   "amrp was not allocated",
@@ -93,11 +84,12 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
         exit_stat=0;
         goto exit;
     }
-  
+
+  /* TODO: rewrite help/version info */
   /* special case: '--version' takes precedence error reporting */
   if (version->count > 0)
     {
-        printf("'%s' example program for the \"argtable\" command line argument parser.\n",argv[0]);
+        printf("'%s' program using default \"hydra\" lib command line argument parser.\n",argv[0]);
         printf("September 2010, Maciej Maliborski\n");
         exit_stat=0;
         goto exit;
@@ -112,39 +104,23 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
         exit_stat=0;
         goto exit;
     }
-  
-  /* special case: uname with no command line options induces brief help */
-  /* if (argc==1) */
-  /*   { */
-  /*       printf("Try '%s --help' for more information.\n",argv[0]); */
-  /*       goto exit; */
-  /*   } */
-  
+    
   /* command line arguments are successfully parsed at this point. */
-  /* print what we have parsed */
   p->rr = rr->ival[0];
   p->buf = buf->ival[0];
   p->sp = sp->ival[0];
   p->lmax = lmax->ival[0];
   p->lmbd = lmbd->ival[0];
   p->errt = errt->dval[0];
-  p->ngh = (p->sp)*(p->rr)*4;
+  p->ngh = (p->sp)*(p->rr)*4; /* TODO: check/modify this */
 
   exit_stat=1;
 
-  /* printf("%d instances of --foo detected on command line\n", foo->count); */
-  /* for (i=0; i<foo->hdr.maxcount; i++) */
-  /*     printf("foo[%d] = %d\n", i, foo->ival[i]);          */
-  /* printf("%d instances of --bar detected on command line\n", bar->count); */
-  /* for (i=0; i<bar->hdr.maxcount; i++) */
-  /*     printf("bar[%d] = %d\n", i, bar->ival[i]);          */
-  
   exit:
   /* deallocate each non-null entry in argtable[] */
   arg_freetable(argtable,sizeof(argtable)/sizeof(argtable[0]));
   if ( exit_stat != 1 )
-       exit( 0 );
-  /* printf("p->rr=%d\n", p->rr ); */
+      exit( 0 );
 }
 
 
