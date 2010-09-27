@@ -114,11 +114,11 @@ int main( int argc, char *argv[] )
       
       h_info_gset ( gset );
       
-      h_alloc_add_glevel( gset, 1, 10);
+      h_alloc_add_glevel( gset, 1, 0);
 
       h_info_gset ( gset );
       
-      h_alloc_add_grid( gset, 1, 10);
+      h_alloc_add_grid( gset, 1, 0);
 
       h_alloc_add_glevel( gset, 2, 16);
       

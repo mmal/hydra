@@ -99,10 +99,11 @@ void h_init_grid ( h_grid * g, H_DBL xL, H_DBL xR,
       g->Lghost = Lghost;
       g->Rghost = Rghost;
 
-      Ntotal = N+Lghost+Rghost;
-
+      Ntotal = N+Lghost+Rghost; /* the total number of grid points */
       g->Ntotal = Ntotal;
-      
+
+      /* TODO:
+       * doubled instructions? */
       g->l = l;
       g->m = m;
       
@@ -195,7 +196,7 @@ void h_init_master_grid ( h_grid * g, H_DBL xL, H_DBL xR,
  * Returns pointer to the grids positions of grid without
  * ghost points.
  * 
- * @param g pointer to the h_grid structure ...
+ * @param g pointer to a h_grid structure from which we get the grid points
  * 
  * @return pointer to the x vector without ghosts
  */
@@ -212,7 +213,7 @@ H_DBL *h_get_grid_positions ( h_grid *g )
  * Returns pointer to the grids positions of grid with
  * ghost points.
  * 
- * @param g pointer to the h_grid structure ...
+ * @param g pointer to a h_grid structure from which we get the grid points
  * 
  * @return pointer to the x vector with ghosts
  */
@@ -227,8 +228,8 @@ H_DBL *h_get_grid_positions_wghosts ( h_grid *g )
  * Returns pointer to the grids values of grid without
  * ghost points.
  * 
- * @param g pointer to the h_grid structure ...
- * @param rank ...
+ * @param g pointer to a h_grid structure from which we get the grid values
+ * @param rank rank of the values of which are to be returned
  * 
  * @return pointer to the u vector without ghosts
  */
@@ -246,8 +247,8 @@ H_DBL *h_get_grid_values ( h_grid *g, int rank )
  * Returns pointer to the grids values of grid with
  * ghost points.
  * 
- * @param g pointer to the h_grid structure ...
- * @param rank ...
+ * @param g pointer to a h_grid structure from which we get the grid values
+ * @param rank rank of the values of which are to be returned
  * 
  * @return pointer to the u vector with ghosts
  */
@@ -267,7 +268,7 @@ H_DBL *h_get_grid_values_wghosts ( h_grid *g, int rank )
  */
 void h_free_grid ( h_grid * g )
 {
-  char *fnc_msg;
+  char *fnc_msg = "Feeing grid";
   
   if ( g != NULL ) {
       if ( g->x != NULL )
@@ -275,26 +276,13 @@ void h_free_grid ( h_grid * g )
 
       if ( g->u != NULL )
           free ( g->u );
-
-      if ( g->children != NULL ) {
-          for (int i = 0; i < g->Nchildren; i++) {
-              h_free_grid ( g->children[i] );
-          }
-          free ( g->children );
-      }
-          
-      fnc_msg = (char*) malloc( 35*sizeof(char) );
-      sprintf(fnc_msg, "Feeing grid l=%d, m=%d", g->l, g->m);
+    
       free( g );
       g = NULL;
-      _STAT_MSG ( fnc_msg,
-                  NULL,
-                  OK, 0 );
-      free( fnc_msg );
   }
   else
-      _STAT_MSG ( "Feeing grid",
-                  "grid was not allocated",
+      _STAT_MSG ( fnc_msg,
+                  "h_grid is unallocated",
                   WARNING, 0 );
 }
 
@@ -391,7 +379,7 @@ void h_alloc_add_glevel ( h_gset *gset, int l, int M )
 
       /* allocating grids and assigning identifiers */
       for (m = 0; m < M; m++) {
-          gset->glevel[l]->grid[m] = (h_grid*) malloc ( sizeof( h_grid ) );
+          gset->glevel[l]->grid[m] = h_alloc_grid ();
           gset->glevel[l]->grid[m]->m = m;
           gset->glevel[l]->grid[m]->l = l;
       }
@@ -439,7 +427,56 @@ void h_alloc_add_grid ( h_gset *gset, int l, int m )
           (h_grid**) realloc ( gset->glevel[l]->grid, gset->glevel[l]->M*sizeof( h_grid* ) );
       
       /* allocating grid and assigning identifiers */
-      gset->glevel[l]->grid[m] = (h_grid*) malloc ( sizeof( h_grid ) );
+      gset->glevel[l]->grid[m] = h_alloc_grid ();
+      gset->glevel[l]->grid[m]->m = m;
+      gset->glevel[l]->grid[m]->l = l;
+  }
+}
+
+
+
+/** 
+ * Allocates memory for N grids at level l and
+ * attaches allocated memory space to gset structure.
+ * Grids are attached in parallel to the existing grids
+ * at a given level l, with appropriate identifiers (continued).
+ * If level l does not exists a function allocates it and creates
+ * N grids on it. If there is no enough space the function prints
+ * a warning message and does not allocate memory.
+ * 
+ * @param gset pointer to the h_gset structure
+ * @param l level at which the grids are to be create
+ * @param N number of grids which has to be created
+ */
+void h_alloc_add_N_grids ( h_gset *gset, int l, int N )
+{
+  char *fnc_msg = "Adding grid to gset";
+
+  if ( gset == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "cannot free unallocated struct",
+                  WARNING, 0 );
+  }
+  else if ( l > gset->L + 1) {
+      _STAT_MSG ( fnc_msg,
+                  "can not allocate these grids, "
+                  "lower levels are not yet allocated",
+                  WARNING, 0 );
+  }
+  else if ( m != gset->glevel[l]->M  ) {
+      _STAT_MSG ( fnc_msg,
+                  "cannot allocate these grids, "
+                  "lower grids allocated/not allocated",
+                  WARNING, 0 );
+  }
+  else {
+      gset->glevel[l]->M += 1;
+      
+      gset->glevel[l]->grid =
+          (h_grid**) realloc ( gset->glevel[l]->grid, gset->glevel[l]->M*sizeof( h_grid* ) );
+      
+      /* allocating grid and assigning identifiers */
+      gset->glevel[l]->grid[m] = h_alloc_grid ();
       gset->glevel[l]->grid[m]->m = m;
       gset->glevel[l]->grid[m]->l = l;
   }
@@ -469,7 +506,7 @@ void h_free_gset ( h_gset *gset )
       for (l = 0; l < L; l++) {
           M = gset->glevel[l]->M;
           for (m = 0; m < M; m++) {
-              free ( gset->glevel[l]->grid[m] );
+              h_free_grid ( gset->glevel[l]->grid[m] );
           }
           free( gset->glevel[l]->grid );
           free( gset->glevel[l] );
@@ -509,8 +546,13 @@ void h_info_gset ( h_gset *gset )
       for (l = 0; l < L; l++) {
           M = gset->glevel[l]->M;
           
-          printf ("  ** level %d contains %d allocated grids"
-                  " with identifiers %d...%d\n", l, M, 0, M-1);
+          if ( M > 0 )
+              printf ("  ** level %d contains %d allocated grids"
+                      " with identifiers %d...%d\n", l, M, 0, M-1 );
+          else
+              printf ("  ** level %d contains %d allocated grids\n",
+                      l, M );
+
       }
       printf("\n");
   }
@@ -538,7 +580,7 @@ void h_info_glevel ( h_glevel *glevel )
   }
   else {
       l = glevel->l;
-      M = glevel->M; /* # of allocated levels in gset */
+      M = glevel->M; /* # of allocated grids in glevel */
 
       printf(" * h_glevel structure:\n");
       printf ("  ** level %d contains %d allocated grids"
