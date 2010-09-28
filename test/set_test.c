@@ -138,6 +138,7 @@ int main( int argc, char *argv[] )
   }
 
 
+  
   /* h_init_coarse_grid ( m->g, xL, xR, N, rank ); */
 
   /* _h_create_set_of_grids ( m ); */
