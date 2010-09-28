@@ -76,6 +76,8 @@ h_gset *h_alloc_gset ( void );
 void h_free_gset ( h_gset *gset );
 void h_alloc_add_glevel ( h_gset *gset, int l, int M );
 void h_alloc_add_grid ( h_gset *gset, int l, int m );
+void h_alloc_add_N_grids ( h_gset *gset, int l, int N );
+
 void h_info_gset ( h_gset *gset );
 void h_info_glevel ( h_glevel *glevel );
 void h_info_grid ( h_grid *grid );

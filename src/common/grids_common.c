@@ -354,7 +354,7 @@ void h_alloc_add_glevel ( h_gset *gset, int l, int M )
   
   if ( gset == NULL ) {
       _STAT_MSG ( fnc_msg,
-                  "cannot free unallocated struct",
+                  "h_gset is unallocated",
                   WARNING, 0 );
   }
   else if ( l <= gset->L-1 ) {
@@ -405,7 +405,7 @@ void h_alloc_add_grid ( h_gset *gset, int l, int m )
 
   if ( gset == NULL ) {
       _STAT_MSG ( fnc_msg,
-                  "cannot free unallocated struct",
+                  "h_gset is unallocated",
                   WARNING, 0 );
   }
   else if ( l > gset->L ) {
@@ -450,35 +450,41 @@ void h_alloc_add_grid ( h_gset *gset, int l, int m )
  */
 void h_alloc_add_N_grids ( h_gset *gset, int l, int N )
 {
-  char *fnc_msg = "Adding grid to gset";
+  char *fnc_msg = "Adding N grids to gset";
 
+  int m, M, L;
+  
   if ( gset == NULL ) {
       _STAT_MSG ( fnc_msg,
-                  "cannot free unallocated struct",
+                  "h_gset is unallocated",
                   WARNING, 0 );
   }
-  else if ( l > gset->L + 1) {
+  else if ( l > gset->L ) {
       _STAT_MSG ( fnc_msg,
                   "can not allocate these grids, "
                   "lower levels are not yet allocated",
                   WARNING, 0 );
   }
-  else if ( m != gset->glevel[l]->M  ) {
-      _STAT_MSG ( fnc_msg,
-                  "cannot allocate these grids, "
-                  "lower grids allocated/not allocated",
-                  WARNING, 0 );
+  else if ( l == gset->L ) {
+      h_alloc_add_glevel ( gset, l, N );
   }
   else {
-      gset->glevel[l]->M += 1;
+      /* saving old # of grids in level l */
+      M = gset->glevel[l]->M;
+
+      /* setting new # of grids in level l */
+      gset->glevel[l]->M = M + N;
       
+      /* reallocating grid pointer */
       gset->glevel[l]->grid =
           (h_grid**) realloc ( gset->glevel[l]->grid, gset->glevel[l]->M*sizeof( h_grid* ) );
       
-      /* allocating grid and assigning identifiers */
-      gset->glevel[l]->grid[m] = h_alloc_grid ();
-      gset->glevel[l]->grid[m]->m = m;
-      gset->glevel[l]->grid[m]->l = l;
+      /* allocating grids and assigning identifiers */
+      for (m = M; m < M+N; m++) {
+          gset->glevel[l]->grid[m] = h_alloc_grid ();
+          gset->glevel[l]->grid[m]->m = m;
+          gset->glevel[l]->grid[m]->l = l;   
+      }      
   }
 }
 
@@ -612,7 +618,7 @@ void h_info_grid ( h_grid *grid )
       l = grid->l; /* level of grid */
       m = grid->m; /* id of grid in this level */
 
-      printf(" * h_grid structure\n");
+      printf(" * h_grid structure:\n");
       printf("  ** is at level %d and has identifier %d\n",
              l, m);
       if ( grid->x == NULL ) {

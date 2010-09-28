@@ -128,6 +128,12 @@ int main( int argc, char *argv[] )
 
       h_info_glevel ( glevel );
 
+      h_alloc_add_N_grids ( gset, 2, 30 );
+      
+      h_info_glevel ( glevel );
+
+      h_info_gset ( gset );
+
       h_grid *grid = h_point_to_grid ( gset, 0, 0 );
 
       h_init_master_grid ( gset->glevel[0]->grid[0], xL, xR, N, rank );
@@ -136,7 +142,6 @@ int main( int argc, char *argv[] )
       
       h_free_gset ( gset );
   }
-
 
   
   /* h_init_coarse_grid ( m->g, xL, xR, N, rank ); */
