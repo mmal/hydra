@@ -5,10 +5,15 @@ g++
 cmake
 
 For debugging:
+
 GNU Nana
     installing:
     sudo apt-get install nana
+GSL 
+    sudo apt-get install libgsl0-dev
 
+Argtable2
+    sudo apt-get install libargtable2-dev
 
 For generating documentation:
 doxygen

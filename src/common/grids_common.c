@@ -491,6 +491,55 @@ void h_alloc_add_N_grids ( h_gset *gset, int l, int N )
 
 
 /** 
+ * Allocates memory for N grids at glevel and
+ * attaches allocated memory space to glevel structure.
+ * Grids are attached in parallel to the existing grids
+ * at a given level, with appropriate identifiers (continued).
+ * If level l does not exists a function allocates it and creates
+ * N grids on it. If there is no enough space the function prints
+ * a warning message and does not allocate memory.
+ * 
+ * @param glevel pointer to the h_glevel structure
+ * @param N number of grids which has to be created
+ */
+void h_alloc_add_N_grids_to_glevel ( h_glevel *glevel, int N )
+{
+  char *fnc_msg = "Adding N grids to glevel";
+
+  int m, M;
+
+  if ( glevel == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_glevel is unallocated",
+                  WARNING, 0 );
+  }
+  else {
+
+      /* save the level of glevel */
+      l = glevel->l;
+      
+      /* save old # of grids in glevel */
+      M = glevel->M;
+
+      /* set new # of grids in glevel */
+      glevel->M = M + N;
+
+      /* reallocate grid pointer */
+      glevel->grid =
+          (h_grid**) realloc ( gset->grid, (M+N)*sizeof( h_grid* ) );
+      
+      /* allocate grids and assign identifiers */
+      for (m = M; m < M+N; m++) {
+          glevel->grid[m] = h_alloc_grid ();
+          glevel->grid[m]->m = m;
+          glevel->grid[m]->l = l;   
+      }
+  }
+}
+
+
+
+/** 
  * h_free_gset frees the memory space pointed by gset
  * 
  * @param gset gset pointer to the h_gset structure
@@ -728,6 +777,20 @@ h_grid *h_point_to_grid ( h_gset *gset, int l, int m )
       free ( fnc_msg );
       return gset->glevel[l]->grid[m];
   }
+}
+
+
+
+/** 
+ * Returns pointer to the master h_grid structure from h_gset structure
+ * 
+ * @param gset pointer to the h_gset structure
+ * 
+ * @return pointer to the h_grid structure
+ */
+h_grid *h_point_to_master_grid ( h_gset *gset )
+{
+  return h_point_to_grid ( gset, 0, 0 );
 }
 
 

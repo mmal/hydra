@@ -5,212 +5,212 @@
 
 int asd=0;
 
-/* void _h_create_child_grid ( h_grid *parent, h_grid **child, */
-/*                             h_amrp *p, int m, int idL, int idR ) */
-/* { */
-/*   /\* ghost points, what with them ? *\/  */
-/*   int i; */
+void _h_create_child_grid ( h_grid *parent, h_grid **child,
+                            h_amrp *p, int m, int idL, int idR )
+{
+  /* ghost points, what with them ? */
+  int i;
 
-/*   int rr = p->rr; /\* refinement ratio *\/ */
+  int rr = p->rr; /* refinement ratio */
 
-/*   int sp = p->ngh; /\* ngh number of ghosts points *\/ */
+  int sp = p->ngh; /* ngh number of ghosts points */
 
-/*   int N_c = (idR-idL)*rr+1; /\* number of child grid points *\/  */
+  int N_c = (idR-idL)*rr+1; /* number of child grid points */
   
-/*   int Lghost_c = 0, Rghost_c = 0; /\* left and right ghost points of the child grid *\/ */
+  int Lghost_c = 0, Rghost_c = 0; /* left and right ghost points of the child grid */
 
-/*   H_DBL h_p = parent->h; /\* spatial spacing of parent grid *\/ */
+  H_DBL h_p = parent->h; /* spatial spacing of parent grid */
   
-/*   H_DBL *x_c = h_get_grid_positions ( parent ); /\* TODO: there was mistake ! *\/ */
+  H_DBL *x_c = h_get_grid_positions ( parent ); /* TODO: there was mistake ! */
 
-/*   H_DBL xL_c = x_c[idL]; /\* coordinate of the left end of the child grid *\/ */
+  H_DBL xL_c = x_c[idL]; /* coordinate of the left end of the child grid */
 
-/*   H_DBL xR_c = x_c[idR]; /\* coordinate of the right end of the child grid *\/ */
+  H_DBL xR_c = x_c[idR]; /* coordinate of the right end of the child grid */
 
-/*   /\* H_DBL xL_c = parent->x[idL]; /\\* coordinate of the left end of the child grid *\\/ *\/ */
+  /* H_DBL xL_c = parent->x[idL]; /\* coordinate of the left end of the child grid *\/ */
 
-/*   /\* H_DBL xR_c = parent->x[idR]; /\\* coordinate of the right end of the child grid *\\/ *\/ */
+  /* H_DBL xR_c = parent->x[idR]; /\* coordinate of the right end of the child grid *\/ */
 
-/*   H_DBL xL_m, xR_m; /\* coordinates of the ends of the master grid *\/ */
+  H_DBL xL_m, xR_m; /* coordinates of the ends of the master grid */
   
-/*   h_grid *fine_grid = h_alloc_grid ( ); */
+  h_grid *fine_grid = h_alloc_grid ( );
 
-/*   h_grid *master_grid = h_alloc_grid ( ); */
+  h_grid *master_grid = h_alloc_grid ( );
 
-/*   if ( parent->is_master == H_TRUE  ) { /\* parent grid is a master grid *\/ */
+  if ( parent->is_master == H_TRUE  ) { /* parent grid is a master grid */
 
-/*       xL_m = parent->xL; */
-/*       xR_m = parent->xR; */
-/*       fine_grid->master = parent; /\* this was *\/ */
-/*       master_grid = (h_grid*) parent; /\* missing *\/ */
+      xL_m = parent->xL;
+      xR_m = parent->xR;
+      fine_grid->master = parent; /* this was */
+      master_grid = (h_grid*) parent; /* missing */
 
-/*   } */
-/*   else { /\* parent grid is not a master grid *\/ */
+  }
+  else { /* parent grid is not a master grid */
 
-/*       master_grid = (h_grid *) parent->master; */
+      master_grid = (h_grid *) parent->master;
       
-/*       /\* if( master_grid == NULL ) VL(("l=%d master_grid == NULL\n", parent->l)); *\/ */
-/*       /\* else VL(("l=%d master_grid != NULL\n", parent->l)); *\/ */
+      /* if( master_grid == NULL ) VL(("l=%d master_grid == NULL\n", parent->l)); */
+      /* else VL(("l=%d master_grid != NULL\n", parent->l)); */
       
-/*       xL_m = master_grid->xL; */
-/*       xR_m = master_grid->xR; */
-/*   } */
+      xL_m = master_grid->xL;
+      xR_m = master_grid->xR;
+  }
 
   
-/*   for (i = 1; i <= sp; i++) { */
-/*       if (xL_c - i*h_p/rr > xL_m) */
-/*           Lghost_c++; */
-/*       if (xR_c + i*h_p/rr < xR_m) */
-/*           Rghost_c++; */
-/*   } */
+  for (i = 1; i <= sp; i++) {
+      if (xL_c - i*h_p/rr > xL_m)
+          Lghost_c++;
+      if (xR_c + i*h_p/rr < xR_m)
+          Rghost_c++;
+  }
   
-/*   /\* VL(( "create_grid.c xL_m=%f, xR_m=%f\n", xL_m, xR_m )); *\/ */
-/*   /\* VL(( "create_grid.c m=%d: Lghost=%d, Rghost=%d\n", m, Lghost_c, Rghost_c )); *\/ */
+  /* VL(( "create_grid.c xL_m=%f, xR_m=%f\n", xL_m, xR_m )); */
+  /* VL(( "create_grid.c m=%d: Lghost=%d, Rghost=%d\n", m, Lghost_c, Rghost_c )); */
   
 
-/*   /\* initializing fine grid *\/ */
-/*   h_init_grid ( fine_grid, xL_c, xR_c, N_c, Lghost_c, Rghost_c, */
-/*                 parent->rank, (parent->l)+1, m ); */
+  /* initializing fine grid */
+  h_init_grid ( fine_grid, xL_c, xR_c, N_c, Lghost_c, Rghost_c,
+                parent->rank, (parent->l)+1, m );
 
-/*   /\* VL(("create_grid.c m=%d, fine_grid->xL=%f, fine_grid->xR=%f\n", *\/ */
-/*   /\*     m, fine_grid->xL, fine_grid->xR )); *\/ */
+  /* VL(("create_grid.c m=%d, fine_grid->xL=%f, fine_grid->xR=%f\n", */
+  /*     m, fine_grid->xL, fine_grid->xR )); */
   
-/*   fine_grid->master = (void *) master_grid; */
+  fine_grid->master = (void *) master_grid;
 
-/*   fine_grid->parent = (void *) parent; */
+  fine_grid->parent = (void *) parent;
 
-/*   *child = fine_grid; */
-/* } */
+  *child = fine_grid;
+}
 
 
-/* void _h_create_offspring_grids ( h_grid *cg, h_amrp *p, */
-/*                                 int *idL, int *idR, int Ngrids ) */
-/* { */
-/*   /\* h_grid *g = fg; *\/ */
-/*   int m; */
+void _h_create_offspring_grids ( h_grid *cg, h_amrp *p,
+                                int *idL, int *idR, int Ngrids )
+{
+  /* h_grid *g = fg; */
+  int m;
   
-/*   h_grid **child = (h_grid **) malloc( Ngrids*sizeof( h_grid *) ); */
+  h_grid **child = (h_grid **) malloc( Ngrids*sizeof( h_grid *) );
 
-/*   /\* CAUSED FREE ERROR *\/ */
-/*   /\* for (m = 0; m < Ngrids; m++) { *\/ */
-/*   /\*     child[m] = h_alloc_grid ( ); *\/ */
-/*   /\* } *\/ */
-/*   /\* VL(("create_grid.c _h_create_offspring_grids TEST\n")); *\/ */
+  /* CAUSED FREE ERROR */
+  /* for (m = 0; m < Ngrids; m++) { */
+  /*     child[m] = h_alloc_grid ( ); */
+  /* } */
+  /* VL(("create_grid.c _h_create_offspring_grids TEST\n")); */
 
-/*   /\* if ( cg->l > 1 ) { *\/ */
-/*   /\*     h_grid *t_Lsibling = &(cg->Lsibling); *\/ */
-/*   /\*     int t_Nchildren = t_Lsibling->l;  *\/ */
-/*   /\*     /\\* int t_m = t_Lsibling->children[t_Nchildren]; *\\/ *\/ */
-/*   /\*     /\\* int t_m = ((h_grid*) ((h_grid*) cg->Lsibling)->children[((h_grid*) cg->Lsibling)->Nchildren-1])->m; *\\/ *\/ */
-/*   /\*     VL((" *** t_Nchildren=%d\n", t_Lsibling->l)); *\/ */
-/*   /\* } *\/ */
+  /* if ( cg->l > 1 ) { */
+  /*     h_grid *t_Lsibling = &(cg->Lsibling); */
+  /*     int t_Nchildren = t_Lsibling->l;  */
+  /*     /\* int t_m = t_Lsibling->children[t_Nchildren]; *\/ */
+  /*     /\* int t_m = ((h_grid*) ((h_grid*) cg->Lsibling)->children[((h_grid*) cg->Lsibling)->Nchildren-1])->m; *\/ */
+  /*     VL((" *** t_Nchildren=%d\n", t_Lsibling->l)); */
+  /* } */
 
-/*   for (m = 0; m < Ngrids; m++) { */
-/*       /\* VL(("create_grid.c _h_create_offspring_grids m=%d TEST\n", m)); *\/ */
-/*       child[m] = h_alloc_grid(); */
-/*       _h_create_child_grid ( cg, &child[m], p, m, idL[m], idR[m] ); */
-/*   } */
+  for (m = 0; m < Ngrids; m++) {
+      /* VL(("create_grid.c _h_create_offspring_grids m=%d TEST\n", m)); */
+      child[m] = h_alloc_grid();
+      _h_create_child_grid ( cg, &child[m], p, m, idL[m], idR[m] );
+  }
 
-/*   /\* if ( cg->l > 1 ) { *\/ */
-/*   /\*     h_grid *t_sibling = (h_grid*) &(cg->sibling); *\/ */
-/*   /\*     child[Ngrids-1]->neighbour = t_sibling->children; *\/ */
-/*   /\* } *\/ */
+  /* if ( cg->l > 1 ) { */
+  /*     h_grid *t_sibling = (h_grid*) &(cg->sibling); */
+  /*     child[Ngrids-1]->neighbour = t_sibling->children; */
+  /* } */
   
-/*   /\* for (m = 0; m < Ngrids-1; m++) { *\/ */
-/*   /\*     child[m]->sibling =  &child[m+1]; *\/ */
-/*   /\*     child[m+1]->Lsibling = &child[m]; *\/ */
-/*   /\* } *\/ */
+  /* for (m = 0; m < Ngrids-1; m++) { */
+  /*     child[m]->sibling =  &child[m+1]; */
+  /*     child[m+1]->Lsibling = &child[m]; */
+  /* } */
 
-/*   cg->children = (void **) child; */
-/*   cg->Nchildren = Ngrids; */
-
-
-/*   /\* if ( parent->is_master == H_TRUE  ) { /\\* parent grid is a master grid *\\/ *\/ */
-/*   /\*     child[m] = parent->xL; *\/ */
-/*   /\*     xR_m = parent->xR; *\/ */
-/*   /\* } *\/ */
-/*   /\* elseent->master != NULL ) { /\\* parent grid is not a master grid *\\/ *\/ */
-/*   /\*     xL_m = parent->master->xL; *\/ */
-/*   /\*     xR_m = parent->master->xR; *\/ */
-/*   /\* } *\/ */
-/* } */
+  cg->children = (void **) child;
+  cg->Nchildren = Ngrids;
 
 
-/* void _h_create_set_of_grids ( h_hms *m ) */
-/* { */
-/*   int i, l=m->g->l, lmax = m->p->lmax; */
+  /* if ( parent->is_master == H_TRUE  ) { /\* parent grid is a master grid *\/ */
+  /*     child[m] = parent->xL; */
+  /*     xR_m = parent->xR; */
+  /* } */
+  /* elseent->master != NULL ) { /\* parent grid is not a master grid *\/ */
+  /*     xL_m = parent->master->xL; */
+  /*     xR_m = parent->master->xR; */
+  /* } */
+}
+
+
+void _h_create_set_of_grids ( h_hms *m )
+{
+  int i, l=m->g->l, lmax = m->p->lmax;
   
-/*   int *id_fp; */
+  int *id_fp;
 
-/*   int Nfp; */
+  int Nfp;
 
-/*   int *idL, *idR, Ngrids; */
+  int *idL, *idR, Ngrids;
 
-/*   /\* h_grid *g_c; *\/ */
+  /* h_grid *g_c; */
 
-/*   /\* h_hms *m_c = (h_hms*) malloc( sizeof(h_hms*) ); *\/ */
+  /* h_hms *m_c = (h_hms*) malloc( sizeof(h_hms*) ); */
 
-/*   h_hms *m_c = h_alloc_hms( ); */
+  h_hms *m_c = h_alloc_hms( );
   
-/*   /\* VL(("TEST1 l=%d, lmax=%d m=%d\n", l, lmax, mm)); *\/ */
+  /* VL(("TEST1 l=%d, lmax=%d m=%d\n", l, lmax, mm)); */
 
-/*   m->g->dt = (m->g->h)/(m->p->lmbd); /\* setting time step size *\/ */
+  m->g->dt = (m->g->h)/(m->p->lmbd); /* setting time step size */
   
-/*   _h_acd_to_one_grid ( m->g, m->f ); */
+  _h_acd_to_one_grid ( m->g, m->f );
 
-/*   /\* VL(("TEST2 l=%d, lmax=%d m=%d\n", l, lmax, mm)); *\/ */
+  /* VL(("TEST2 l=%d, lmax=%d m=%d\n", l, lmax, mm)); */
 
-/*   if ( l < lmax ) { */
+  if ( l < lmax ) {
       
-/*       h_flagging_points ( m, &id_fp, &Nfp ); */
+      h_flagging_points ( m, &id_fp, &Nfp );
 
-/*       /\* VL(("TEST3 l=%d, lmax=%d m=%d\n", l, lmax, mm)); *\/ */
+      /* VL(("TEST3 l=%d, lmax=%d m=%d\n", l, lmax, mm)); */
 
-/*       /\* VL(("l=%d Nfp=%d", l, Nfp)); *\/ */
+      /* VL(("l=%d Nfp=%d", l, Nfp)); */
       
-/*       if ( Nfp > 0 ) { */
+      if ( Nfp > 0 ) {
       
-/*           h_clustering_flagged ( id_fp, Nfp, m->p->buf, m->g->N, */
-/*                                  &idL, &idR, &Ngrids ); */
+          h_clustering_flagged ( id_fp, Nfp, m->p->buf, m->g->N,
+                                 &idL, &idR, &Ngrids );
 
-/*           if( id_fp!=NULL ) */
-/*               free( id_fp ); */
-/*           /\* VL(("create_grid TEST\n")); /\\****\\/ *\/ */
-/*           _h_create_offspring_grids ( m->g, m->p, idL, idR, Ngrids ); */
+          if( id_fp!=NULL )
+              free( id_fp );
+          /* VL(("create_grid TEST\n")); /\****\/ */
+          _h_create_offspring_grids ( m->g, m->p, idL, idR, Ngrids );
           
-/*           if( idL!=NULL ) */
-/*               free( idL ); */
-/*           if( idR!=NULL ) */
-/*               free( idR ); */
+          if( idL!=NULL )
+              free( idL );
+          if( idR!=NULL )
+              free( idR );
 
-/*           for (i = 0; i < Ngrids; i++) { */
-/*               /\* g_c = m->g->children[i]; *\/ */
-/*               m_c->g = (h_grid*) m->g->children[i]; */
-/*               m_c->p = m->p; */
-/*               m_c->f = m->f; */
-/*               /\* m->g = g_c; *\/  */
-/*               _h_create_set_of_grids ( m_c ); */
-/*           } */
-/*       } */
-/*       else { */
-/*           _STAT_MSG ( "Create set of grids", */
-/*                       "no flagged points at level l=", */
-/*                       WARNING, 0 ); */
-/*       } */
-/*   } */
+          for (i = 0; i < Ngrids; i++) {
+              /* g_c = m->g->children[i]; */
+              m_c->g = (h_grid*) m->g->children[i];
+              m_c->p = m->p;
+              m_c->f = m->f;
+              /* m->g = g_c; */
+              _h_create_set_of_grids ( m_c );
+          }
+      }
+      else {
+          _STAT_MSG ( "Create set of grids",
+                      "no flagged points at level l=",
+                      WARNING, 0 );
+      }
+  }
   
-/*   VL(("asd=%d\n", asd++)); */
-/*   /\* free ( m_c->f ); *\/ */
-/*   free ( m_c ); */
+  VL(("asd=%d\n", asd++));
+  /* free ( m_c->f ); */
+  free ( m_c );
   
-/*   /\* h_free_hms ( m_c ); *\/ */
+  /* h_free_hms ( m_c ); */
   
-/*   /\* h_free_grid ( m_c->g ); *\/ */
-/*   /\* h_free_amrp( m_c->p ); *\/ */
-/*   /\* h_free_fnc( m_c->f ); *\/ */
-/* } */
+  /* h_free_grid ( m_c->g ); */
+  /* h_free_amrp( m_c->p ); */
+  /* h_free_fnc( m_c->f ); */
+}
 
-void h_create_init_gset ( h_hms *hms )
+int h_create_init_gset ( h_hms *hms )
 {
   char *fnc_msg = "Create and initialize h_gset";
 
@@ -231,15 +231,185 @@ void h_create_init_gset ( h_hms *hms )
   while ( l < lmax  ) {
       
       status = h_create_init_glevel ( hms, l );
-
+      
       if (status != H_OK) {
           break;
       }
       
+      l++;
   }
   
+  return status;
 }
 
+
+int h_create_init_glevel ( h_hms *hms, int l )
+{
+  char *fnc_msg = "Create and initialize h_glevel";
+
+  int m, M, status = H_ER;
+
+  h_gset *gset;
+  h_glevel *glevel;
+  h_grid *grid;
+
+  h_amrp *amrp;
+  h_fnc *fnc;
+  
+  if ( hms == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_hms is unallocated",
+                  ERROR, 0 );
+      return status;
+  }
+  else if ( hms->gset == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_gset is unallocated",
+                  ERROR, 0 );
+      return status;
+  }
+  else if ( hms->gset->glevel == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_glevel is unallocated",
+                  ERROR, 0 );
+      return status;
+  }
+  else {
+      gset = hms->gset;
+      amrp = hms->amrp;
+      fnc = hms->fnc;
+      
+      /* check whether master grid is created and
+       * properly initialized */
+      if ( l == 0 ) {
+          grid = h_point_to_master_grid ( gset );
+
+          if ( grid == NULL ) {
+              _STAT_MSG ( fnc_msg,
+                          "master h_grid is unallocated",
+                          ERROR, 0 );
+              return status;
+          }
+          else if ( grid->x == NULL || grid->u == NULL ) {
+              _STAT_MSG ( fnc_msg,
+                          "master h_grid is uninitialized",
+                          ERROR, 0 );
+              return status;
+          }
+          else
+              return H_OK;
+      }
+      /* l > 0 */
+      else {
+          glevel = gset->glevel[l-1]; /* parent level (l-1) */
+
+          M = glevel->M; /* # of grids in parent level (l-1) */
+
+          /* allocating l-th level without grids */
+          h_alloc_add_glevel ( gset, l, 0 );
+          
+          for (m = 0; m < M; m++) {
+              
+              status = h_create_init_grid ( glevel->grid[m], gset->glevel[l], amrp, fnc );
+              
+              if (status != H_OK) 
+                  break;
+          }
+          
+          return status;
+      }
+  }
+}
+
+
+
+int h_create_init_grid ( h_grid *pgrid, h_glevel *chglevel, h_amrp *amrp, h_fnc *fnc )
+{
+  char *fnc_msg = "Create and initialize h_grid";
+
+  int m, M, status = H_ER;
+
+  h_gset *gset;
+  h_glevel *glevel;
+  h_grid *grid;
+
+  h_amrp *amrp;
+  h_fnc *fnc;
+
+
+  int i;
+  
+  int *id_fp, Nfp, *idL, *idR, Ngrids;
+
+  
+  if ( pgrid == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "parent h_grid is unallocated",
+                  WARNING, 0 );
+      return status;
+  }
+  else if ( chglevel == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "child h_glevel is unallocated",
+                  WARNING, 0 );
+      return status;
+  }
+  else if ( amrp == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_amrp is unallocated",
+                  WARNING, 0 );
+      return status;
+  }
+  else if ( fnc == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_fnc is unallocated",
+                  WARNING, 0 );
+      return status;
+  }
+  else {
+
+      h_flagging_points ( pgrid, &id_fp, &Nfp );  
+
+      if ( Nfp > 0 ) {
+          h_clustering_flagged ( id_fp, Nfp, amrp->buf, pgrid->N, &idL, &idR, &Ngrids );
+
+          if( id_fp!=NULL )
+              free( id_fp );
+
+          
+
+          for (i = 0; i < Ngrids; i++) {
+              alloc
+                        _h_create_child_grid ( cg, &child[m], p, m, idL[m], idR[m] );
+
+          }
+          _h_create_offspring_grids ( m->g, m->p, idL, idR, Ngrids );
+          
+          if( idL!=NULL )
+              free( idL );
+          if( idR!=NULL )
+              free( idR );
+
+          for (i = 0; i < Ngrids; i++) {
+              /* g_c = m->g->children[i]; */
+              m_c->g = (h_grid*) m->g->children[i];
+              m_c->p = m->p;
+              m_c->f = m->f;
+              /* m->g = g_c; */
+              _h_create_set_of_grids ( m_c );
+          }
+      }
+      else {
+          _STAT_MSG ( "Create set of grids",
+                      "no flagged points at level l=",
+                      WARNING, 0 );
+      }
+  }
+
+
+
+
+  }
 
 
 void _h_acd_to_grid ( h_grid *g, h_fnc *f )
