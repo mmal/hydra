@@ -210,74 +210,135 @@ int asd=0;
 /*   /\* h_free_fnc( m_c->f ); *\/ */
 /* } */
 
+void h_create_init_gset ( h_hms *hms )
+{
+  char *fnc_msg = "Create and initialize h_gset";
 
-
-
-
-/* void _h_acd_to_grid ( h_grid *g, h_fnc *f ) */
-/* { */
-/*   char *fnc_msg = "Assign Cauchy data to grid"; */
-
-/*   int i, j, Ntotal; */
-
-/*   _fnc_1D fnc_ptr; */
-
-/*   if ( g == NULL || g->x == NULL || g->u == NULL ) */
-/*       _STAT_MSG ( fnc_msg, */
-/*                   "h_grid is non initiated/unallocated", */
-/*                   ERROR, 0 ); */
+  int l, lmax, status;
   
-/*   if ( g->rank != f->rank ) */
-/*       _STAT_MSG ( fnc_msg, */
-/*                   "ranks of h_grid and h_fnc structures are not equal", */
-/*                   ERROR, 0 ); */
+  if ( hms == NULL )
+      _STAT_MSG ( fnc_msg,
+                  "h_hms is unallocated",
+                  ERROR, 0 );
+
+  /* h_gset *gset = hms->gset; */
+  /* h_amrp *amrp = hms->amrp; */
+  /* h_fnc *fnc = hms->fnc; */
+
+  l = 0;
+  lmax = hms->amrp->lmax;
   
-/*   Ntotal = g->Ntotal; */
-  
-/*   /\* loop through initial functions *\/ */
-/*   for (i = 0; i < f->rank; i++) {  */
+  while ( l < lmax  ) {
       
-/*       fnc_ptr = f->C_da[i]; */
+      status = h_create_init_glevel ( hms, l );
+
+      if (status != H_OK) {
+          break;
+      }
       
-/*       /\* loop through the grid points *\/ */
-/*       for (j = 0; j < Ntotal; j++) {  */
-/*           g->u[i*Ntotal+j] = fnc_ptr( g->x[j], f->params ); */
-/*       } */
-/*   } */
-/* } */
-
-
-
-/* void _h_acd_to_glevel ( h_glevel *glevel, h_fnc *fnc ) */
-/* { */
-/*   char *fnc_msg = "Assign Cauchy data to glevel"; */
+  }
   
-/*   int m, M; */
-
-/*   int Lghost, Rghost, Ntotal; */
-
-/*   _fnc_1D fnc_ptr; */
-
-/*   if ( glevel == NULL ) { */
-/*       _STAT_MSG ( fnc_msg, */
-/*                   "h_glevel is unallocated", */
-/*                   WARNING, 0 ); */
-/*   } */
-/*   else if ( fnc == NULL ) { */
-/*       _STAT_MSG ( fnc_msg, */
-/*                   "h_fnc is unallocated", */
-/*                   WARNING, 0 ); */
-/*   } */
-/*   else { */
-/*       M = glevel->M; /\* # of allocated grids in glevel *\/ */
-
-/*       for (m = 0; m < M; m++) { */
-/*           _h_acd_to_grid ( glevel->grid[m], fnc ); */
-/*       } */
-/*   } */
-/* } */
+}
 
 
+
+void _h_acd_to_grid ( h_grid *g, h_fnc *f )
+{
+  char *fnc_msg = "Assign Cauchy data to grid";
+
+  int i, j, Ntotal;
+
+  _fnc_1D fnc_ptr;
+
+  if ( g == NULL || g->x == NULL || g->u == NULL )
+      _STAT_MSG ( fnc_msg,
+                  "h_grid is non initiated/unallocated",
+                  ERROR, 0 );
+  
+  if ( g->rank != f->rank )
+      _STAT_MSG ( fnc_msg,
+                  "ranks of h_grid and h_fnc structures are not equal",
+                  ERROR, 0 );
+  
+  Ntotal = g->Ntotal;
+  
+  /* loop through initial functions */
+  for (i = 0; i < f->rank; i++) {
+      
+      fnc_ptr = f->C_da[i];
+      
+      /* loop through the grid points */
+      for (j = 0; j < Ntotal; j++) {
+          g->u[i*Ntotal+j] = fnc_ptr( g->x[j], f->params );
+      }
+  }
+}
+
+
+
+void _h_acd_to_glevel ( h_glevel *glevel, h_fnc *fnc )
+{
+  char *fnc_msg = "Assign Cauchy data to glevel";
+  
+  int m, M;
+
+  if ( glevel == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_glevel is unallocated",
+                  WARNING, 0 );
+  }
+  else if ( fnc == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_fnc is unallocated",
+                  WARNING, 0 );
+  }
+  else {
+      /* there is no need to check whether each grid
+       * in glevel is allocated or not, this is
+       * done in _h_acd_to_grid function
+       */
+      
+      M = glevel->M; /* # of allocated grids in glevel */
+
+      for (m = 0; m < M; m++) {
+          _h_acd_to_grid ( glevel->grid[m], fnc );
+      }
+  }
+}
+
+
+
+/* jeżeli zestaw siatek został utworzony przez
+ * używtkownika wcześniej */
+void _h_acd_to_gset ( h_gset *gset, h_fnc *fnc )
+{
+  char *fnc_msg = "Assign Cauchy data to gset";
+  
+  int l, L;
+
+  if ( gset == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_gset is unallocated",
+                  WARNING, 0 );
+  }
+  else if ( fnc == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_fnc is unallocated",
+                  WARNING, 0 );
+  }
+  else {
+      /* there is no need to check whether each grid
+       * in glevel is allocated or not, this is
+       * done in _h_acd_to_glevel function
+       */
+      
+      L = gset->L; /* # of allocated levels in gset */
+
+      for (l = 0; l < L; l++) {
+          _h_acd_to_glevel ( gset->glevel[l], fnc );
+      }
+  }
+}
 
 /* /\* void _h_assign_cauchy_data ( h_grid *g, h_amrp *p, h_fnc *f ) *\/ */
 /* /\* { *\/ */

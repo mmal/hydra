@@ -452,7 +452,7 @@ void h_alloc_add_N_grids ( h_gset *gset, int l, int N )
 {
   char *fnc_msg = "Adding N grids to gset";
 
-  int m, M, L;
+  int m, M;
   
   if ( gset == NULL ) {
       _STAT_MSG ( fnc_msg,
@@ -728,4 +728,64 @@ h_grid *h_point_to_grid ( h_gset *gset, int l, int m )
       free ( fnc_msg );
       return gset->glevel[l]->grid[m];
   }
+}
+
+
+
+int h_get_num_glevels_in_gset ( h_gset *gset )
+{
+  char *fnc_msg = "Get the number of glevels in the gset";
+  
+  if ( gset == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_gset is unallocated",
+                  WARNING, 0 );
+      return H_ER;
+  }
+  else
+      return gset->L;
+}
+
+
+
+int h_get_num_grids_in_gset ( h_gset *gset, int l )
+{
+  char *fnc_msg = "Get the number of grids at given level l in the gset";
+  
+  if ( gset == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_gset is unallocated",
+                  WARNING, 0 );
+      return H_ER;
+  }
+  else if ( gset->glevel == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_glevel is unallocated",
+                  WARNING, 0 );
+      return H_ER;
+  }
+  else if ( gset->L < l + 1 ) {
+      _STAT_MSG ( fnc_msg,
+                  "for a given h_gset there is no such level",
+                  WARNING, 0 );
+      return H_ER;
+  }
+  else
+      return gset->glevel[l]->M;
+}
+
+
+
+int h_get_num_grids_in_glevel ( h_glevel *glevel )
+{
+  char *fnc_msg = "Get the number of grids in the glevel";
+
+  if ( glevel == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_glevel is unallocated",
+                  WARNING, 0 );
+      return H_ER;
+  }
+  else 
+      return glevel->M;
 }

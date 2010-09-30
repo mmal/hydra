@@ -139,7 +139,7 @@ int main( int argc, char *argv[] )
       h_init_master_grid ( gset->glevel[0]->grid[0], xL, xR, N, rank );
         
       h_info_grid ( grid );
-      
+
       h_free_gset ( gset );
   }
 

@@ -83,6 +83,8 @@ void h_info_glevel ( h_glevel *glevel );
 void h_info_grid ( h_grid *grid );
 h_grid *h_point_to_grid ( h_gset *gset, int l, int m );
 h_glevel *h_point_to_glevel ( h_gset *gset, int l );
-
+int h_get_num_glevels_in_gset ( h_gset *gset );
+int h_get_num_grids_in_gset ( h_gset *gset, int l );
+int h_get_num_grids_in_glevel ( h_glevel *glevel );
 
 #endif /* _H_GRIDS_COMMON_H_ */

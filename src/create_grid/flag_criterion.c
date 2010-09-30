@@ -13,22 +13,18 @@
 #include "flag_criterion.h"
 
 
-/* int h_fc_Test ( void *vm, H_DBL * tau ) */
-/* { */
-/*   int i ,N; */
-
-/*   h_hms *m = (h_hms *)vm; */
-
-/*   printf("\nh_fc_Test\n\n"); */
+int h_fc_Test ( h_grid *grid, h_amrp *amrp, h_fnc *f, H_DBL * tau )
+{
+  int i;
   
-/*   N = m->g->N; */
+  int N = grid->N;
 
-/*   for (i = 0; i < N; i++) { */
-/*       tau[i] = sin(2*i)*10; */
-/*   } */
+  for (i = 0; i < N; i++) {
+      tau[i] = sin(2*i)*10;
+  }
   
-/*   return H_OK; */
-/* } */
+  return H_OK;
+}
 
 /* int jac_null (H_DBL t, const H_DBL y[], H_DBL *dfdy,  */
 /*               H_DBL dfdt[], void *params) */
