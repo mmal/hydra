@@ -368,48 +368,49 @@ int h_create_init_grid ( h_grid *pgrid, h_glevel *chglevel, h_amrp *amrp, h_fnc 
   }
   else {
 
+      /* flag points in pgrid */
       h_flagging_points ( pgrid, &id_fp, &Nfp );  
 
       if ( Nfp > 0 ) {
+          /* cluster flagged points in pgrid */
           h_clustering_flagged ( id_fp, Nfp, amrp->buf, pgrid->N, &idL, &idR, &Ngrids );
 
+          /* save # of grids in chglevel */
+          M = h_get_num_grids_in_glevel ( chglevel );
+          
+          /* add and alloc N grids in chglevel */
+          h_alloc_add_N_grids_to_glevel ( chglevel, Ngrids );
+          
+          for (m = 0; m < Ngrids; m++) {
+              /* alloc and initialize child grid in chglevel */
+              _h_create_child_grid ( pgrid, &chglevel->grid[M+m], amrp, m, idL[m], idR[m] );
+
+              /* assign Cauchy data to child grid in chglevel */
+              _h_acd_to_grid ( chglevel->grid[M+m], fnc );
+          }
+
+          /* free vectors needed for flagging */
+          /* TODO: construct some flagging structure
+           * containing these vectors and flagging
+           * criterion function */
+          
           if( id_fp!=NULL )
               free( id_fp );
-
-          
-
-          for (i = 0; i < Ngrids; i++) {
-              alloc
-                        _h_create_child_grid ( cg, &child[m], p, m, idL[m], idR[m] );
-
-          }
-          _h_create_offspring_grids ( m->g, m->p, idL, idR, Ngrids );
-          
           if( idL!=NULL )
               free( idL );
           if( idR!=NULL )
               free( idR );
 
-          for (i = 0; i < Ngrids; i++) {
-              /* g_c = m->g->children[i]; */
-              m_c->g = (h_grid*) m->g->children[i];
-              m_c->p = m->p;
-              m_c->f = m->f;
-              /* m->g = g_c; */
-              _h_create_set_of_grids ( m_c );
-          }
+          return H_OK;
       }
       else {
-          _STAT_MSG ( "Create set of grids",
-                      "no flagged points at level l=",
+          _STAT_MSG ( fnc_msg,
+                      "no flagged points at given glevel",
                       WARNING, 0 );
+          return H_ER;
       }
   }
-
-
-
-
-  }
+}
 
 
 void _h_acd_to_grid ( h_grid *g, h_fnc *f )
