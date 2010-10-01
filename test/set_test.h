@@ -18,7 +18,7 @@
 #include "src/derivs_fda/derivs.h"
 /* #include "src/ivp/ivp_1D.h" */
 
-/* #include "src/plot_data/plot_1D.h" */
+#include "src/plot_data/plot_1D.h"
 
 /* #include "src/create_grid/flagging.h" */
 /* #include "src/create_grid/flag_criterion.h" */

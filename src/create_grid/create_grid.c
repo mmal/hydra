@@ -156,8 +156,10 @@ int h_create_init_glevel ( h_hms *hms, int l )
                           ERROR, 0 );
               return status;
           }
-          else
+          else {
+              _h_acd_to_grid ( grid, fnc );
               return H_OK;
+          }
       }
       /* l > 0 */
       else {
