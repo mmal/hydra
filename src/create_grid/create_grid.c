@@ -5,7 +5,9 @@
 
 int asd=0;
 
-void _h_create_child_grid ( h_grid *parent, h_grid **child,
+
+
+void _h_create_child_grid ( h_grid *parent, h_grid *child,
                             h_amrp *p, int m, int idL, int idR )
 {
   /* ghost points, what with them ? */
@@ -27,36 +29,30 @@ void _h_create_child_grid ( h_grid *parent, h_grid **child,
 
   H_DBL xR_c = x_c[idR]; /* coordinate of the right end of the child grid */
 
-  /* H_DBL xL_c = parent->x[idL]; /\* coordinate of the left end of the child grid *\/ */
-
-  /* H_DBL xR_c = parent->x[idR]; /\* coordinate of the right end of the child grid *\/ */
-
   H_DBL xL_m, xR_m; /* coordinates of the ends of the master grid */
   
-  h_grid *fine_grid = h_alloc_grid ( );
+  /* h_grid *fine_grid = h_alloc_grid ( ); */
 
-  h_grid *master_grid = h_alloc_grid ( );
+  /* h_grid *master_grid = h_alloc_grid ( ); */
 
+  h_grid *master_grid;
+  
   if ( parent->is_master == H_TRUE  ) { /* parent grid is a master grid */
 
       xL_m = parent->xL;
       xR_m = parent->xR;
-      fine_grid->master = parent; /* this was */
+      child->master = parent; /* this was */
       master_grid = (h_grid*) parent; /* missing */
 
   }
-  else { /* parent grid is not a master grid */
-
+  else {
+      /* parent grid is not a master grid */
       master_grid = (h_grid *) parent->master;
-      
-      /* if( master_grid == NULL ) VL(("l=%d master_grid == NULL\n", parent->l)); */
-      /* else VL(("l=%d master_grid != NULL\n", parent->l)); */
-      
       xL_m = master_grid->xL;
       xR_m = master_grid->xR;
   }
 
-  
+ 
   for (i = 1; i <= sp; i++) {
       if (xL_c - i*h_p/rr > xL_m)
           Lghost_c++;
@@ -64,151 +60,18 @@ void _h_create_child_grid ( h_grid *parent, h_grid **child,
           Rghost_c++;
   }
   
-  /* VL(( "create_grid.c xL_m=%f, xR_m=%f\n", xL_m, xR_m )); */
-  /* VL(( "create_grid.c m=%d: Lghost=%d, Rghost=%d\n", m, Lghost_c, Rghost_c )); */
-  
-
   /* initializing fine grid */
-  h_init_grid ( fine_grid, xL_c, xR_c, N_c, Lghost_c, Rghost_c,
+  h_init_grid ( child, xL_c, xR_c, N_c, Lghost_c, Rghost_c,
                 parent->rank, (parent->l)+1, m );
 
-  /* VL(("create_grid.c m=%d, fine_grid->xL=%f, fine_grid->xR=%f\n", */
-  /*     m, fine_grid->xL, fine_grid->xR )); */
-  
-  fine_grid->master = (void *) master_grid;
+  child->master = (void *) master_grid;
 
-  fine_grid->parent = (void *) parent;
+  child->parent = (void *) parent;
 
-  *child = fine_grid;
+  /* *child = fine_grid; */
 }
 
 
-void _h_create_offspring_grids ( h_grid *cg, h_amrp *p,
-                                int *idL, int *idR, int Ngrids )
-{
-  /* h_grid *g = fg; */
-  int m;
-  
-  h_grid **child = (h_grid **) malloc( Ngrids*sizeof( h_grid *) );
-
-  /* CAUSED FREE ERROR */
-  /* for (m = 0; m < Ngrids; m++) { */
-  /*     child[m] = h_alloc_grid ( ); */
-  /* } */
-  /* VL(("create_grid.c _h_create_offspring_grids TEST\n")); */
-
-  /* if ( cg->l > 1 ) { */
-  /*     h_grid *t_Lsibling = &(cg->Lsibling); */
-  /*     int t_Nchildren = t_Lsibling->l;  */
-  /*     /\* int t_m = t_Lsibling->children[t_Nchildren]; *\/ */
-  /*     /\* int t_m = ((h_grid*) ((h_grid*) cg->Lsibling)->children[((h_grid*) cg->Lsibling)->Nchildren-1])->m; *\/ */
-  /*     VL((" *** t_Nchildren=%d\n", t_Lsibling->l)); */
-  /* } */
-
-  for (m = 0; m < Ngrids; m++) {
-      /* VL(("create_grid.c _h_create_offspring_grids m=%d TEST\n", m)); */
-      child[m] = h_alloc_grid();
-      _h_create_child_grid ( cg, &child[m], p, m, idL[m], idR[m] );
-  }
-
-  /* if ( cg->l > 1 ) { */
-  /*     h_grid *t_sibling = (h_grid*) &(cg->sibling); */
-  /*     child[Ngrids-1]->neighbour = t_sibling->children; */
-  /* } */
-  
-  /* for (m = 0; m < Ngrids-1; m++) { */
-  /*     child[m]->sibling =  &child[m+1]; */
-  /*     child[m+1]->Lsibling = &child[m]; */
-  /* } */
-
-  cg->children = (void **) child;
-  cg->Nchildren = Ngrids;
-
-
-  /* if ( parent->is_master == H_TRUE  ) { /\* parent grid is a master grid *\/ */
-  /*     child[m] = parent->xL; */
-  /*     xR_m = parent->xR; */
-  /* } */
-  /* elseent->master != NULL ) { /\* parent grid is not a master grid *\/ */
-  /*     xL_m = parent->master->xL; */
-  /*     xR_m = parent->master->xR; */
-  /* } */
-}
-
-
-void _h_create_set_of_grids ( h_hms *m )
-{
-  int i, l=m->g->l, lmax = m->p->lmax;
-  
-  int *id_fp;
-
-  int Nfp;
-
-  int *idL, *idR, Ngrids;
-
-  /* h_grid *g_c; */
-
-  /* h_hms *m_c = (h_hms*) malloc( sizeof(h_hms*) ); */
-
-  h_hms *m_c = h_alloc_hms( );
-  
-  /* VL(("TEST1 l=%d, lmax=%d m=%d\n", l, lmax, mm)); */
-
-  m->g->dt = (m->g->h)/(m->p->lmbd); /* setting time step size */
-  
-  _h_acd_to_one_grid ( m->g, m->f );
-
-  /* VL(("TEST2 l=%d, lmax=%d m=%d\n", l, lmax, mm)); */
-
-  if ( l < lmax ) {
-      
-      h_flagging_points ( m, &id_fp, &Nfp );
-
-      /* VL(("TEST3 l=%d, lmax=%d m=%d\n", l, lmax, mm)); */
-
-      /* VL(("l=%d Nfp=%d", l, Nfp)); */
-      
-      if ( Nfp > 0 ) {
-      
-          h_clustering_flagged ( id_fp, Nfp, m->p->buf, m->g->N,
-                                 &idL, &idR, &Ngrids );
-
-          if( id_fp!=NULL )
-              free( id_fp );
-          /* VL(("create_grid TEST\n")); /\****\/ */
-          _h_create_offspring_grids ( m->g, m->p, idL, idR, Ngrids );
-          
-          if( idL!=NULL )
-              free( idL );
-          if( idR!=NULL )
-              free( idR );
-
-          for (i = 0; i < Ngrids; i++) {
-              /* g_c = m->g->children[i]; */
-              m_c->g = (h_grid*) m->g->children[i];
-              m_c->p = m->p;
-              m_c->f = m->f;
-              /* m->g = g_c; */
-              _h_create_set_of_grids ( m_c );
-          }
-      }
-      else {
-          _STAT_MSG ( "Create set of grids",
-                      "no flagged points at level l=",
-                      WARNING, 0 );
-      }
-  }
-  
-  VL(("asd=%d\n", asd++));
-  /* free ( m_c->f ); */
-  free ( m_c );
-  
-  /* h_free_hms ( m_c ); */
-  
-  /* h_free_grid ( m_c->g ); */
-  /* h_free_amrp( m_c->p ); */
-  /* h_free_fnc( m_c->f ); */
-}
 
 int h_create_init_gset ( h_hms *hms )
 {
@@ -221,17 +84,13 @@ int h_create_init_gset ( h_hms *hms )
                   "h_hms is unallocated",
                   ERROR, 0 );
 
-  /* h_gset *gset = hms->gset; */
-  /* h_amrp *amrp = hms->amrp; */
-  /* h_fnc *fnc = hms->fnc; */
-
   l = 0;
   lmax = hms->amrp->lmax;
   
   while ( l < lmax  ) {
-      
+
       status = h_create_init_glevel ( hms, l );
-      
+      VL(("l=%d\n",l));
       if (status != H_OK) {
           break;
       }
@@ -241,6 +100,7 @@ int h_create_init_gset ( h_hms *hms )
   
   return status;
 }
+
 
 
 int h_create_init_glevel ( h_hms *hms, int l )
@@ -323,21 +183,12 @@ int h_create_init_glevel ( h_hms *hms, int l )
 
 
 
-int h_create_init_grid ( h_grid *pgrid, h_glevel *chglevel, h_amrp *amrp, h_fnc *fnc )
+int h_create_init_grid ( h_grid *pgrid, h_glevel *chglevel,
+                         h_amrp *amrp, h_fnc *fnc )
 {
   char *fnc_msg = "Create and initialize h_grid";
 
   int m, M, status = H_ER;
-
-  h_gset *gset;
-  h_glevel *glevel;
-  h_grid *grid;
-
-  h_amrp *amrp;
-  h_fnc *fnc;
-
-
-  int i;
   
   int *id_fp, Nfp, *idL, *idR, Ngrids;
 
@@ -369,7 +220,7 @@ int h_create_init_grid ( h_grid *pgrid, h_glevel *chglevel, h_amrp *amrp, h_fnc 
   else {
 
       /* flag points in pgrid */
-      h_flagging_points ( pgrid, &id_fp, &Nfp );  
+      h_flagging_points ( pgrid, amrp, fnc, &id_fp, &Nfp );  
 
       if ( Nfp > 0 ) {
           /* cluster flagged points in pgrid */
@@ -383,7 +234,7 @@ int h_create_init_grid ( h_grid *pgrid, h_glevel *chglevel, h_amrp *amrp, h_fnc 
           
           for (m = 0; m < Ngrids; m++) {
               /* alloc and initialize child grid in chglevel */
-              _h_create_child_grid ( pgrid, &chglevel->grid[M+m], amrp, m, idL[m], idR[m] );
+              _h_create_child_grid ( pgrid, chglevel->grid[M+m], amrp, m, idL[m], idR[m] );
 
               /* assign Cauchy data to child grid in chglevel */
               _h_acd_to_grid ( chglevel->grid[M+m], fnc );
@@ -411,6 +262,7 @@ int h_create_init_grid ( h_grid *pgrid, h_glevel *chglevel, h_amrp *amrp, h_fnc 
       }
   }
 }
+
 
 
 void _h_acd_to_grid ( h_grid *g, h_fnc *f )
@@ -510,107 +362,3 @@ void _h_acd_to_gset ( h_gset *gset, h_fnc *fnc )
       }
   }
 }
-
-/* /\* void _h_assign_cauchy_data ( h_grid *g, h_amrp *p, h_fnc *f ) *\/ */
-/* /\* { *\/ */
-/* /\*   /\\* int i, j; *\\/ *\/ */
-/* /\*   /\\* int l=0, N; *\\/ *\/ */
-
-/* /\*   /\\* int lmax = p->lmax; *\\/ *\/ */
-
-/* /\*   /\\* int Lghost, Rghost, Ntotal; *\\/ *\/ */
-
-/* /\*   /\\* _fnc_1D fnc_ptr; *\\/ *\/ */
-
-/* /\*   int m; *\/ */
-  
-/* /\*   h_grid **child; *\/ */
-
-/* /\*   if ( g == NULL || g->x == NULL || g->u == NULL ) *\/ */
-/* /\*       _STAT_MSG ( "Assign Cauchy data: using given initial conditions", *\/ */
-/* /\*                   "grid non allocated", *\/ */
-/* /\*                   ERROR, 0 ); *\/ */
-
-/* /\*   /\\* if ( g->is_master != H_TRUE  ) *\\/ *\/ */
-/* /\*   /\\*     _STAT_MSG ( "Assign Cauchy data: using given initial conditions", *\\/ *\/ */
-/* /\*   /\\*                 "passed grid is not master grid", *\\/ *\/ */
-/* /\*   /\\*                 ERROR, 0 ); *\\/ *\/ */
-
-/* /\*   if ( g->rank != f->rank ) *\/ */
-/* /\*       _STAT_MSG ( "Assign Cauchy data: using given initial conditions", *\/ */
-/* /\*                   "ranks are not equal", *\/ */
-/* /\*                   ERROR, 0 ); *\/ */
-
-
-/* /\*   _h_acd_to_one_grid( g, f ); *\/ */
-
-/* /\*   if ( g->children == NULL ) *\/ */
-/* /\*       printf("\n\n g->children == NULL \n\n"); *\/ */
-/* /\*   else *\/ */
-/* /\*       printf("\n\n g->children != NULL \n\n"); *\/ */
-  
-/* /\*   if ( g->children != NULL ) { *\/ */
-/* /\*       child = (h_grid **) g->children; *\/ */
-  
-/* /\*       for (m = 0; m < g->Nchildren; m++) { *\/ */
-/* /\*           _h_assign_cauchy_data ( child[m], p, f ); *\/ */
-/* /\*       } *\/ */
-/* /\*   } *\/ */
-  
-
-
-/* /\*   /\\* /\\\* for ( i = 0; i < rank; i++ ) { *\\\/ *\\/ *\/ */
-/* /\*   /\\* /\\\*     fnc_ptr = va_arg ( arguments, H_DBL (*)(H_DBL, void*) ); *\\\/ *\\/ *\/ */
-/* /\*   /\\* /\\\*     if ( fnc_ptr == NULL ) { *\\\/ *\\/ *\/ */
-/* /\*   /\\* /\\\*         va_end ( arguments ); *\\\/ *\\/ *\/ */
-/* /\*   /\\* /\\\*         _STAT_MSG ( "Assign Cauchy data: using given initial conditions", *\\\/ *\\/ *\/ */
-/* /\*   /\\* /\\\*                     "number of arguments is not equal to rank", *\\\/ *\\/ *\/ */
-/* /\*   /\\* /\\\*                     ERROR, 0 ); *\\\/ *\\/ *\/ */
-/* /\*   /\\* /\\\*     } *\\\/ *\\/ *\/ */
-/* /\*   /\\* /\\\*     else { *\\\/ *\\/ *\/ */
-
-/* /\*   /\\* N = g->N; *\\/ *\/ */
-/* /\*   /\\* Lghost = g->Lghost; *\\/ *\/ */
-/* /\*   /\\* Rghost = g->Rghost; *\\/ *\/ */
-/* /\*   /\\* Ntotal = N+Lghost+Rghost; *\\/ *\/ */
-          
-/* /\*   /\\* /\\\* for (l = 0; l < lmax; l++) { /\\\\* loop for all grids hierarchy *\\\\/ *\\\/ *\\/ *\/ */
-
-/* /\*   /\\* while ( l ) { *\\/ *\/ */
-/* /\*   /\\*     _h_acd_to_one_grid( g, p, f ); *\\/ *\/ */
-      
-/* /\*   /\\*     for (i = 0; i < f->rank; i++) { *\\/ *\/ */
-/* /\*   /\\*         fnc_ptr = f->C_da[i]; *\\/ *\/ */
-
-/* /\*   /\\*         for (j = 0; j < Ntotal; j++) { *\\/ *\/ */
-/* /\*   /\\*             g->u[i*Ntotal+j] = fnc_ptr( g->x[j], params ); *\\/ *\/ */
-/* /\*   /\\*         } *\\/ *\/ */
-/* /\*   /\\*     } *\\/ *\/ */
-
-/* /\*   /\\* if( g_m->is_master == H_TRUE ) { *\\/ *\/ */
-/* /\*   /\\*                 for (j = 0; j < Ntotal; j++) { *\\/ *\/ */
-/* /\*   /\\*                     g->u[i*Ntotal+j] = fnc_ptr( g->x[j], params ); *\\/ *\/ */
-/* /\*   /\\*                 } *\\/ *\/ */
-/* /\*   /\\*             } *\\/ *\/ */
-/* /\*   /\\*             else { *\\/ *\/ */
-/* /\*   /\\*                 for ( m = 0, m < g->Nchild, m++ ) *\\/ *\/ */
-/* /\*   /\\*                     g_c = (h_grid*) g_m->child[m]; *\\/ *\/ */
-                  
-/* /\*   /\\*                 for (j = 0; j < Ntotal; j++) { *\\/ *\/ */
-/* /\*   /\\*                     g->u[i*Ntotal+j] = fnc_ptr( g->x[j], params ); *\\/ *\/ */
-/* /\*   /\\*                 } *\\/ *\/ */
-                  
-/* /\*   /\\*             } *\\/ *\/ */
-/* /\*   /\\*         } *\\/ *\/ */
-/* /\*   /\\*     } *\\/ *\/ */
-      
-/* /\*   /\\*         g = cg; *\\/ *\/ */
-/* /\*   /\\*     } *\\/ *\/ */
-
-
-/* /\*   _STAT_MSG ( "Assign Cauchy data: using given initial conditions", *\/ */
-/* /\*               NULL, *\/ */
-/* /\*               OK, 0 ); *\/ */
-/* /\* } *\/ */
-
-

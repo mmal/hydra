@@ -506,7 +506,7 @@ void h_alloc_add_N_grids_to_glevel ( h_glevel *glevel, int N )
 {
   char *fnc_msg = "Adding N grids to glevel";
 
-  int m, M;
+  int l, m, M;
 
   if ( glevel == NULL ) {
       _STAT_MSG ( fnc_msg,
@@ -526,7 +526,7 @@ void h_alloc_add_N_grids_to_glevel ( h_glevel *glevel, int N )
 
       /* reallocate grid pointer */
       glevel->grid =
-          (h_grid**) realloc ( gset->grid, (M+N)*sizeof( h_grid* ) );
+          (h_grid**) realloc ( glevel->grid, (M+N)*sizeof( h_grid* ) );
       
       /* allocate grids and assign identifiers */
       for (m = M; m < M+N; m++) {

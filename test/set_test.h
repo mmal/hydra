@@ -22,7 +22,7 @@
 
 /* #include "src/create_grid/flagging.h" */
 /* #include "src/create_grid/flag_criterion.h" */
-/* #include "src/create_grid/create_grid.h" */
+#include "src/create_grid/create_grid.h"
 
 /* #include "src/integrate/boialg.h" */
 

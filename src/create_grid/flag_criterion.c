@@ -13,9 +13,14 @@
 #include "flag_criterion.h"
 
 
-int h_fc_Test ( h_grid *grid, h_amrp *amrp, h_fnc *f, H_DBL * tau )
+int h_fc_Test ( void *vgrid, void *vamrp, void *vfnc, H_DBL * tau )
 {
   int i;
+
+  h_grid *grid = (h_grid *) vgrid;
+  h_amrp *amrp = (h_amrp *) vamrp;
+  h_fnc *fnc = (h_fnc *) vfnc;
+
   
   int N = grid->N;
 

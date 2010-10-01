@@ -16,20 +16,19 @@ typedef H_DBL (*_fnc_1D)(H_DBL, void*);
 
 typedef int (*_deriv_1D)(H_DBL, H_DBL*, H_DBL*, H_DBL*, int, int, void*);
 
-typedef int (*_flag_crit)(void *, H_DBL *);
+typedef int (*_flag_crit)(void *, void *, void *, H_DBL *);
 
 
 typedef struct
 {
   int rank;
 
-  /* void **C_data; */
   _fnc_1D *C_da;
 
   _deriv_1D *deriv;
   int ISN;
   
-  _flag_crit *fc;
+  _flag_crit fc;
 
   const gsl_odeiv_step_type * step_T;
   

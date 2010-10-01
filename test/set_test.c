@@ -102,46 +102,50 @@ int main( int argc, char *argv[] )
 
   h_init_fnc_step_type ( hms->fnc, gsl_odeiv_step_rk4 );
 
-  /* h_init_coarse_grid ( hms->gset->glevel[0]->grid[0], xL, xR, N, rank ); */
+  h_init_fnc_flag_crit ( hms->fnc, h_fc_Test );
 
+  h_init_master_grid ( hms->gset->glevel[0]->grid[0], xL, xR, N, rank );
 
-  /* h_init_fnc_flag_crit ( hms->fnc, &h_fc_SV ); */
+  h_create_init_gset ( hms );
+
+  h_info_gset ( hms->gset );
+  
 
   h_free_hms ( hms );
   
-  {
-      h_gset *gset = h_alloc_gset( );
+  /* { */
+  /*     h_gset *gset = h_alloc_gset( ); */
       
-      h_info_gset ( gset );
+  /*     h_info_gset ( gset ); */
       
-      h_alloc_add_glevel( gset, 1, 0);
+  /*     h_alloc_add_glevel( gset, 1, 0); */
 
-      h_info_gset ( gset );
+  /*     h_info_gset ( gset ); */
       
-      h_alloc_add_grid( gset, 1, 0);
+  /*     h_alloc_add_grid( gset, 1, 0); */
 
-      h_alloc_add_glevel( gset, 2, 16);
+  /*     h_alloc_add_glevel( gset, 2, 16); */
       
-      h_info_gset ( gset );
+  /*     h_info_gset ( gset ); */
       
-      h_glevel *glevel = h_point_to_glevel ( gset, 2 );
+  /*     h_glevel *glevel = h_point_to_glevel ( gset, 2 ); */
 
-      h_info_glevel ( glevel );
+  /*     h_info_glevel ( glevel ); */
 
-      h_alloc_add_N_grids ( gset, 2, 30 );
+  /*     h_alloc_add_N_grids ( gset, 2, 30 ); */
       
-      h_info_glevel ( glevel );
+  /*     h_info_glevel ( glevel ); */
 
-      h_info_gset ( gset );
+  /*     h_info_gset ( gset ); */
 
-      h_grid *grid = h_point_to_grid ( gset, 0, 0 );
+  /*     h_grid *grid = h_point_to_grid ( gset, 0, 0 ); */
 
-      h_init_master_grid ( gset->glevel[0]->grid[0], xL, xR, N, rank );
+  /*     h_init_master_grid ( gset->glevel[0]->grid[0], xL, xR, N, rank ); */
         
-      h_info_grid ( grid );
+  /*     h_info_grid ( grid ); */
 
-      h_free_gset ( gset );
-  }
+  /*     h_free_gset ( gset ); */
+  /* } */
 
   
   /* h_init_coarse_grid ( m->g, xL, xR, N, rank ); */

@@ -14,72 +14,58 @@
 
 
 
-void h_flagging_points ( h_hms *m, int **id_fp, int *Nfp )
+void h_flagging_points ( h_grid *grid, h_amrp *amrp, h_fnc *fnc,
+                         int **id_fp, int *Nfp )
 {
-  int i, N, stat;
-
+  char *fnc_msg = "Flagging points";
+    
+  int i, N, status;
   int *id_fp_t = NULL;
   
   H_DBL err_tol;
-
   H_DBL *tau;
 
-  _flag_crit _fc;
+  _flag_crit *_fc;
 
-  if ( m->g==NULL || m->p==NULL || m->f->fc==NULL ) {
-      _STAT_MSG("Flagging points","empty parameters",ERROR,0);
-  }
+  N = grid->N;
 
-  N = m->g->N;
-  VL(("flagging.c TEST  m->g->N=%d\n", m->g->N));
-  VL(("flagging.c TEST  m->g->Ntotal=%d\n", m->g->Ntotal));
-
-  err_tol = m->p->errt;
+  err_tol = amrp->errt;
 
   tau = (H_DBL*) malloc( N*sizeof( H_DBL ) );
 
   if ( tau==NULL ) {
-      _STAT_MSG("Flagging points","cannot allocate memory for tau",ERROR,0);
+      _STAT_MSG( fnc_msg,
+                 "cannot allocate memory for tau",
+                 ERROR, 0);
   }
   
-  _fc = m->f->fc;
+  _fc = &fnc->fc; /* TODO */
   
-  stat = _fc(  m, tau );
+  status = (*_fc)( grid, amrp, fnc, tau );
 
-  if ( stat!=H_OK ) {
-      _STAT_MSG("Flagging points","flagging criterion failed",ERROR,0);
+  if ( status!=H_OK ) {
+      _STAT_MSG( fnc_msg,
+                 "flagging criterion failed",
+                 ERROR, 0);
   }
   
-  *Nfp = 0; /* at the beginning there are no flagged points */
+  /* at the beginning there are no flagged points */
+  *Nfp = 0; 
 
   id_fp_t = (int*) realloc( id_fp_t, 10*sizeof(int) );
 
-  /* if( id_fp_t == NULL ) printf( "reallocating \n id_fp_t == NULL\n" ); */
-  
+ 
+  /* checking whether the returned value exceeds
+   * the error tolerance, loop over the real grid points */
+  for (i = 0; i < N; i++) {
 
-  /* checking whether the returned value exceeds the error tolerance */
-  for (i = 0; i < N; i++) { /* loop over the real grid points */
-        if ( tau[i] > err_tol ) {
-            ++*Nfp; /* flag i-th point and realloc flagged points
-                     * matrix id */
-            id_fp_t = (int *) realloc( id_fp_t, (*Nfp)*sizeof(int) );
-            id_fp_t[(*Nfp)-1] = i; /* save flagged point id */
-            /* VL((" tau[%d] = %e, %e\n", i, tau[i], err_tol)); */
-        }
+      if ( tau[i] > err_tol ) {
+          ++*Nfp; /* flag i-th point and realloc flagged points
+                   * matrix id */
+          id_fp_t = (int *) realloc( id_fp_t, (*Nfp)*sizeof(int) );
+          id_fp_t[(*Nfp)-1] = i; /* save flagged point id */
+      }
   }
-  /* VL(("flagging.c TEST  Nfp=%d\n", *Nfp)); */
-
-  /* if ( m->g->is_master == H_TRUE && *Nfp > (int) (0.8*N) ) { */
-  /*     VL(("Master grid is too coarse\n")); */
-  /*     sleep ( 2 ); */
-  /*     h_init_coarse_grid ( m->g, m->g->xL, m->g->xR, N*2-1, m->g->rank ); */
-  /*     _h_acd_to_one_grid ( m->g, m->f ); */
-  /*     h_flagging_points ( m, id_fp, Nfp ); */
-  /* } */
-
-  /* for (i = 0; i < *Nfp; i++) { */
-  /*     printf("i=%d, id_fp=%d\n", i, id_fp_t[i]); */
-  /* } */
 
   *id_fp = id_fp_t;
 
