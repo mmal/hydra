@@ -110,13 +110,8 @@ int main( int argc, char *argv[] )
 
   h_info_gset ( hms->gset );
 
-  h_1Dplot_grid ( h_point_to_grid( hms->gset, 1, 0 ), 0, H_FALSE, "asdasdf", -1 );
 
-  h_1Dplot_grid ( h_point_to_master_grid( hms->gset ), 0, H_FALSE, "asdasdf", -1 );
-
-  h_1Dplot_glevel ( hms->gset->glevel[1], 0, H_FALSE, "asdasdf", -1 );
-
-  h_1Dplot_gset ( hms->gset, 0, H_FALSE, "asdasdf", -1 );
+  h_1Dplot_save_gset ( hms->gset, 0, H_FALSE, "asdasdf", -1 );
 
   h_free_hms ( hms );
   
