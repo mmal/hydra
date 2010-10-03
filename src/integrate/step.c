@@ -32,6 +32,7 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
 
   int (*deriv_ptr)(H_DBL, H_DBL*, H_DBL*, H_DBL*, int, int, void*);
   int N = hss->grid->Ntotal;
+  int Ntotal = hss->grid->Ntotal;
   int ISN = hss->fnc->ISN;
   int Ncalls;
   
@@ -44,19 +45,11 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
   int Lmove, Rmove;
   
   H_DBL h = hss->grid->h;
-
   H_DBL xL_m, xR_m;
   
   H_DBL *yptr = y;
-
   H_DBL *xptr = hss->grid->x;
   
-  /* h_grid *master_grid = h_alloc_grid ( ); */
-  /* if( t == m->g->tlast+m->g->dt/2 && t == m->g->tlast + m->g->dt ) */
-  /*   { */
-  /*       m->g->Ncalls++; */
-  /*       Ncalls = m->g->Ncalls; */
-  /*   } */
 
   ( hss->grid->Ncalls++ );
   
@@ -68,40 +61,50 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
   }
 
   
-  printf(" wyw. p. s. r. dt=%e"
-         ", stepper %s, order=%u, t=%f, Ncalls=%d\n", hss->grid->dt,
-         hss->fnc->step_T->name, (*hss->fnc->step_T->order)(NULL), t, Ncalls );
-  printf("N=%d\n", N);
+  /* printf(" wyw. p. s. r. dt=%e" */
+  /*        ", stepper %s, order=%u, t=%f, Ncalls=%d\n", hss->grid->dt, */
+  /*        hss->fnc->step_T->name, (*hss->fnc->step_T->order)(NULL), t, Ncalls ); */
+  /* printf("N=%d\n", N); */
   /* sleep( 1 ); */
   
   if ( hss->grid->is_master == H_TRUE )
     {
         for (i = 0; i < N; i++) {
-            if (i<ISN) {
-                deriv_ptr = hss->fnc->deriv[i];
-                status = deriv_ptr(t, hss->grid->x, yptr, f, i, N, &h);
+            if ( i == 0 ) {
+                status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
             }
-            else if ( i>N-ISN ) {
-                status = (*hss->fnc->deriv[N-1-i])(t, hss->grid->x, yptr, f, -i, N, &h);
+            else if ( i == 1 ) {
+                status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
             }
-            else
-                status = (*hss->fnc->deriv[ISN-1])(t, hss->grid->x, yptr, f, i, N, &h);
+            else if ( i == Ntotal-1 ) {
+                status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h);
+            }
+            else if ( i == Ntotal-2 ) {
+                status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h);
+            }
+            else {
+                /* centered derivative */
+                status = (*hss->fnc->deriv[2])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
+            }
         }
+        /* for (i = 0; i < N; i++) { */
+        /*     if (i<ISN) { */
+        /*         deriv_ptr = hss->fnc->deriv[i]; */
+        /*         status = deriv_ptr(t, hss->grid->x, yptr, f, i, N, &h); */
+        /*     } */
+        /*     else if ( i>N-ISN ) { */
+        /*         status = (*hss->fnc->deriv[N-1-i])(t, hss->grid->x, yptr, f, -i, N, &h); */
+        /*     } */
+        /*     else */
+        /*         status = (*hss->fnc->deriv[ISN-1])(t, hss->grid->x, yptr, f, i, N, &h); */
+        /* } */
     }
   else {
-      VL(("  Grid is not master\n"));
+      /* VL(("  Grid is not master\n")); */
 
-      /* master_grid = (h_grid *) m->g->master; */ /* TODO: */
-
-      /* VL(("  Grid is not master 1a\n")); */
-
-      /* xL_m = master_grid->xL; */
-      /* xR_m = master_grid->xR; */
       xL_m = -1.;
       xR_m = 1.;
       
-      /* VL(("  Grid is not master 1b\n")); */
-
       if ( Lghost < ngh - (Ncalls-1)*sp  )
           Lmove = 0;
       else
@@ -123,46 +126,67 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
       /* for (i = Lmove; i < N; i++) { */
       /*     /\* VL(("i=%d\n", i)); *\/ */
       /*     if ( i<ISN && ( xptr[i] == xL_m + i*h ) ) { */
-      /*         status = (*m->f->deriv[i])(t, xptr, yptr, f, i, N, &h); */
+      /*         status = (*hss->fnc->deriv[i])(t, xptr, yptr, f, i, N, &h); */
       /*     } */
       /*     else if ( i>N-ISN && ( xptr[i] == xR_m - i*h ) ) { */
-      /*         status = (*m->f->deriv[ISN-1-i])(t, xptr, yptr, f, -i, N, &h); */
+      /*         status = (*hss->fnc->deriv[ISN-1-i])(t, xptr, yptr, f, -i, N, &h); */
       /*     } */
       /*     else */
-      /*         status = (*m->f->deriv[ISN-1])(t, xptr, yptr, f, i, N, &h); */
+      /*         status = (*hss->fnc->deriv[ISN-1])(t, xptr, yptr, f, i, N, &h); */
       /* } */
 
       for (i = Lmove; i < N; i++) {
+
+          /* printf("x[%d]=%e\n", i, xptr[i]); */
+          /* printf("u[%d]=%e\n", i, y[i]); */
+          /* VL(("i=%d\n", i)); */
           
-          if ( xptr[i]-2*h >= xL_m && xptr[i]+2*h <= xR_m ) {
+          /* if ( xptr[i] - h == xL_m ) { */
+          /*     VL(("xptr[i] - h == xL_m ")); */
+          /*     status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h); */
+          /* } */
+          /* else if ( xptr[i] + h == xR_m ) { */
+          /*     VL(("xptr[i] + h == xR_m ")); */
+          /*     status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h); */
+          /* } */
+          /* else if ( xptr[i] == xL_m ) { */
+          /*     VL(("xptr[i] == xL_m ")); */
+          /*     status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h); */
+          /* } */
+          /* else if ( xptr[i] == xR_m ) { */
+          /*     VL(("xptr[i] == xR_m ")); */
+          /*     status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h); */
+          /* } */
+          /* else if ( xptr[i]-2*h >= xL_m && xptr[i]+2*h <= xR_m ) { */
+          /*     /\* centered derivative *\/ */
+          /*     VL(("xptr[i]-2*h >= xL_m && xptr[i]+2*h <= xR_m ")); */
+          /*     status = (*hss->fnc->deriv[2])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h); */
+          /* } */
+
+
+          if ( i == 0 ) {
+              status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
+          }
+          else if ( i == 1 ) {
+              status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
+          }
+          else if ( i == Ntotal-1 ) {
+              status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h);
+          }
+          else if ( i == Ntotal-2 ) {
+              status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h);
+          }
+          else {
               /* centered derivative */
               status = (*hss->fnc->deriv[2])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
           }
-          else if ( xptr[i] - h == xL_m ) {
-              status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
-          }
-          else if ( xptr[i] + h == xR_m ) {
-              status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h);
-          }
-          else if ( xptr[i] == xL_m ) {
-              status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
-          }
-          else if ( xptr[i] == xR_m ) {
-              status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h);
-          }
+
+
+          /* sleep(1); */
+
       }
       
-      /* for (i = 0; i < Lmove; i++) { */
-      /*     yptr[i] = 66.; */
-      /* } */
-      /* for (i = N+Lmove; i < N + Lmove + Rmove; i++) { */
-      /*     yptr[i] = 66.; */
-      /* } */
-      
-      /* exit(0); */
   }
-
-  /* h_free_grid ( master_grid ); */
   
   return GSL_SUCCESS;
 }
@@ -281,17 +305,17 @@ int _h_boialg_step_grid ( h_grid *grid, h_amrp *amrp, h_fnc *fnc )
       dt = grid->dt;
       t1 = t0 + dt;
 
-      printf("TEST\n");
-      printf("dt=%e\n", dt);
+      /* printf("TEST\n"); */
+      /* printf("dt=%e\n", dt); */
       
       while ( t0 < t1 )
         {
-            status = gsl_odeiv_step_apply ( s, t0, dt, u, u_err,
+            status = gsl_odeiv_step_apply ( s, t0, dt, grid->u, u_err,
                                             NULL, NULL, &sys );
             
             if ( status != GSL_SUCCESS ) {
                 _STAT_MSG("Stepping _h_step", "status != GSL_SUCCESS",
-                          H_WA, 0);
+                          WARNING, 0);
                 break;
             }
             
