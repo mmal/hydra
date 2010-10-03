@@ -49,7 +49,12 @@ void _h_1Dplot_save_script ( int L )
   fprintf ( fscript, "set xlabel \"x\"\n");
   fprintf ( fscript, "set ylabel \"l\"\n");
   fprintf ( fscript, "set format x \"%% g\"\n");
-  fprintf ( fscript, "set ytics 0,1,%d\n", L);
+
+  if ( L < 7 )
+      fprintf ( fscript, "set ytics 0,1,%d\n", L);
+  else
+      fprintf ( fscript, "set ytics 0,2,%d\n", L);
+  
   fprintf ( fscript, "set key\n");
   fprintf ( fscript, "set grid x front\n");
   fprintf ( fscript, "set boxwidth 0.7\n");

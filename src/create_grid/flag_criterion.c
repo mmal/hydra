@@ -13,16 +13,20 @@
 #include "flag_criterion.h"
 
 
+
 int h_fc_Test ( void *vgrid, void *vamrp, void *vfnc, H_DBL * tau )
 {
-  int i;
+  int i, N;
 
-  h_grid *grid = (h_grid *) vgrid;
-  h_amrp *amrp = (h_amrp *) vamrp;
-  h_fnc *fnc = (h_fnc *) vfnc;
+  h_grid *grid;
+  h_amrp *amrp;
+  h_fnc *fnc;
 
+  grid = (h_grid *) vgrid;
+  amrp = (h_amrp *) vamrp;
+  fnc  = (h_fnc *) vfnc;
   
-  int N = grid->N;
+  N = grid->N;
 
   for (i = 0; i < N; i++) {
       tau[i] = sin(2*i)*10;
@@ -30,6 +34,43 @@ int h_fc_Test ( void *vgrid, void *vamrp, void *vfnc, H_DBL * tau )
   
   return H_OK;
 }
+
+
+
+int h_fc_SV ( void *vgrid, void *vamrp, void *vfnc, H_DBL * tau )
+{
+  int i, N;
+
+  H_DBL *u, h;
+  
+  h_grid *grid;
+  h_amrp *amrp;
+  h_fnc *fnc;
+
+  grid = (h_grid *) vgrid;
+  amrp = (h_amrp *) vamrp;
+  fnc  = (h_fnc *) vfnc;
+  
+  N = grid->N;
+  u = h_get_grid_values ( grid, 0 );
+  h = grid->h;
+
+  for (i = 2; i < N-2; i++) {
+      tau[i] = fabs ( ( u[i+1]-u[i-1] )/( 2*h ) );
+  }
+
+  tau[0] = 0.;
+  tau[1] = 0.;
+  tau[N-2] = 0.;
+  tau[N-1] = 0.;
+
+  return H_OK;
+}
+
+/* /\* int h_fc_TV ( void *vm, H_DBL * tau ){ *\/ */
+/* /\*   return H_ER; *\/ */
+/* /\* } *\/ */
+
 
 /* int jac_null (H_DBL t, const H_DBL y[], H_DBL *dfdy,  */
 /*               H_DBL dfdt[], void *params) */
@@ -332,27 +373,3 @@ int h_fc_Test ( void *vgrid, void *vamrp, void *vfnc, H_DBL * tau )
 /* /\*   return H_ER; *\/ */
 /* /\* } *\/ */
 
-/* int h_fc_SV ( void *vm, H_DBL * tau ) */
-/* { */
-/*   h_hms *m = (h_hms *) vm; */
-
-/*   int i, N = m->g->N; */
-
-/*   H_DBL *u = h_get_grid_values ( m->g, 0 ); */
-/*   H_DBL h = m->g->h; */
-
-/*   for (i = 2; i < N-2; i++) { */
-/*       tau[i] = fabs ( ( u[i-2]-8*u[i-1]+8*u[i+1]-u[i+2] )/( 12*h ) ); */
-/*   } */
-
-/*   tau[0] = 0.; */
-/*   tau[1] = 0.; */
-/*   tau[N-2] = 0.; */
-/*   tau[N-1] = 0.; */
-
-/*   return H_OK; */
-/* } */
-
-/* /\* int h_fc_TV ( void *vm, H_DBL * tau ){ *\/ */
-/* /\*   return H_ER; *\/ */
-/* /\* } *\/ */

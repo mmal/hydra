@@ -7,6 +7,7 @@
 
 
 #include "src/common/types.h"
+#include "src/common/amrp_common.h"
 #include "src/stat_log/stat_msg.h"
 
 
@@ -65,8 +66,8 @@ typedef struct
 
 
 h_grid *h_alloc_grid ( void );
-void h_init_grid ( h_grid *g, H_DBL xL, H_DBL xR, int N, int Lghost, int Rghost, int rank, int l, int m );
-void h_init_master_grid ( h_grid *g, H_DBL xL, H_DBL xR, int N, int rank );
+void h_init_grid ( h_grid *g, H_DBL xL, H_DBL xR, int N, int Lghost, int Rghost, int rank, int l, int m, h_amrp *p );
+void h_init_master_grid ( h_grid *g, H_DBL xL, H_DBL xR, int N, int rank, h_amrp *p );
 H_DBL *h_get_grid_positions ( h_grid *g );
 H_DBL *h_get_grid_positions_wghosts ( h_grid *g );
 H_DBL *h_get_grid_values ( h_grid *g, int rank );

@@ -62,7 +62,7 @@ void _h_create_child_grid ( h_grid *parent, h_grid *child,
   
   /* initializing fine grid */
   h_init_grid ( child, xL_c, xR_c, N_c, Lghost_c, Rghost_c,
-                parent->rank, (parent->l)+1, m );
+                parent->rank, (parent->l)+1, m, p );
 
   child->master = (void *) master_grid;
 
@@ -90,7 +90,7 @@ int h_create_init_gset ( h_hms *hms )
   while ( l < lmax  ) {
 
       status = h_create_init_glevel ( hms, l );
-      VL(("l=%d\n",l));
+      /* VL(("l=%d\n",l)); */
       if (status != H_OK) {
           break;
       }

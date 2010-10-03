@@ -65,6 +65,7 @@ int RHS_extern_0 ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
 }
 
 
+
 int RHS_extern_1 ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
                    int i, int N, void *vparams )
 {
@@ -85,7 +86,7 @@ int main( int argc, char *argv[] )
 {
   const int rank = 2;
 
-  const int N = 21;
+  const int N = 31;
   
   const H_DBL xL = -1.;
 
@@ -95,24 +96,31 @@ int main( int argc, char *argv[] )
 
   h_init_amrp ( hms->amrp, argc, argv );
 
-
   h_init_fnc_derivs ( hms->fnc, 3, RHS_extern_0, RHS_extern_1, RHS_centered );
 
   h_init_fnc_cauchy_data ( hms->fnc, NULL, rank, sin_, zero_ );
 
   h_init_fnc_step_type ( hms->fnc, gsl_odeiv_step_rk4 );
 
-  h_init_fnc_flag_crit ( hms->fnc, h_fc_Test );
+  h_init_fnc_flag_crit ( hms->fnc, h_fc_SV );
 
-  h_init_master_grid ( hms->gset->glevel[0]->grid[0], xL, xR, N, rank );
+  h_init_master_grid ( hms->gset->glevel[0]->grid[0], xL, xR, N, rank, hms->amrp );
 
   h_create_init_gset ( hms );
 
   h_info_gset ( hms->gset );
 
 
-  h_1Dplot_save_gset ( hms->gset, 0, H_FALSE, "asdasdf", -1 );
+  /* h_1Dplot_save_gset ( hms->gset, 0, H_FALSE, "asdasdf", -1 ); */
 
+  /* _h_boialg_step_grid ( hms->gset->glevel[0]->grid[0], hms->amrp, hms->fnc ); */
+  /* _h_boialg_step_glevel ( h_point_to_glevel( hms->gset, 0 ), hms->amrp, hms->fnc ); */
+  h_boialg ( hms );
+
+  /* h_1Dplot_save_gset ( hms->gset, 0, H_FALSE, "asdasdf", -1 ); */
+
+  /* h_1Dplot_save_gset ( hms->gset, 1, H_FALSE, "asdasdf", -1 ); */
+  
   h_free_hms ( hms );
   
   /* { */

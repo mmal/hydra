@@ -23,6 +23,7 @@ h_fnc *h_alloc_fnc ( void )
 }
 
 
+
 int h_init_fnc_cauchy_data ( h_fnc *f, void *params, int rank, ... )
 {
   char *fnc_msg = "Initializing Cauchy data in h_fnc structure";
@@ -70,6 +71,7 @@ int h_init_fnc_cauchy_data ( h_fnc *f, void *params, int rank, ... )
 
   return H_TRUE;
 }
+
 
 
 int h_init_fnc_derivs ( h_fnc *f, int ISN, ... ) /* Independent Stencil Number */
@@ -120,6 +122,7 @@ int h_init_fnc_derivs ( h_fnc *f, int ISN, ... ) /* Independent Stencil Number *
 }
 
 
+
 int h_init_fnc_flag_crit ( h_fnc *f, _flag_crit fc )
 {
   char *fnc_msg = "Initializing flag criterion in h_fnc structure";
@@ -137,6 +140,7 @@ int h_init_fnc_flag_crit ( h_fnc *f, _flag_crit fc )
   
   return H_TRUE;
 }
+
 
 
 int h_init_fnc_step_type ( h_fnc *f, const gsl_odeiv_step_type * s )

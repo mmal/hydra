@@ -66,7 +66,7 @@ h_grid * h_alloc_grid ( void )
  */
 void h_init_grid ( h_grid * g, H_DBL xL, H_DBL xR,
                    int N, int Lghost, int Rghost,
-                   int rank, int l, int m )
+                   int rank, int l, int m, h_amrp *p )
 {
   int i, Ntotal;
 
@@ -76,6 +76,10 @@ void h_init_grid ( h_grid * g, H_DBL xL, H_DBL xR,
   if ( g == NULL )
       _STAT_MSG ( fnc_msg,
                   "h_grid is unallocated",
+                  WARNING, 0 );
+  else if ( p == NULL )
+      _STAT_MSG ( fnc_msg,
+                  "h_amrp is unallocated",
                   WARNING, 0 );
 
   else if ( N<2  )
@@ -108,6 +112,7 @@ void h_init_grid ( h_grid * g, H_DBL xL, H_DBL xR,
       g->m = m;
       
       g->t = 0.;
+      g->dt = g->h/p->lmbd;
       g->tlast = 0.;
       g->Ncalls = 0;
       
@@ -182,9 +187,9 @@ void h_init_grid ( h_grid * g, H_DBL xL, H_DBL xR,
  * @param rank rank of the equation
  */
 void h_init_master_grid ( h_grid * g, H_DBL xL, H_DBL xR,
-                          int N, int rank )
+                          int N, int rank, h_amrp *p )
 {
-  h_init_grid ( g, xL, xR, N, 0, 0, rank, 0, 0 );
+  h_init_grid ( g, xL, xR, N, 0, 0, rank, 0, 0, p );
   g->master = NULL;
   g->is_master = H_TRUE;
   g->Nchildren = 0;
