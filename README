@@ -11,6 +11,8 @@ GNU Nana
     sudo apt-get install nana
 GSL 
     sudo apt-get install libgsl0-dev
+    
+    with rk4s stepper!
 
 Argtable2
     sudo apt-get install libargtable2-dev

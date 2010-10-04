@@ -64,7 +64,7 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
   /* printf(" wyw. p. s. r. dt=%e" */
   /*        ", stepper %s, order=%u, t=%f, Ncalls=%d\n", hss->grid->dt, */
   /*        hss->fnc->step_T->name, (*hss->fnc->step_T->order)(NULL), t, Ncalls ); */
-  /* printf("N=%d\n", N); */
+  /* printf("l=%d  Ncalls=%d\n", hss->grid->l, Ncalls); */
   /* sleep( 1 ); */
   
   if ( hss->grid->is_master == H_TRUE )
@@ -142,24 +142,24 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
           /* VL(("i=%d\n", i)); */
           
           /* if ( xptr[i] - h == xL_m ) { */
-          /*     VL(("xptr[i] - h == xL_m ")); */
+          /*     /\* VL(("xptr[i] - h == xL_m ")); *\/ */
           /*     status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h); */
           /* } */
           /* else if ( xptr[i] + h == xR_m ) { */
-          /*     VL(("xptr[i] + h == xR_m ")); */
+          /*     /\* VL(("xptr[i] + h == xR_m ")); *\/ */
           /*     status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h); */
           /* } */
           /* else if ( xptr[i] == xL_m ) { */
-          /*     VL(("xptr[i] == xL_m ")); */
+          /*     /\* VL(("xptr[i] == xL_m ")); *\/ */
           /*     status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h); */
           /* } */
           /* else if ( xptr[i] == xR_m ) { */
-          /*     VL(("xptr[i] == xR_m ")); */
+          /*     /\* VL(("xptr[i] == xR_m ")); *\/ */
           /*     status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h); */
           /* } */
           /* else if ( xptr[i]-2*h >= xL_m && xptr[i]+2*h <= xR_m ) { */
           /*     /\* centered derivative *\/ */
-          /*     VL(("xptr[i]-2*h >= xL_m && xptr[i]+2*h <= xR_m ")); */
+          /*     /\* VL(("xptr[i]-2*h >= xL_m && xptr[i]+2*h <= xR_m ")); *\/ */
           /*     status = (*hss->fnc->deriv[2])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h); */
           /* } */
 
@@ -180,7 +180,7 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
               /* centered derivative */
               status = (*hss->fnc->deriv[2])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
           }
-
+          
 
           /* sleep(1); */
 

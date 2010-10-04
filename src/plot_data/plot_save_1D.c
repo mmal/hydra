@@ -99,6 +99,7 @@ void _h_1D_plot_save_grid_position ( h_grid *grid )
   xL = grid->xL;
   xR = grid->xR;
 
+  fprintf( fposition, "# l=%d m=%d\n", grid->l, grid->m );
   fprintf( fposition,
            "%f\t%f\t%d\n"
            "%f\t%f\t%d\n"
@@ -142,6 +143,9 @@ void _h_1D_plot_save_grid_data ( h_grid *grid, int rank, int wghost )
       u = h_get_grid_values( grid, rank );
   }
 
+  fprintf( fdata, "# l=%d m=%d N=%d Lghost=%d Rghost=%d Ntotal=%d\n",
+           grid->l, grid->m, grid->N, grid->Lghost, grid->Rghost, grid->Ntotal );
+  
   for (i = 0; i < N; i++) {
       fprintf( fdata, "%e\t%e\n", x[i], u[i] );
   }
@@ -214,6 +218,90 @@ void h_1Dplot_save_gset ( h_gset * gset, int rank, int wghost,
       _h_1Dplot_save_script ( gset->L );
       /* save gset data/positions to files */
       _h_1Dplot_save_gset ( gset, rank, wghost, handler );
+
+      /* if sleep_time is negative do not kill the plot window */
+      /* obtained by setting x11 terminal option persist */
+      if ( sleep_time < 0 ) {
+          _h_1Dplot_add_options ( handler, "set term x11 persist" );
+          gnuplot_cmd( handler, "load \"" FSCRIPT "\"");
+      }
+      else {
+          gnuplot_cmd( handler, "load \"" FSCRIPT "\"");
+          sleep( sleep_time );
+      }
+      
+      gnuplot_close( handler );
+  }
+}
+
+
+
+void h_1Dplot_save_glevel ( h_glevel * glevel, int rank, int wghost,
+                            const char* title, int sleep_time )
+{
+  char *fnc_msg = "1D plot glevel";
+  
+  gnuplot_ctrl * handler = gnuplot_init();
+  
+
+  if ( glevel == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_glevel is unallocated",
+                  WARNING, 0 );
+      
+      gnuplot_close( handler );
+  }
+  else {
+      
+      /* setting default options for 1D plot */
+      _h_1Dplot_set_options ( handler, title, glevel->grid[0]->t );
+
+      /* save guplot script */
+      _h_1Dplot_save_script ( glevel->l );
+      /* save gset data/positions to files */
+      _h_1Dplot_save_glevel ( glevel, rank, wghost, handler );
+
+      /* if sleep_time is negative do not kill the plot window */
+      /* obtained by setting x11 terminal option persist */
+      if ( sleep_time < 0 ) {
+          _h_1Dplot_add_options ( handler, "set term x11 persist" );
+          gnuplot_cmd( handler, "load \"" FSCRIPT "\"");
+      }
+      else {
+          gnuplot_cmd( handler, "load \"" FSCRIPT "\"");
+          sleep( sleep_time );
+      }
+      
+      gnuplot_close( handler );
+  }
+}
+
+
+
+void h_1Dplot_save_grid ( h_grid * grid, int rank, int wghost,
+                          const char* title, int sleep_time )
+{
+  char *fnc_msg = "1D plot grid";
+  
+  gnuplot_ctrl * handler = gnuplot_init();
+  
+
+  if ( grid == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_grid is unallocated",
+                  WARNING, 0 );
+      
+      gnuplot_close( handler );
+  }
+  else {
+      
+      /* setting default options for 1D plot */
+      _h_1Dplot_set_options ( handler, title, grid->t );
+
+      /* save guplot script */
+      _h_1Dplot_save_script ( grid->l );
+      /* save gset data/positions to files */
+      _h_1Dplot_save_grid ( grid, rank, wghost, handler );
 
       /* if sleep_time is negative do not kill the plot window */
       /* obtained by setting x11 terminal option persist */

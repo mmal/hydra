@@ -77,7 +77,7 @@ int RHS_extern_1 ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
   t=h;
   /* VL(("called RHS_extern_1\n")); */
   f[abs(i)] = u[N+abs(i)];
-  f[N+abs(i)] = fda_D2_5_extern_0_node( u, h, i );
+  f[N+abs(i)] = fda_D2_5_extern_1_node( u, h, i );
   /* fda_D2_5_extern_1_node */
   return H_TRUE;
 }
@@ -87,7 +87,7 @@ int main( int argc, char *argv[] )
 {
   const int rank = 2;
 
-  const int N = 31;
+  const int N = 41;
   
   const H_DBL xL = -1.;
 
@@ -112,27 +112,31 @@ int main( int argc, char *argv[] )
   h_info_gset ( hms->gset );
 
 
-  /* h_1Dplot_save_gset ( hms->gset, 0, H_FALSE, "asdasdf", -1 ); */
-
-  /* _h_boialg_step_grid ( hms->gset->glevel[0]->grid[0], hms->amrp, hms->fnc ); */
-
-  /* _h_boialg_step_grid ( hms->gset->glevel[1]->grid[0], hms->amrp, hms->fnc ); */
-
-  /* _h_boialg_step_grid ( hms->gset->glevel[1]->grid[0], hms->amrp, hms->fnc ); */
-
-
-
-
-  /* _h_boialg_step_grid ( hms->gset->glevel[1]->grid[0], hms->amrp, hms->fnc ); */
-
-  /* _h_boialg_step_glevel ( h_point_to_glevel( hms->gset, 0 ), hms->amrp, hms->fnc ); */
-
   h_boialg ( hms );
+      
 
-  h_1Dplot_save_gset ( hms->gset, 0, H_FALSE, "gset: rank 0", -1 );
-
-  h_1Dplot_save_gset ( hms->gset, 1, H_FALSE, "gset: rank 1", -1 );
+  /* while ( hms->gset->glevel[0]->grid[0]->t < 1 ) { */
+  /*     printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t ); */
+  /*     h_boialg ( hms ); */
+  /* } */
   
+  /* h_1Dplot_save_gset ( hms->gset, 0, H_TRUE, "gset: rank 0", -1 ); */
+
+  /* h_1Dplot_save_gset ( hms->gset, 1, H_TRUE, "gset: rank 1", -1 ); */
+
+  /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 1 , 0), 0, H_TRUE, "grid: rank 1", -1 ); */
+
+  /* h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 0), 0, H_TRUE, "grid 0: rank 0", -1 ); */
+
+  h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 0), 0, H_TRUE, "grid 0: rank 0", -1 );
+  h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 0), 1, H_TRUE, "grid 0: rank 1", -1 );
+  
+  h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 1), 0, H_TRUE, "grid 1: rank 0", -1 );
+  h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 1), 1, H_TRUE, "grid 1: rank 1", -1 );
+
+  h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 2), 0, H_TRUE, "grid 2: rank 0", -1 );
+  h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 2), 1, H_TRUE, "grid 2: rank 1", -1 );
+
   h_free_hms ( hms );
     
   return 0;

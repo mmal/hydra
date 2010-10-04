@@ -51,32 +51,37 @@ int h_boialg ( h_hms *hms )
 
 int _h_boialg ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
 {
-  int status, repeat, L;
+  int status, repeat, L, rratio;
 
   h_glevel *glevel;
   
   L = gset->L;
 
-  repeat = (int) pow( amrp->rr, l );
+  rratio = amrp->rr;
 
+  if ( l > 0 )
+      repeat = (int) pow( rratio, l );
+  else
+      repeat = (int) pow( rratio, l );
+  
   glevel = h_point_to_glevel ( gset, l );
       
   do {
-      printf("repeat=%d, l=%d\n", repeat, l);
-          
+      printf("l=%d, repeat=%d\n", l, repeat);
+      
       /* regriding, and step on level l */
       status = _h_boialg_step_glevel ( glevel, amrp, fnc );
 
       if ( status != H_OK )
           break;
       
-      if ( l < L - 1 && repeat == (int) pow( amrp->rr, l ) ) {
+      if ( l < L - 1 && repeat == (int) pow( rratio, l )  ) {
 
           status = _h_boialg ( gset, amrp, fnc , l+1 );
           if ( status != H_OK )
               break;
 
-          status = _h_update_glevel ( glevel, h_point_to_glevel ( gset, l+1 ) );
+          status = _h_update_glevel ( glevel, h_point_to_glevel ( gset, l+1 ), amrp );
           if ( status != H_OK )
               break;
           

@@ -52,11 +52,11 @@ void _h_create_child_grid ( h_grid *parent, h_grid *child,
       xR_m = master_grid->xR;
   }
 
- 
+  /* TODO: większe/mnieje lub rowne ??? */
   for (i = 1; i <= sp; i++) {
-      if (xL_c - i*h_p/rr > xL_m)
+      if (xL_c - i*h_p/rr >= xL_m)
           Lghost_c++;
-      if (xR_c + i*h_p/rr < xR_m)
+      if (xR_c + i*h_p/rr <= xR_m)
           Rghost_c++;
   }
   
