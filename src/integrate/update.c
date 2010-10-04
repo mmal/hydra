@@ -3,6 +3,10 @@
 #include "update.h"
 
 
+#define INTERP_TYPE gsl_interp_linear
+#define N_CHILD 2
+
+
 int _h_dbl_eq ( H_DBL a, H_DBL b )
 {
   if ( fabs ( a-b ) <= DBL_EPSILON )
@@ -83,7 +87,7 @@ int _h_update_grid_ghosts_right ( h_grid *parent, h_grid *child, h_amrp *amrp )
   int i, j, r, Nchild, Nparent;
   int Lghost, Rghost;
 
-  int iparentR=-1, NparentR, NchildR=2;
+  int iparentR=-1, NparentR, NchildR=N_CHILD;
   
   int rratio = amrp->rr;
   int ngh = amrp->ngh;
@@ -115,13 +119,13 @@ int _h_update_grid_ghosts_right ( h_grid *parent, h_grid *child, h_amrp *amrp )
       for (j = 0; j < Nparent; j++) {
           if ( _h_dbl_eq( xparent[j], xRc ) ) {
               iparentR = j;
-              /* printf("%e %e\n", xparent[j], xLc ); */
+              printf("iparentR = %d \n", iparentR );
               break;
           }
       }
 
-      NparentR = (int) ( ( xRp -xparent[iparentR] )/hparent ) + 1;
-      
+      NparentR = (int) ( ( xRp - xparent[iparentR] )/hparent ) + 1;
+      printf("NparentR = %d \n", NparentR );
       if ( NparentR > ngh/rratio )
           NparentR = ngh/rratio;
 
@@ -129,23 +133,23 @@ int _h_update_grid_ghosts_right ( h_grid *parent, h_grid *child, h_amrp *amrp )
       u_to_interpolate = (H_DBL*) malloc ( rank*(NparentR+NchildR)*sizeof( H_DBL ) ); 
       
       for (i = 0; i < NparentR; i++) {
-          /* printf( "i=%d xparent[%d]=%e\n", i, iparentL-nparentL+i+1, xparent[iparentL-nparentL+i+1] ); */
-          x_to_interpolate[i] = xparent[iparentR-NparentR+i+1];
+          printf( "i=%d xparent[%d]=%e\n", i, iparentR+i, xparent[iparentR+i] );
+          x_to_interpolate[i+NchildR] = xparent[iparentR+i];
 
           for (r = 0; r < rank; r++) {
               uparent = h_get_grid_values_wghosts ( parent, r );
-              u_to_interpolate[r*(NparentR+NchildR) + i] = uparent[iparentR-NparentR+i+1];
+              u_to_interpolate[r*(NparentR+NchildR) + i +NchildR] = uparent[iparentR+i];
           }
       }
 
       /* adding child points for interpolation */
       for (i = 0; i < NchildR; i++) {
-          x_to_interpolate[NparentR+i] = xchild[Lghost+1+i];
-
+          x_to_interpolate[i] = xchild[Lghost-(NchildR-i-6)];
+          
           for (r = 0; r < rank; r++) {
               uchild = h_get_grid_values_wghosts ( child, r );
-
-              u_to_interpolate[r*(NparentR+NchildR) + NparentR + i] = uchild[Lghost+1+i];
+              
+              u_to_interpolate[r*(NparentR+NchildR) +  i] = uchild[Lghost-(NchildR-i-6)];
           }
       }
       
@@ -167,12 +171,13 @@ int _h_update_grid_ghosts_right ( h_grid *parent, h_grid *child, h_amrp *amrp )
                 = gsl_interp_accel_alloc ();
             
             gsl_spline *spline
-                = gsl_spline_alloc (gsl_interp_polynomial, NparentR+NchildR);
+                = gsl_spline_alloc (INTERP_TYPE, NparentR+NchildR);
             
             gsl_spline_init (spline, x_to_interpolate, u_to_interpolate, NparentR+NchildR);
             
-          for (i = 0; i < Lghost; i++) {
-              uchild[i] = gsl_spline_eval (spline, xchild[i], acc);
+          for (i = 0; i < Rghost; i++) {
+              uchild[Lghost+Nchild+i] =
+                  gsl_spline_eval (spline, xchild[Lghost+Nchild+i], acc);
           }
           
           gsl_spline_free (spline);
@@ -192,7 +197,7 @@ int _h_update_grid_ghosts_left ( h_grid *parent, h_grid *child, h_amrp *amrp )
   int i, j, r, Nchild, Nparent;
   int Lghost, Rghost;
 
-  int iparentL=-1, iparentR=-1, NparentL, NchildL=2;
+  int iparentL=-1, iparentR=-1, NparentL, NchildL=N_CHILD;
   
   int rratio = amrp->rr;
   int ngh = amrp->ngh;
@@ -277,7 +282,7 @@ int _h_update_grid_ghosts_left ( h_grid *parent, h_grid *child, h_amrp *amrp )
                 = gsl_interp_accel_alloc ();
             
             gsl_spline *spline
-                = gsl_spline_alloc (gsl_interp_polynomial, NparentL+NchildL);
+                = gsl_spline_alloc (INTERP_TYPE, NparentL+NchildL);
             
             gsl_spline_init (spline, x_to_interpolate, u_to_interpolate, NparentL+NchildL);
             

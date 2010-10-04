@@ -115,27 +115,28 @@ int main( int argc, char *argv[] )
   h_boialg ( hms );
       
 
-  /* while ( hms->gset->glevel[0]->grid[0]->t < 1 ) { */
-  /*     printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t ); */
-  /*     h_boialg ( hms ); */
-  /* } */
+  while ( hms->gset->glevel[0]->grid[0]->t < 1. ) {
+      printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t );
+      h_boialg ( hms );
+  }
   
-  /* h_1Dplot_save_gset ( hms->gset, 0, H_TRUE, "gset: rank 0", -1 ); */
+  h_1Dplot_save_gset ( hms->gset, 0, H_FALSE, "gset: rank 0", -1 );
+  h_1Dplot_save_gset ( hms->gset, 1, H_FALSE, "gset: rank 1", -1 );
 
-  /* h_1Dplot_save_gset ( hms->gset, 1, H_TRUE, "gset: rank 1", -1 ); */
+  h_1Dplot_save_gset ( hms->gset, 0, H_TRUE, "gset: rank 0 wghosts1", -1 );
 
   /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 1 , 0), 0, H_TRUE, "grid: rank 1", -1 ); */
 
   /* h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 0), 0, H_TRUE, "grid 0: rank 0", -1 ); */
 
-  h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 0), 0, H_TRUE, "grid 0: rank 0", -1 );
-  h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 0), 1, H_TRUE, "grid 0: rank 1", -1 );
+  /* h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 0), 0, H_TRUE, "grid 0: rank 0", -1 ); */
+  /* h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 0), 1, H_TRUE, "grid 0: rank 1", -1 ); */
   
-  h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 1), 0, H_TRUE, "grid 1: rank 0", -1 );
-  h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 1), 1, H_TRUE, "grid 1: rank 1", -1 );
+  /* h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 1), 0, H_TRUE, "grid 1: rank 0", -1 ); */
+  /* h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 1), 1, H_TRUE, "grid 1: rank 1", -1 ); */
 
-  h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 2), 0, H_TRUE, "grid 2: rank 0", -1 );
-  h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 2), 1, H_TRUE, "grid 2: rank 1", -1 );
+  /* h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 2), 0, H_TRUE, "grid 2: rank 0", -1 ); */
+  /* h_1Dplot_grid ( h_point_to_grid( hms->gset, 1 , 2), 1, H_TRUE, "grid 2: rank 1", -1 ); */
 
   h_free_hms ( hms );
     
