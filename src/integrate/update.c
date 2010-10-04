@@ -80,23 +80,15 @@ int _h_update_grid_ghosts ( h_grid *parent, h_grid *child, h_amrp *amrp )
 
 int _h_update_grid_ghosts_right ( h_grid *parent, h_grid *child, h_amrp *amrp )
 {
-  return H_OK;
-}
-
-
-
-int _h_update_grid_ghosts_left ( h_grid *parent, h_grid *child, h_amrp *amrp )
-{
   int i, j, r, Nchild, Nparent;
   int Lghost, Rghost;
 
-  int iparentL=-1, iparentR=-1, nparentL;
+  int iparentR=-1, NparentR, NchildR=2;
   
   int rratio = amrp->rr;
   int ngh = amrp->ngh;
   int rank = child->rank;
-  
-  
+    
   H_DBL *xparent = h_get_grid_positions_wghosts ( parent );
   H_DBL *uparent = h_get_grid_values_wghosts ( parent, 0 );
   
@@ -119,87 +111,191 @@ int _h_update_grid_ghosts_left ( h_grid *parent, h_grid *child, h_amrp *amrp )
   Nchild = child->N;
   Nparent = parent->Ntotal;
 
-  printf("Lghost=%d\n", Lghost);
-  
-  if ( Lghost > 0 ) {
-      
+  if ( Rghost > 0 ) {
       for (j = 0; j < Nparent; j++) {
-          if ( _h_dbl_eq( xparent[j], xLc ) ) {
-              iparentL = j;
-              printf("%e %e\n", xparent[j], xLc );
+          if ( _h_dbl_eq( xparent[j], xRc ) ) {
+              iparentR = j;
+              /* printf("%e %e\n", xparent[j], xLc ); */
               break;
           }
-          /* if ( _h_dbl_eq( xparent[j], xchild[Lghost-1] ) ) */
-          /*     iparentR = j; */
       }
 
-      nparentL = (int) ( (xparent[iparentL] - xLp)/hparent ) + 1;
+      NparentR = (int) ( ( xRp -xparent[iparentR] )/hparent ) + 1;
       
-      if ( nparentL > ngh/rratio )
-          nparentL = ngh/rratio;
+      if ( NparentR > ngh/rratio )
+          NparentR = ngh/rratio;
 
-      x_to_interpolate = (H_DBL*) malloc ( (nparentL+2)*sizeof( H_DBL ) ); 
-      u_to_interpolate = (H_DBL*) malloc ( rank*(nparentL+2)*sizeof( H_DBL ) ); 
-
-      for (i = 0; i < nparentL; i++) {
+      x_to_interpolate = (H_DBL*) malloc ( (NparentR+NchildR)*sizeof( H_DBL ) ); 
+      u_to_interpolate = (H_DBL*) malloc ( rank*(NparentR+NchildR)*sizeof( H_DBL ) ); 
+      
+      for (i = 0; i < NparentR; i++) {
           /* printf( "i=%d xparent[%d]=%e\n", i, iparentL-nparentL+i+1, xparent[iparentL-nparentL+i+1] ); */
-          x_to_interpolate[i] = xparent[iparentL-nparentL+i+1];
+          x_to_interpolate[i] = xparent[iparentR-NparentR+i+1];
 
-          uparent = h_get_grid_values_wghosts ( parent, 0 );
-
-          x_to_interpolate[i] = xparent[iparentL-nparentL+i+1];
-          u_to_interpolate[i] = uparent[iparentL-nparentL+i+1];
+          for (r = 0; r < rank; r++) {
+              uparent = h_get_grid_values_wghosts ( parent, r );
+              u_to_interpolate[r*(NparentR+NchildR) + i] = uparent[iparentR-NparentR+i+1];
+          }
       }
 
-      for (i = 0; i < 2; i++) {
-          x_to_interpolate[nparentL+i] = xchild[Lghost+1+i];
-          u_to_interpolate[nparentL+i] = uchild[Lghost+1+i];
+      /* adding child points for interpolation */
+      for (i = 0; i < NchildR; i++) {
+          x_to_interpolate[NparentR+i] = xchild[Lghost+1+i];
+
+          for (r = 0; r < rank; r++) {
+              uchild = h_get_grid_values_wghosts ( child, r );
+
+              u_to_interpolate[r*(NparentR+NchildR) + NparentR + i] = uchild[Lghost+1+i];
+          }
       }
+      
+      
       
       FILE *fp = fopen("file", "w");
-      for (i = 0; i < nparentL+2; i++) {
+      for (i = 0; i < NparentR+NchildR; i++) {
           fprintf( fp, "%e %e\n", x_to_interpolate[i], u_to_interpolate[i]);
       }
       fclose(fp);
+
       
-      /* printf ( "iparentL=%d\n", iparentL); */
-      /* printf ( "nparentL=%d\n", nparentL); */
+      for (r = 0; r < rank; r++)
+        {
+            uchild = h_get_grid_values_wghosts ( child, r );
+            u_to_interpolate += r*(NparentR+NchildR);
+            
+            gsl_interp_accel *acc
+                = gsl_interp_accel_alloc ();
+            
+            gsl_spline *spline
+                = gsl_spline_alloc (gsl_interp_polynomial, NparentR+NchildR);
+            
+            gsl_spline_init (spline, x_to_interpolate, u_to_interpolate, NparentR+NchildR);
+            
+          for (i = 0; i < Lghost; i++) {
+              uchild[i] = gsl_spline_eval (spline, xchild[i], acc);
+          }
+          
+          gsl_spline_free (spline);
+          
+          gsl_interp_accel_free (acc);
+      }
+
       
-      /* printf ( "%d %d\n", iparentL, iparentR ); */
-      /* printf ( "xchild[i=%d] = %e\n", 0, xchild[0] ); */
-      /* printf ( "xchild[i=%d] = %e\n", Lghost-1, xchild[Lghost-1] ); */
   }
-  
-  /* for (i = 0; i < Lghost; i++) { */
-  /*     for (r = 0; r < rank; r++) { */
-  /*         uchild = h_get_grid_values_wghosts ( child, r ); */
-  /*         uchild[i] = 0.921; */
-  /*     } */
-  /* } */
-  /* for (i = Nchild+Lghost; i < Nchild+Lghost+Rghost; i++) { */
-  /*     for (r = 0; r < rank; r++) { */
-  /*         uchild = h_get_grid_values_wghosts ( child, r ); */
-  /*         uchild[i] = 0.921; */
-  /*     } */
-  /* } */
-
-  /* gsl_interp_accel *acc */
-  /*     = gsl_interp_accel_alloc (); */
-
-  /* gsl_spline *spline */
-  /*     = gsl_spline_alloc (gsl_interp_linear, nparentL+2); */
-     
-  /* gsl_spline_init (spline, x_to_interpolate, u_to_interpolate, nparentL+2); */
-
-  /* for (i = 0; i < Lghost; i++) { */
-  /*     uchild[i] = gsl_spline_eval (spline, xchild[i], acc); */
-  /* } */
-      
-  /* gsl_spline_free (spline); */
-
-  /* gsl_interp_accel_free (acc); */
-
+  return H_OK;
 }
+
+
+
+int _h_update_grid_ghosts_left ( h_grid *parent, h_grid *child, h_amrp *amrp )
+{
+  int i, j, r, Nchild, Nparent;
+  int Lghost, Rghost;
+
+  int iparentL=-1, iparentR=-1, NparentL, NchildL=2;
+  
+  int rratio = amrp->rr;
+  int ngh = amrp->ngh;
+  int rank = child->rank;
+    
+  H_DBL *xparent = h_get_grid_positions_wghosts ( parent );
+  H_DBL *uparent = h_get_grid_values_wghosts ( parent, 0 );
+  
+  H_DBL *xchild = h_get_grid_positions_wghosts ( child );
+  H_DBL *uchild = h_get_grid_values_wghosts ( child, 0 );
+
+  H_DBL xLc = child->xL;
+  H_DBL xRc = child->xR;
+
+  H_DBL xLp = parent->xL;
+  H_DBL xRp = parent->xR;
+
+  H_DBL hparent = parent->h;
+
+  H_DBL *x_to_interpolate;
+  H_DBL *u_to_interpolate;
+
+  Lghost= child->Lghost;
+  Rghost= child->Rghost;
+  Nchild = child->N;
+  Nparent = parent->Ntotal;
+
+  if ( Lghost > 0 ) {
+      for (j = 0; j < Nparent; j++) {
+          if ( _h_dbl_eq( xparent[j], xLc ) ) {
+              iparentL = j;
+              /* printf("%e %e\n", xparent[j], xLc ); */
+              break;
+          }
+      }
+
+      NparentL = (int) ( (xparent[iparentL] - xLp)/hparent ) + 1;
+      
+      if ( NparentL > ngh/rratio )
+          NparentL = ngh/rratio;
+
+      x_to_interpolate = (H_DBL*) malloc ( (NparentL+NchildL)*sizeof( H_DBL ) ); 
+      u_to_interpolate = (H_DBL*) malloc ( rank*(NparentL+NchildL)*sizeof( H_DBL ) ); 
+      
+      for (i = 0; i < NparentL; i++) {
+          /* printf( "i=%d xparent[%d]=%e\n", i, iparentL-nparentL+i+1, xparent[iparentL-nparentL+i+1] ); */
+          x_to_interpolate[i] = xparent[iparentL-NparentL+i+1];
+
+
+          for (r = 0; r < rank; r++) {
+              uparent = h_get_grid_values_wghosts ( parent, r );
+              u_to_interpolate[r*(NparentL+NchildL) + i] = uparent[iparentL-NparentL+i+1];
+          }
+      }
+
+      /* adding child points for interpolation */
+      for (i = 0; i < NchildL; i++) {
+          x_to_interpolate[NparentL+i] = xchild[Lghost+1+i];
+
+          for (r = 0; r < rank; r++) {
+              uchild = h_get_grid_values_wghosts ( child, r );
+
+              u_to_interpolate[r*(NparentL+NchildL) + NparentL + i] = uchild[Lghost+1+i];
+          }
+      }
+      
+      
+      
+      FILE *fp = fopen("file", "w");
+      for (i = 0; i < NparentL+NchildL; i++) {
+          fprintf( fp, "%e %e\n", x_to_interpolate[i], u_to_interpolate[i]);
+      }
+      fclose(fp);
+
+      
+      for (r = 0; r < rank; r++)
+        {
+            uchild = h_get_grid_values_wghosts ( child, r );
+            u_to_interpolate += r*(NparentL+NchildL);
+            
+            gsl_interp_accel *acc
+                = gsl_interp_accel_alloc ();
+            
+            gsl_spline *spline
+                = gsl_spline_alloc (gsl_interp_polynomial, NparentL+NchildL);
+            
+            gsl_spline_init (spline, x_to_interpolate, u_to_interpolate, NparentL+NchildL);
+            
+          for (i = 0; i < Lghost; i++) {
+              uchild[i] = gsl_spline_eval (spline, xchild[i], acc);
+          }
+          
+          gsl_spline_free (spline);
+          
+          gsl_interp_accel_free (acc);
+      }
+
+      
+  }
+  return H_OK;
+}
+
+
 
 int _h_update_glevel ( h_glevel *parent, h_glevel *child, h_amrp *amrp )
 {
