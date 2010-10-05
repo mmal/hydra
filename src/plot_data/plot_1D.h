@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 
 
 #include "src/common/types.h"
@@ -12,10 +13,14 @@
 #include "src/stat_log/stat_msg.h"
 #include "src/plot_data/gnuplot_i.h"
 
+#define FDATA "data.dat"
+#define FPOSITION "positions.dat"
+#define FSCRIPT "script.gp"
 
+#define MAX_CHAR 1024
 
 void _h_1Dplot_set_options ( gnuplot_ctrl * h, const char * title, const H_DBL time );
-void _h_1Dplot_add_options ( gnuplot_ctrl * h, const char *option );
+void _h_1Dplot_add_options ( gnuplot_ctrl * h, const char *option, ... );
 void _h_1Dplot_grid ( h_grid *grid, int rank, int wghost, gnuplot_ctrl *handler );
 void _h_1Dplot_glevel ( h_glevel *glevel, int rank, int wghost, gnuplot_ctrl *handler );
 void _h_1Dplot_gset ( h_gset *gset, int rank, int wghost, gnuplot_ctrl *handler );
@@ -32,5 +37,8 @@ void _h_1Dplot_save_gset ( h_gset *gset, int rank, int wghost, gnuplot_ctrl *han
 void h_1Dplot_save_gset ( h_gset * gset, int rank, int wghost, const char* title, int sleep_time );
 void h_1Dplot_save_grid ( h_grid * grid, int rank, int wghost, const char* title, int sleep_time );
 void h_1Dplot_save_glevel ( h_glevel * glevel, int rank, int wghost, const char* title, int sleep_time );
+
+void h_1Dplot_save_eps_grid ( h_grid * grid, int rank, int wghost, const char *title, const char *file );
+
 
 #endif /* _PLOT_1D_H_ */

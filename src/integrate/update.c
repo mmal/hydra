@@ -3,7 +3,7 @@
 #include "update.h"
 
 
-#define INTERP_TYPE gsl_interp_linear
+#define INTERP_TYPE gsl_interp_cspline
 #define N_CHILD 2
 
 

@@ -42,10 +42,22 @@ void _h_1Dplot_set_options ( gnuplot_ctrl * h, const char * title,
 
 
 
-void _h_1Dplot_add_options ( gnuplot_ctrl * h, const char *option )
+void _h_1Dplot_add_options ( gnuplot_ctrl * h, const char *option, ... )
 {
-  if ( option != NULL )
-      gnuplot_cmd( h, option );
+  va_list args;
+
+  char * str = (char *) malloc ( MAX_CHAR*sizeof( char ) );
+
+  va_start( args, option );
+ 
+  vsprintf(str, option, args);
+
+  if ( str != NULL ) {
+      gnuplot_cmd( h, str );
+      free ( str );
+  }
+  va_end( args );
+
 }
 
 

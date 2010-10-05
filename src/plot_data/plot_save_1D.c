@@ -2,11 +2,6 @@
 #include "plot_1D.h"
 
 
-#define FDATA "data.dat"
-#define FPOSITION "positions.dat"
-#define FSCRIPT "script.gp"
-
-
 
 void _h_1Dplot_save_script ( int L )
 {
@@ -17,9 +12,9 @@ void _h_1Dplot_save_script ( int L )
       exit (EXIT_FAILURE);
   }
 
-  fprintf ( fscript, "set terminal x11 persist\n");
+  /* fprintf ( fscript, "set terminal x11 persist\n"); */
   fprintf ( fscript, "set nokey\n");
-  fprintf ( fscript, "set size 1.,0.55\n");
+  /* fprintf ( fscript, "set size 1.,0.55\n"); */
   fprintf ( fscript, "set origin 0,0\n");
   fprintf ( fscript, "set ylabel \"u(t, x)\"\n");
   fprintf ( fscript, "set xlabel \"\"\n");
@@ -317,3 +312,6 @@ void h_1Dplot_save_grid ( h_grid * grid, int rank, int wghost,
       gnuplot_close( handler );
   }
 }
+
+
+
