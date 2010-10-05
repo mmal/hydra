@@ -39,6 +39,7 @@ void h_1Dplot_save_grid ( h_grid * grid, int rank, int wghost, const char* title
 void h_1Dplot_save_glevel ( h_glevel * glevel, int rank, int wghost, const char* title, int sleep_time );
 
 void h_1Dplot_save_eps_grid ( h_grid * grid, int rank, int wghost, const char *title, const char *file );
+void h_1Dplot_save_eps_glevel ( h_glevel * glevel, int rank, int wghost, const char *title, const char *file );
 
 
 #endif /* _PLOT_1D_H_ */

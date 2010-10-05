@@ -1,10 +1,24 @@
 
 #include "plot_1D.h"
 
+char DAT_TEMPLATE[] = "dat.XXXXXX";
+char POS_TEMPLATE[] = "pos.XXXXXX";
+char SCR_TEMPLATE[] = "scr.XXXXXX";
+
+char DAT_NAME[] = "dat.XXXXXX";
+char POS_NAME[] = "pos.XXXXXX";
+char SCR_NAME[] = "scr.XXXXXX";
 
 
 void _h_1Dplot_save_script ( int L )
 {
+  sprintf(SCR_NAME, "%s", SCR_TEMPLATE);
+  
+  int fd = mkstemp( SCR_NAME );
+
+  /* FILE *fp = fdopen( fd, "w"); */
+
+
   FILE *fscript = fopen( FSCRIPT, "w");
 
   if ( fscript == NULL ) {

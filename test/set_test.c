@@ -125,7 +125,8 @@ int main( int argc, char *argv[] )
 
   h_1Dplot_save_gset ( hms->gset, 0, H_TRUE, "gset: rank 0 wghosts1", 1 );
 
-  h_1Dplot_save_eps_grid ( h_point_to_grid( hms->gset, 0, 0 ), 0, H_FALSE, "master grid: rank 0", "file.eps");
+  /* h_1Dplot_save_eps_grid ( h_point_to_grid( hms->gset, 0, 0 ), 0, H_FALSE, "master grid: rank 0", "file.eps"); */
+  
 
   h_1Dplot_save_eps_glevel ( h_point_to_glevel( hms->gset, 1), 0, H_FALSE, "glevel 1: rank 0", "level1.eps");
 
