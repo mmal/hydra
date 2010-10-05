@@ -2,8 +2,12 @@
 
 #include "update.h"
 
+/* gsl_interp_linear */
+/* gsl_interp_polynomial */
+/* gsl_interp_cspline */
 
-#define INTERP_TYPE gsl_interp_cspline
+
+#define INTERP_TYPE gsl_interp_polynomial
 #define N_CHILD 2
 
 
@@ -110,6 +114,8 @@ int _h_update_grid_ghosts_right ( h_grid *parent, h_grid *child, h_amrp *amrp )
   H_DBL *x_to_interpolate;
   H_DBL *u_to_interpolate;
 
+  H_DBL t = child->t;
+
   Lghost= child->Lghost;
   Rghost= child->Rghost;
   Nchild = child->N;
@@ -176,8 +182,15 @@ int _h_update_grid_ghosts_right ( h_grid *parent, h_grid *child, h_amrp *amrp )
             gsl_spline_init (spline, x_to_interpolate, u_to_interpolate, NparentR+NchildR);
             
           for (i = 0; i < Rghost; i++) {
-              uchild[Lghost+Nchild+i] =
-                  gsl_spline_eval (spline, xchild[Lghost+Nchild+i], acc);
+              if ( r == 0 )
+                  uchild[Lghost+Nchild+i] =
+                      sin(2*M_PI*xchild[Lghost+Nchild+i])*cos(2*M_PI*t);
+              if ( r == 1 )
+                  uchild[Lghost+Nchild+i] =
+                      -2*M_PI*sin(2*M_PI*xchild[Lghost+Nchild+i])*sin(2*M_PI*t);
+                  
+              /* uchild[Lghost+Nchild+i] = */
+              /*     gsl_spline_eval (spline, xchild[Lghost+Nchild+i], acc); */
           }
           
           gsl_spline_free (spline);
@@ -219,6 +232,8 @@ int _h_update_grid_ghosts_left ( h_grid *parent, h_grid *child, h_amrp *amrp )
 
   H_DBL *x_to_interpolate;
   H_DBL *u_to_interpolate;
+
+  H_DBL t = child->t;
 
   Lghost= child->Lghost;
   Rghost= child->Rghost;
@@ -287,7 +302,14 @@ int _h_update_grid_ghosts_left ( h_grid *parent, h_grid *child, h_amrp *amrp )
             gsl_spline_init (spline, x_to_interpolate, u_to_interpolate, NparentL+NchildL);
             
           for (i = 0; i < Lghost; i++) {
-              uchild[i] = gsl_spline_eval (spline, xchild[i], acc);
+              if ( r == 0 )
+                  uchild[i] =
+                      sin(2*M_PI*xchild[i])*cos(2*M_PI*t);
+              if ( r == 1 )
+                  uchild[i] =
+                      -2*M_PI*sin(2*M_PI*xchild[i])*sin(2*M_PI*t);
+
+              /* uchild[i] = gsl_spline_eval (spline, xchild[i], acc); */
           }
           
           gsl_spline_free (spline);

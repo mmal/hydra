@@ -2,7 +2,11 @@
 
 #include "plot_1D.h"
 
+
+extern char DAT_NAME[];
+extern char POS_NAME[];
 extern char SCR_NAME[];
+
 
 
 void h_1Dplot_save_eps_gset ( h_gset * gset, int rank, int wghost,
@@ -27,6 +31,7 @@ void h_1Dplot_save_eps_gset ( h_gset * gset, int rank, int wghost,
       gnuplot_close( handler );
   }      
   else {
+
       
       /* Checking if the file exist */
       if ( access( file, F_OK ) != 0 ) {
@@ -35,6 +40,7 @@ void h_1Dplot_save_eps_gset ( h_gset * gset, int rank, int wghost,
                       WARNING, 0 );
       }
 
+      _h_1Dplot_gen_names( );
 
       /* setting default options for 1D plot */
       _h_1Dplot_set_options ( handler, title, gset->glevel[0]->grid[0]->t );
@@ -52,7 +58,7 @@ void h_1Dplot_save_eps_gset ( h_gset * gset, int rank, int wghost,
       _h_1Dplot_add_options ( handler, "set output \"%s\"", file );
 
       /* loading gnuplot script */
-      gnuplot_cmd( handler, "load \"" FSCRIPT "\"");
+      gnuplot_cmd( handler, "load \"%s\"", SCR_NAME );
       
       gnuplot_close( handler );
   }
@@ -63,8 +69,6 @@ void h_1Dplot_save_eps_gset ( h_gset * gset, int rank, int wghost,
 void h_1Dplot_save_eps_glevel ( h_glevel * glevel, int rank, int wghost,
                                 const char *title, const char *file )
 {
-  printf("%s\n", SCR_NAME );
-  sleep ( 10 );
   char *fnc_msg = "1D plot save eps glevel";
   
   gnuplot_ctrl * handler = gnuplot_init();
@@ -92,6 +96,7 @@ void h_1Dplot_save_eps_glevel ( h_glevel * glevel, int rank, int wghost,
                       WARNING, 0 );
       }
 
+      _h_1Dplot_gen_names( );
 
       /* setting default options for 1D plot */
       _h_1Dplot_set_options ( handler, title, glevel->grid[0]->t );
@@ -109,7 +114,7 @@ void h_1Dplot_save_eps_glevel ( h_glevel * glevel, int rank, int wghost,
       _h_1Dplot_add_options ( handler, "set output \"%s\"", file );
 
       /* loading gnuplot script */
-      gnuplot_cmd( handler, "load \"" FSCRIPT "\"");
+      gnuplot_cmd( handler, "load \"%s\"", SCR_NAME );
       
       gnuplot_close( handler );
   }
@@ -147,6 +152,7 @@ void h_1Dplot_save_eps_grid ( h_grid * grid, int rank, int wghost,
                       WARNING, 0 );
       }
 
+      _h_1Dplot_gen_names( );
 
       /* setting default options for 1D plot */
       _h_1Dplot_set_options ( handler, title, grid->t );
@@ -164,7 +170,7 @@ void h_1Dplot_save_eps_grid ( h_grid * grid, int rank, int wghost,
       _h_1Dplot_add_options ( handler, "set output \"%s\"", file );
 
       /* loading gnuplot script */
-      gnuplot_cmd( handler, "load \"" FSCRIPT "\"");
+      gnuplot_cmd( handler, "load \"%s\"", SCR_NAME );
 
       gnuplot_close( handler );
   }

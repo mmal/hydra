@@ -1,25 +1,48 @@
 
 #include "plot_1D.h"
 
+
+
 char DAT_TEMPLATE[] = "dat.XXXXXX";
 char POS_TEMPLATE[] = "pos.XXXXXX";
 char SCR_TEMPLATE[] = "scr.XXXXXX";
 
-char DAT_NAME[] = "dat.XXXXXX";
-char POS_NAME[] = "pos.XXXXXX";
-char SCR_NAME[] = "scr.XXXXXX";
+char DAT_NAME[] = "TTT.XXXXXX";
+char POS_NAME[] = "TTT.XXXXXX";
+char SCR_NAME[] = "TTT.XXXXXX";
+
+
+
+void _h_1Dplot_gen_names ( void )
+{
+  int i;
+  char *ptr[3];
+
+  int fdes;    /* file descriptor */
+  FILE *fptr;  /* file pointer */
+  
+  sprintf ( DAT_NAME, "%s", DAT_TEMPLATE );
+  sprintf ( POS_NAME, "%s", POS_TEMPLATE );
+  sprintf ( SCR_NAME, "%s", SCR_TEMPLATE );
+
+  ptr[0]=DAT_NAME;
+  ptr[1]=POS_NAME;
+  ptr[2]=SCR_NAME;
+  
+  for (i = 0; i < 3; i++) {
+      fdes = mkstemp ( ptr[i] );
+      fptr = fdopen ( fdes, "w");
+      fclose( fptr ); 
+      /* printf("fname = %s\n", ptr[i]); */
+      /* sleep(3); */
+  }
+}
+
 
 
 void _h_1Dplot_save_script ( int L )
 {
-  sprintf(SCR_NAME, "%s", SCR_TEMPLATE);
-  
-  int fd = mkstemp( SCR_NAME );
-
-  /* FILE *fp = fdopen( fd, "w"); */
-
-
-  FILE *fscript = fopen( FSCRIPT, "w");
+  FILE *fscript = fopen( SCR_NAME, "w");
 
   if ( fscript == NULL ) {
       perror ("fopen(fscript)");
@@ -42,9 +65,8 @@ void _h_1Dplot_save_script ( int L )
   fprintf ( fscript, "set bmargin 0\n");
   fprintf ( fscript, "set origin 0.1,0.35\n");
 
-  fprintf ( fscript, "plot \""
-            FDATA
-            "\" u 1:2 with points lc rgb \"#ff6666\" ti \"\"\n" );
+  fprintf ( fscript, "plot \"%s\" u 1:2 with points lc rgb \"#ff6666\" ti \"\"\n",
+            DAT_NAME);
   
   fprintf ( fscript, "set size 0.85,0.25\n" );
   fprintf ( fscript, "set rmargin 0\n" );
@@ -69,12 +91,11 @@ void _h_1Dplot_save_script ( int L )
   fprintf ( fscript, "set boxwidth 0.7\n");
   fprintf ( fscript, "set style fill solid 1.0 noborder\n");
   
-  fprintf ( fscript, "plot [][:%d] \""
-            FPOSITION
-            "\" u 2:3 w filledcurve x1  lt 1 lc rgb \"#542222\"  ti \"gh\"\n", L+1);
+  fprintf ( fscript, "plot [][:%d] \"%s\" u 2:3 w filledcurve x1  lt 1 lc rgb \"#542222\"  ti \"gh\"\n",
+            L+1, POS_NAME);
   
-  fprintf ( fscript, "replot \""
-            FPOSITION "\" u 1:3 w filledcurve x1 lt 1 lc rgb \"#a84343\" ti \"no gh\"\n");
+  fprintf ( fscript, "replot \"%s\" u 1:3 w filledcurve x1 lt 1 lc rgb \"#a84343\" ti \"no gh\"\n",
+            POS_NAME);
 
   fprintf ( fscript, "unset multiplot\n");
 
@@ -95,7 +116,7 @@ void _h_1D_plot_save_grid_position ( h_grid *grid )
   if ( grid->is_master == H_TRUE ) mode = "w";
   else mode = "a";
 
-  fposition = fopen( FPOSITION, mode );
+  fposition = fopen( POS_NAME, mode );
   if ( fposition == NULL ) {
       perror ("fopen(fposition)");
       exit (EXIT_FAILURE);
@@ -135,7 +156,7 @@ void _h_1D_plot_save_grid_data ( h_grid *grid, int rank, int wghost )
   if ( grid->is_master == H_TRUE ) mode = "w";
   else mode = "a";
 
-  fdata = fopen( FDATA, mode );
+  fdata = fopen( DAT_NAME, mode );
   if ( fdata == NULL ) {
       perror ("fopen(fdata)");
       exit (EXIT_FAILURE);
@@ -210,7 +231,6 @@ void h_1Dplot_save_gset ( h_gset * gset, int rank, int wghost,
   
   gnuplot_ctrl * handler = gnuplot_init();
   
-
   if ( gset == NULL ) {
       _STAT_MSG ( fnc_msg,
                   "h_gset is unallocated",
@@ -220,6 +240,8 @@ void h_1Dplot_save_gset ( h_gset * gset, int rank, int wghost,
   }
   else {
       
+      _h_1Dplot_gen_names( );
+
       /* setting default options for 1D plot */
       _h_1Dplot_set_options ( handler, title, gset->glevel[0]->grid[0]->t );
 
@@ -232,10 +254,10 @@ void h_1Dplot_save_gset ( h_gset * gset, int rank, int wghost,
       /* obtained by setting x11 terminal option persist */
       if ( sleep_time < 0 ) {
           _h_1Dplot_add_options ( handler, "set term x11 persist" );
-          gnuplot_cmd( handler, "load \"" FSCRIPT "\"");
+          gnuplot_cmd( handler, "load \"%s\"", SCR_NAME );
       }
       else {
-          gnuplot_cmd( handler, "load \"" FSCRIPT "\"");
+          gnuplot_cmd( handler, "load \"%s\"", SCR_NAME );
           sleep( sleep_time );
       }
       
@@ -252,7 +274,6 @@ void h_1Dplot_save_glevel ( h_glevel * glevel, int rank, int wghost,
   
   gnuplot_ctrl * handler = gnuplot_init();
   
-
   if ( glevel == NULL ) {
       _STAT_MSG ( fnc_msg,
                   "h_glevel is unallocated",
@@ -262,6 +283,8 @@ void h_1Dplot_save_glevel ( h_glevel * glevel, int rank, int wghost,
   }
   else {
       
+      _h_1Dplot_gen_names( );
+
       /* setting default options for 1D plot */
       _h_1Dplot_set_options ( handler, title, glevel->grid[0]->t );
 
@@ -274,10 +297,10 @@ void h_1Dplot_save_glevel ( h_glevel * glevel, int rank, int wghost,
       /* obtained by setting x11 terminal option persist */
       if ( sleep_time < 0 ) {
           _h_1Dplot_add_options ( handler, "set term x11 persist" );
-          gnuplot_cmd( handler, "load \"" FSCRIPT "\"");
+          gnuplot_cmd( handler, "load \"%s\"", SCR_NAME );
       }
       else {
-          gnuplot_cmd( handler, "load \"" FSCRIPT "\"");
+          gnuplot_cmd( handler, "load \"%s\"", SCR_NAME );
           sleep( sleep_time );
       }
       
@@ -294,7 +317,6 @@ void h_1Dplot_save_grid ( h_grid * grid, int rank, int wghost,
   
   gnuplot_ctrl * handler = gnuplot_init();
   
-
   if ( grid == NULL ) {
       _STAT_MSG ( fnc_msg,
                   "h_grid is unallocated",
@@ -303,7 +325,9 @@ void h_1Dplot_save_grid ( h_grid * grid, int rank, int wghost,
       gnuplot_close( handler );
   }
   else {
-      
+
+      _h_1Dplot_gen_names( );
+
       /* setting default options for 1D plot */
       _h_1Dplot_set_options ( handler, title, grid->t );
 
@@ -316,16 +340,13 @@ void h_1Dplot_save_grid ( h_grid * grid, int rank, int wghost,
       /* obtained by setting x11 terminal option persist */
       if ( sleep_time < 0 ) {
           _h_1Dplot_add_options ( handler, "set term x11 persist" );
-          gnuplot_cmd( handler, "load \"" FSCRIPT "\"");
+          gnuplot_cmd( handler, "load \"%s\"", SCR_NAME );
       }
       else {
-          gnuplot_cmd( handler, "load \"" FSCRIPT "\"");
+          gnuplot_cmd( handler, "load \"%s\"", SCR_NAME );
           sleep( sleep_time );
       }
       
       gnuplot_close( handler );
   }
 }
-
-
-
