@@ -115,7 +115,7 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
       else
           Rmove = (Ncalls-1)*sp;
 
-      N = N-Lmove-Rmove;
+      /* N = N-Lmove-Rmove; */
 
       /* VL(("  Grid is not master 2, Lmove=%d, Rmove=%d\n", Lmove, Rmove)); */
       /* VL(("  Grid is not master 3, Lghost=%d, Rghost=%d\n", Lghost, Rghost)); */
@@ -135,7 +135,7 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
       /*         status = (*hss->fnc->deriv[ISN-1])(t, xptr, yptr, f, i, N, &h); */
       /* } */
 
-      for (i = Lmove; i < N; i++) {
+      for (i = Lmove; i < N-Rmove; i++) {
 
           /* printf("x[%d]=%e\n", i, xptr[i]); */
           /* printf("u[%d]=%e\n", i, y[i]); */

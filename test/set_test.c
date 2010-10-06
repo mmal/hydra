@@ -44,6 +44,7 @@ int RHS_centered ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
 }
 
 
+
 int RHS_extern_0 ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
                    int i, int N, void *vparams )
 {
@@ -59,7 +60,7 @@ int RHS_extern_0 ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
   }
   else {
       f[N-1] = 0.;
-      f[2*N-1] = 0;
+      f[2*N-1] = 0.;
   }
   
   return H_TRUE;
@@ -87,7 +88,7 @@ int main( int argc, char *argv[] )
 {
   const int rank = 2;
 
-  const int N = 101;
+  const int N = 41;
   
   const H_DBL xL = -1.;
 
@@ -115,7 +116,7 @@ int main( int argc, char *argv[] )
   /* h_boialg ( hms ); */
       
 
-  while ( hms->gset->glevel[0]->grid[0]->t < 2. ) {
+  while ( hms->gset->glevel[0]->grid[0]->t < 4.5 ) {
       printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t );
       h_boialg ( hms );
   }

@@ -16,6 +16,8 @@
 int _h_update_grid_interior ( h_grid *parent, h_grid *child, h_amrp *amrp );
 int _h_update_grid_ghosts ( h_grid *parent, h_grid *child, h_amrp *amrp );
 
+int _h_update_grid_all  ( h_grid *parent, h_grid *child, h_amrp *amrp );
+
 int _h_update_grid_ghosts_left ( h_grid *parent, h_grid *child, h_amrp *amrp );
 int _h_update_grid_ghosts_right ( h_grid *parent, h_grid *child, h_amrp *amrp );
 

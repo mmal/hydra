@@ -6,9 +6,8 @@
 /* gsl_interp_polynomial */
 /* gsl_interp_cspline */
 
-
-#define INTERP_TYPE gsl_interp_polynomial
-#define N_CHILD 2
+#define INTERP_TYPE gsl_interp_linear
+#define N_CHILD 0
 
 
 int _h_dbl_eq ( H_DBL a, H_DBL b )
@@ -20,10 +19,11 @@ int _h_dbl_eq ( H_DBL a, H_DBL b )
 }
 
 
+
 int _h_update_grid ( h_grid *parent, h_grid *child, h_amrp *amrp  )
 {
-  VL((" *** Updating from child l=%d m=%d to parent l=%d m=%d\n",
-      child->l, child->m, parent->l, parent->m ));
+  /* VL((" *** Updating from child l=%d m=%d to parent l=%d m=%d\n", */
+  /*     child->l, child->m, parent->l, parent->m )); */
 
   int status;
   
@@ -33,8 +33,54 @@ int _h_update_grid ( h_grid *parent, h_grid *child, h_amrp *amrp  )
   
   status = _h_update_grid_ghosts ( parent, child, amrp );
 
+  /* status = _h_update_grid_all ( parent, child, amrp ); */
+
   return status;
 }
+
+
+
+int _h_update_grid_all  ( h_grid *parent, h_grid *child, h_amrp *amrp )
+{
+  int i, r, rank = 2;
+  H_DBL *xchild = h_get_grid_positions_wghosts ( child );
+  H_DBL *uchild;
+
+  H_DBL t = child->t;
+  
+  int Lghost, Rghost, Nchild;
+
+  Lghost = child->Lghost;
+  Rghost = child->Rghost;  
+  Nchild = child->N;
+
+  for (r = 0; r < rank; r++) {
+
+      uchild = h_get_grid_values_wghosts ( child, r );
+      
+      for (i = 0; i < Lghost; i++) {
+          if ( r == 0 )
+              uchild[i] =
+                  sin(2*M_PI*xchild[i])*cos(2*M_PI*t);
+          if ( r == 1 )
+              uchild[i] =
+                  -2*M_PI*sin(2*M_PI*xchild[i])*sin(2*M_PI*t);
+      }
+
+      for (i = 0; i < Rghost; i++) {
+          if ( r == 0 )
+              uchild[Lghost+Nchild+i] =
+                  sin(2*M_PI*xchild[Lghost+Nchild+i])*cos(2*M_PI*t);
+          if ( r == 1 )
+              uchild[Lghost+Nchild+i] =
+                  -2*M_PI*sin(2*M_PI*xchild[Lghost+Nchild+i])*sin(2*M_PI*t);
+      }
+  }
+
+  return H_OK;
+}
+
+
 
 
 int _h_update_grid_interior ( h_grid *parent, h_grid *child, h_amrp *amrp )
@@ -66,6 +112,7 @@ int _h_update_grid_interior ( h_grid *parent, h_grid *child, h_amrp *amrp )
   }
   return H_OK;
 }
+
 
 
 
@@ -118,6 +165,7 @@ int _h_update_grid_ghosts_right ( h_grid *parent, h_grid *child, h_amrp *amrp )
 
   Lghost= child->Lghost;
   Rghost= child->Rghost;
+
   Nchild = child->N;
   Nparent = parent->Ntotal;
 
@@ -125,13 +173,13 @@ int _h_update_grid_ghosts_right ( h_grid *parent, h_grid *child, h_amrp *amrp )
       for (j = 0; j < Nparent; j++) {
           if ( _h_dbl_eq( xparent[j], xRc ) ) {
               iparentR = j;
-              printf("iparentR = %d \n", iparentR );
+              /* printf("iparentR = %d \n", iparentR ); */
               break;
           }
       }
 
       NparentR = (int) ( ( xRp - xparent[iparentR] )/hparent ) + 1;
-      printf("NparentR = %d \n", NparentR );
+      /* printf("NparentR = %d \n", NparentR ); */
       if ( NparentR > ngh/rratio )
           NparentR = ngh/rratio;
 
@@ -139,7 +187,7 @@ int _h_update_grid_ghosts_right ( h_grid *parent, h_grid *child, h_amrp *amrp )
       u_to_interpolate = (H_DBL*) malloc ( rank*(NparentR+NchildR)*sizeof( H_DBL ) ); 
       
       for (i = 0; i < NparentR; i++) {
-          printf( "i=%d xparent[%d]=%e\n", i, iparentR+i, xparent[iparentR+i] );
+          /* printf( "i=%d xparent[%d]=%e\n", i, iparentR+i, xparent[iparentR+i] ); */
           x_to_interpolate[i+NchildR] = xparent[iparentR+i];
 
           for (r = 0; r < rank; r++) {
@@ -161,11 +209,11 @@ int _h_update_grid_ghosts_right ( h_grid *parent, h_grid *child, h_amrp *amrp )
       
       
       
-      FILE *fp = fopen("file", "w");
-      for (i = 0; i < NparentR+NchildR; i++) {
-          fprintf( fp, "%e %e\n", x_to_interpolate[i], u_to_interpolate[i]);
-      }
-      fclose(fp);
+      /* FILE *fp = fopen("file", "w"); */
+      /* for (i = 0; i < NparentR+NchildR; i++) { */
+      /*     fprintf( fp, "%e %e\n", x_to_interpolate[i], u_to_interpolate[i]); */
+      /* } */
+      /* fclose(fp); */
 
       
       for (r = 0; r < rank; r++)
@@ -181,16 +229,16 @@ int _h_update_grid_ghosts_right ( h_grid *parent, h_grid *child, h_amrp *amrp )
             
             gsl_spline_init (spline, x_to_interpolate, u_to_interpolate, NparentR+NchildR);
             
-          for (i = 0; i < Rghost; i++) {
-              if ( r == 0 )
-                  uchild[Lghost+Nchild+i] =
-                      sin(2*M_PI*xchild[Lghost+Nchild+i])*cos(2*M_PI*t);
-              if ( r == 1 )
-                  uchild[Lghost+Nchild+i] =
-                      -2*M_PI*sin(2*M_PI*xchild[Lghost+Nchild+i])*sin(2*M_PI*t);
+            for (i = 0; i < Rghost; i++) {
+              /* if ( r == 0 ) */
+              /*     uchild[Lghost+Nchild+i] = */
+              /*         sin(2*M_PI*xchild[Lghost+Nchild+i])*cos(2*M_PI*t); */
+              /* if ( r == 1 ) */
+              /*     uchild[Lghost+Nchild+i] = */
+              /*         -2*M_PI*sin(2*M_PI*xchild[Lghost+Nchild+i])*sin(2*M_PI*t); */
                   
-              /* uchild[Lghost+Nchild+i] = */
-              /*     gsl_spline_eval (spline, xchild[Lghost+Nchild+i], acc); */
+              uchild[Lghost+Nchild+i] =
+                  gsl_spline_eval (spline, xchild[Lghost+Nchild+i], acc);
           }
           
           gsl_spline_free (spline);
@@ -281,11 +329,11 @@ int _h_update_grid_ghosts_left ( h_grid *parent, h_grid *child, h_amrp *amrp )
       
       
       
-      FILE *fp = fopen("file", "w");
-      for (i = 0; i < NparentL+NchildL; i++) {
-          fprintf( fp, "%e %e\n", x_to_interpolate[i], u_to_interpolate[i]);
-      }
-      fclose(fp);
+      /* FILE *fp = fopen("file", "w"); */
+      /* for (i = 0; i < NparentL+NchildL; i++) { */
+      /*     fprintf( fp, "%e %e\n", x_to_interpolate[i], u_to_interpolate[i]); */
+      /* } */
+      /* fclose(fp); */
 
       
       for (r = 0; r < rank; r++)
@@ -302,14 +350,14 @@ int _h_update_grid_ghosts_left ( h_grid *parent, h_grid *child, h_amrp *amrp )
             gsl_spline_init (spline, x_to_interpolate, u_to_interpolate, NparentL+NchildL);
             
           for (i = 0; i < Lghost; i++) {
-              if ( r == 0 )
-                  uchild[i] =
-                      sin(2*M_PI*xchild[i])*cos(2*M_PI*t);
-              if ( r == 1 )
-                  uchild[i] =
-                      -2*M_PI*sin(2*M_PI*xchild[i])*sin(2*M_PI*t);
+              /* if ( r == 0 ) */
+              /*     uchild[i] = */
+              /*         sin(2*M_PI*xchild[i])*cos(2*M_PI*t); */
+              /* if ( r == 1 ) */
+              /*     uchild[i] = */
+              /*         -2*M_PI*sin(2*M_PI*xchild[i])*sin(2*M_PI*t); */
 
-              /* uchild[i] = gsl_spline_eval (spline, xchild[i], acc); */
+              uchild[i] = gsl_spline_eval (spline, xchild[i], acc);
           }
           
           gsl_spline_free (spline);
@@ -326,8 +374,8 @@ int _h_update_grid_ghosts_left ( h_grid *parent, h_grid *child, h_amrp *amrp )
 
 int _h_update_glevel ( h_glevel *parent, h_glevel *child, h_amrp *amrp )
 {
-  VL((" *** Updating from child glevel l=%d to parent glevel l=%d\n",
-      child->l, parent->l ));
+  /* VL((" *** Updating from child glevel l=%d to parent glevel l=%d\n", */
+  /*     child->l, parent->l )); */
   int status;
   int m, M;
 
