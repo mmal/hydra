@@ -6,8 +6,8 @@
 /* gsl_interp_polynomial */
 /* gsl_interp_cspline */
 
-#define INTERP_TYPE gsl_interp_linear
-#define N_CHILD 0
+#define INTERP_TYPE gsl_interp_polynomial
+#define N_CHILD 2
 
 
 int _h_dbl_eq ( H_DBL a, H_DBL b )
