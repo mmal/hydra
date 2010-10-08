@@ -6,7 +6,7 @@
 /* gsl_interp_polynomial */
 /* gsl_interp_cspline */
 
-#define INTERP_TYPE gsl_interp_polynomial
+#define INTERP_TYPE gsl_interp_linear
 #define N_CHILD 2
 
 
@@ -25,16 +25,27 @@ int _h_update_grid ( h_grid *parent, h_grid *child, h_amrp *amrp  )
   /* VL((" *** Updating from child l=%d m=%d to parent l=%d m=%d\n", */
   /*     child->l, child->m, parent->l, parent->m )); */
 
+  char *fnc_msg = "Updating from child to parent grid";
+
   int status;
-  
-  status = _h_update_grid_interior ( parent, child, amrp );
-  if ( status != H_OK )
-      return status;
-  
-  status = _h_update_grid_ghosts ( parent, child, amrp );
 
-  /* status = _h_update_grid_all ( parent, child, amrp ); */
 
+  if ( _h_dbl_eq ( parent->t, child->t ) != 1 ) {
+      _STAT_MSG ( fnc_msg,
+                  "time of the parent and the child grid not equal",
+                  ERROR, 0 );
+      return H_ER;
+  }
+  else {
+      status = _h_update_grid_interior ( parent, child, amrp );
+      if ( status != H_OK )
+          return status;
+  
+      status = _h_update_grid_ghosts ( parent, child, amrp );
+      
+      /* status = _h_update_grid_all ( parent, child, amrp ); */
+  }
+  
   return status;
 }
 
@@ -50,6 +61,10 @@ int _h_update_grid_all  ( h_grid *parent, h_grid *child, h_amrp *amrp )
   
   int Lghost, Rghost, Nchild;
 
+  H_DBL tmp;
+  tmp = parent->t;
+  tmp = amrp->errt;
+  
   Lghost = child->Lghost;
   Rghost = child->Rghost;  
   Nchild = child->N;
@@ -374,8 +389,8 @@ int _h_update_grid_ghosts_left ( h_grid *parent, h_grid *child, h_amrp *amrp )
 
 int _h_update_glevel ( h_glevel *parent, h_glevel *child, h_amrp *amrp )
 {
-  /* VL((" *** Updating from child glevel l=%d to parent glevel l=%d\n", */
-  /*     child->l, parent->l )); */
+  VL((" *** Updating from child glevel l=%d to parent glevel l=%d\n",
+      child->l, parent->l ));
   int status;
   int m, M;
 

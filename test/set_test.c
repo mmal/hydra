@@ -113,16 +113,16 @@ int main( int argc, char *argv[] )
   h_info_gset ( hms->gset );
 
 
-  /* h_boialg ( hms ); */
+  h_boialg ( hms );
       
 
-  while ( hms->gset->glevel[0]->grid[0]->t < 4.5 ) {
-      printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t );
-      h_boialg ( hms );
-  }
+  /* while ( hms->gset->glevel[0]->grid[0]->t < 1.5 ) { */
+  /*     printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t ); */
+  /*     h_boialg ( hms ); */
+  /* } */
   
-  h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 1, 4 ), 0, H_TRUE, "grid 0,4: rank 0 ", -1 );
-  h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 1, 4 ), 1, H_TRUE, "grid 0,4: rank 1 ", -1 );
+  /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 1, 4 ), 0, H_TRUE, "grid 0,4: rank 0 ", -1 ); */
+  /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 1, 4 ), 1, H_TRUE, "grid 0,4: rank 1 ", -1 ); */
 
   h_1Dplot_save_gset ( hms->gset, 0, H_FALSE, "gset: rank 0", -1 );
   h_1Dplot_save_gset ( hms->gset, 1, H_FALSE, "gset: rank 1", -1 );
