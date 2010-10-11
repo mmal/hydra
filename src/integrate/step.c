@@ -233,7 +233,7 @@ int _h_boialg_step_glevel ( h_glevel *glevel, h_amrp *amrp, h_fnc *fnc )
           grid = glevel->grid[m];
 
           status = _h_boialg_step_grid ( grid, amrp, fnc );
-
+          
           if ( status != H_OK )
               break;
       }
@@ -246,7 +246,7 @@ int _h_boialg_step_glevel ( h_glevel *glevel, h_amrp *amrp, h_fnc *fnc )
 
 int _h_boialg_step_grid ( h_grid *grid, h_amrp *amrp, h_fnc *fnc )
 {
-  char *fnc_msg = "Berger&Oliger step glevel";
+  char *fnc_msg = "Berger&Oliger step grid";
 
   int rank, N, status;
 

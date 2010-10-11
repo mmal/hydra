@@ -22,8 +22,8 @@ int _h_dbl_eq ( H_DBL a, H_DBL b )
 
 int _h_update_grid ( h_grid *parent, h_grid *child, h_amrp *amrp  )
 {
-  /* VL((" *** Updating from child l=%d m=%d to parent l=%d m=%d\n", */
-  /*     child->l, child->m, parent->l, parent->m )); */
+  VL((" *** Updating from child l=%d m=%d to parent l=%d m=%d\n",
+      child->l, child->m, parent->l, parent->m ));
 
   char *fnc_msg = "Updating from child to parent grid";
 

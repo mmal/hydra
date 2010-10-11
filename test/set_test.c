@@ -112,10 +112,12 @@ int main( int argc, char *argv[] )
 
   h_info_gset ( hms->gset );
 
+  
 
   h_boialg ( hms );
-      
 
+
+  
   /* while ( hms->gset->glevel[0]->grid[0]->t < 1.5 ) { */
   /*     printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t ); */
   /*     h_boialg ( hms ); */

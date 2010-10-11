@@ -14,6 +14,7 @@
 
 
 int h_boialg ( h_hms *hms );
+int _h_boialg_old ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l );
 int _h_boialg ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l );
 
 

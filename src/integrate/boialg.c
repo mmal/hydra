@@ -51,6 +51,7 @@ int h_boialg ( h_hms *hms )
 
 int _h_boialg_old ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
 {
+  printf("_h_boialg_old\n");
   int status, repeat, L, rratio;
 
   h_glevel *glevel;
@@ -89,11 +90,10 @@ int _h_boialg_old ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
       
       if ( l < L - 1 && repeat == (int) pow( rratio, l )  ) {
 
-          status = _h_boialg ( gset, amrp, fnc , l+1 );
+          status = _h_boialg_old ( gset, amrp, fnc , l+1 );
           if ( status != H_OK )
               break;
 
-          
       }
       repeat--;
 
@@ -107,7 +107,7 @@ int _h_boialg_old ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
 
 int _h_boialg ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
 {
-  int status, repeat, L, rratio;
+  int status=H_OK, repeat, L, rratio, r;
 
   h_glevel *glevel;
   
@@ -115,45 +115,86 @@ int _h_boialg ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
 
   rratio = amrp->rr;
 
-  if ( l > 0 )
-      repeat = (int) pow( rratio, l );
-  else
-      repeat = (int) pow( rratio, l );
+  repeat = (int) pow( rratio, l );
+
+  glevel = h_point_to_glevel ( gset, l );
   
-      
-  do {
-      printf("l=%d, repeat=%d\n", l, repeat);
+  printf("l=%d, repeat=%d\n", l, repeat);
 
-      glevel = h_point_to_glevel ( gset, l );
+  if ( l < L-1 ) {
+        /* printf("l == L-1\n"); */
+        
+        for (r = 0; r < repeat; r++) {
 
-      /* regriding, and step on level l */
+            /* printf("l=%d, r=%d\n", l, r); */
+
+            status = _h_boialg_step_glevel ( glevel, amrp, fnc );
+            
+            if ( status != H_OK )
+                break;
+            
+            status = _h_boialg ( gset, amrp, fnc , l+1 );
+            if ( status != H_OK )
+                break;
+
+            if ( l != 0 && r == repeat-1 ) {
+                status = _h_update_glevel ( h_point_to_glevel ( gset, l-1 ), glevel, amrp );
+            }
+
+            /* if ( status != H_OK ) */
+            /*     break; */
+            
+        }
+    }
+
+  else if ( l == L-1 && L != 1 )
+    {
+        /* printf("l == L-1, rratio=%d\n", rratio); */
+        for (r = 0; r < rratio; r++) {
+            status = _h_boialg_step_glevel ( glevel, amrp, fnc );
+            /* printf("status=%d\n", status); */
+            if ( status != H_OK )
+                break;
+        }
+
+        /* status = _h_update_glevel ( h_point_to_glevel ( gset, l-1 ), glevel, amrp ); */
+    }
+  else if ( L == 1 ) {
+      /* printf("L == 1\n"); */
       status = _h_boialg_step_glevel ( glevel, amrp, fnc );
+  }
+      /*     printf("l=%d, repeat=%d\n", l, repeat); */
 
-      if ( status != H_OK )
-          break;
+  /*     glevel = h_point_to_glevel ( gset, l ); */
 
-      if ( ( (repeat+1) % rratio == 0 && repeat > 1 ) ) {
-          printf ("(repeat+1) %% rr == 0, repeat = %d\n\n", repeat );
-          /* if ( l < L - 1 ) */
-          /*     status = _h_update_glevel ( glevel, h_point_to_glevel ( gset, l+1 ), amrp ); */
-          status = _h_update_glevel ( h_point_to_glevel ( gset, l-1 ), glevel, amrp );
-      }
+  /*     /\* regriding, and step on level l *\/ */
+  /*     status = _h_boialg_step_glevel ( glevel, amrp, fnc ); */
+
+  /*     if ( status != H_OK ) */
+  /*         break; */
+
+  /*     if ( ( (repeat+1) % rratio == 0 && repeat > 1 ) ) { */
+  /*         printf ("(repeat+1) %% rr == 0, repeat = %d\n\n", repeat ); */
+  /*         /\* if ( l < L - 1 ) *\/ */
+  /*         /\*     status = _h_update_glevel ( glevel, h_point_to_glevel ( gset, l+1 ), amrp ); *\/ */
+  /*         status = _h_update_glevel ( h_point_to_glevel ( gset, l-1 ), glevel, amrp ); */
+  /*     } */
       
-      if ( status != H_OK )
-          break;
+  /*     if ( status != H_OK ) */
+  /*         break; */
 
       
-      if ( l < L - 1 && repeat == (int) pow( rratio, l )  ) {
+  /*     if ( l < L - 1 && repeat == (int) pow( rratio, l )  ) { */
 
-          status = _h_boialg ( gset, amrp, fnc , l+1 );
-          if ( status != H_OK )
-              break;
+  /*         status = _h_boialg ( gset, amrp, fnc , l+1 ); */
+  /*         if ( status != H_OK ) */
+  /*             break; */
 
           
-      }
-      repeat--;
+  /*     } */
+  /*     repeat--; */
 
-  } while ( repeat > 0 );
+  /* } while ( repeat > 0 ); */
   
   return status;
 }
