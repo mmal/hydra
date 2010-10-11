@@ -1,9 +1,23 @@
+/**
+ * @file   amrp_common.c
+ * @author Maciej Maliborski <maciej.maliborski@gmail.com>
+ * @date   Mon Oct 11 22:00:44 2010
+ * 
+ * @brief  The h_amrp structure management functions.
+ * 
+ * 
+ */
 
 
 #include "amrp_common.h"
 
 
 
+/** 
+ * Allocates memory for a h_amrp structure.
+ * 
+ * @return pointer to the h_amrp structure
+ */
 h_amrp *h_alloc_amrp ( void )
 {
   h_amrp * p = (h_amrp*) malloc ( sizeof( h_amrp ) );
@@ -16,6 +30,17 @@ h_amrp *h_alloc_amrp ( void )
 }
 
 
+
+/** 
+ * Initializes, previously allocated, h_amrp structure
+ * from program's command-line arguments. 
+ * 
+ * 
+ * @param p pointer to the h_amrp structure
+ * @param argc argument count
+ * @param argv  argument vector
+ * @return  void
+ */
 void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
 {
   char *fnc_msg = "Initializing h_amrp structure";
@@ -126,6 +151,12 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
 }
 
 
+
+/** 
+ * Frees the memory space pointed by p
+ * 
+ * @param p pointer to the h_amrp structure
+ */
 void h_free_amrp ( h_amrp *p )
 {
   char *fnc_msg = "Freeing h_amrc structure";

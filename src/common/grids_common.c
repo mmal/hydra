@@ -1,3 +1,13 @@
+/**
+ * @file   grids_common.c
+ * @author Maciej Maliborski <maciej.maliborski@gmail.com>
+ * @date   Mon Oct 11 22:03:50 2010
+ * 
+ * @brief  The h_grid, h_glevel and h_gset structures
+ * management functions.
+ * 
+ * 
+ */
 
 
 #include "grids_common.h"
@@ -787,11 +797,12 @@ h_grid *h_point_to_grid ( h_gset *gset, int l, int m )
 
 
 /** 
- * Returns pointer to the master h_grid structure from h_gset structure
+ * Returns pointer to the master h_grid structure from
+ * the h_gset structure
  * 
  * @param gset pointer to the h_gset structure
  * 
- * @return pointer to the h_grid structure
+ * @return pointer to the master h_grid structure
  */
 h_grid *h_point_to_master_grid ( h_gset *gset )
 {
@@ -800,6 +811,14 @@ h_grid *h_point_to_master_grid ( h_gset *gset )
 
 
 
+/** 
+ * Returns number of allocated levels in the
+ * h_gset structure pointed by gset.
+ * 
+ * @param gset pointer to the h_gset structure
+ * 
+ * @return number of levels in gset
+ */
 int h_get_num_glevels_in_gset ( h_gset *gset )
 {
   char *fnc_msg = "Get the number of glevels in the gset";
@@ -816,6 +835,14 @@ int h_get_num_glevels_in_gset ( h_gset *gset )
 
 
 
+/** 
+ * 
+ * 
+ * @param gset pointer to the h_gset structure
+ * @param l 
+ * 
+ * @return number of grids in gset at level l
+ */
 int h_get_num_grids_in_gset ( h_gset *gset, int l )
 {
   char *fnc_msg = "Get the number of grids at given level l in the gset";
@@ -844,6 +871,13 @@ int h_get_num_grids_in_gset ( h_gset *gset, int l )
 
 
 
+/** 
+ * 
+ * 
+ * @param glevel pointer to the h_glevel structure 
+ * 
+ * @return number of grids in glevel
+ */
 int h_get_num_grids_in_glevel ( h_glevel *glevel )
 {
   char *fnc_msg = "Get the number of grids in the glevel";
