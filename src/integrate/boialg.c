@@ -122,27 +122,27 @@ int _h_boialg ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
   printf("l=%d, repeat=%d\n", l, repeat);
 
   if ( l < L-1 ) {
-        /* printf("l == L-1\n"); */
+      /* printf("l == L-1\n"); */
         
-        for (r = 0; r < repeat; r++) {
+      for (r = 0; r < repeat; r++) {
+          
+          printf("l=%d, r=%d\n", l, r);
+          
+          status = _h_boialg_step_glevel ( glevel, amrp, fnc );
+          
+          if ( status != H_OK )
+              break;
+          
+          status = _h_boialg ( gset, amrp, fnc , l+1 );
+          if ( status != H_OK )
+              break;
+          
+          if ( l != 0 && l != L-1 && r == repeat-1 ) {
+              status = _h_update_glevel ( h_point_to_glevel ( gset, l-1 ), glevel, amrp );
+          }
 
-            /* printf("l=%d, r=%d\n", l, r); */
-
-            status = _h_boialg_step_glevel ( glevel, amrp, fnc );
-            
-            if ( status != H_OK )
-                break;
-            
-            status = _h_boialg ( gset, amrp, fnc , l+1 );
-            if ( status != H_OK )
-                break;
-
-            if ( l != 0 && r == repeat-1 ) {
-                status = _h_update_glevel ( h_point_to_glevel ( gset, l-1 ), glevel, amrp );
-            }
-
-            /* if ( status != H_OK ) */
-            /*     break; */
+          /* if ( status != H_OK ) */
+          /*     break; */
             
         }
     }
@@ -151,11 +151,13 @@ int _h_boialg ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
     {
         /* printf("l == L-1, rratio=%d\n", rratio); */
         for (r = 0; r < rratio; r++) {
+            printf("l=%d, r=%d\n", l, r);
             status = _h_boialg_step_glevel ( glevel, amrp, fnc );
             /* printf("status=%d\n", status); */
             if ( status != H_OK )
                 break;
         }
+        status = _h_update_glevel ( h_point_to_glevel ( gset, l-1 ), glevel, amrp );
 
         /* status = _h_update_glevel ( h_point_to_glevel ( gset, l-1 ), glevel, amrp ); */
     }

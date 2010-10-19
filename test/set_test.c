@@ -114,8 +114,14 @@ int main( int argc, char *argv[] )
 
   
 
-  h_boialg ( hms );
+  /* h_boialg ( hms ); */
 
+  H_DBL *xnear;
+  int j;
+  xnear = _h_find_5_nearest ( -0.95, h_point_to_grid( hms->gset, 0, 0 ), hms->amrp );
+  for (j = 0; j < 5; j++) {
+      printf("xnear[j=%d]=%e\n", j, xnear[j] );
+  }
 
   
   /* while ( hms->gset->glevel[0]->grid[0]->t < 1.5 ) { */

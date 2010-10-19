@@ -13,14 +13,15 @@
 
 typedef struct
 {
-  int N, l, m;
+  int N;                        /**< number of physical grid points */
   int rank;                     /**< rank of the equation */
+  int l, m;                     /**< grid position in the gset */
+  H_DBL xL, xR;                 /**< physical range of grid */
+  H_DBL h, dt;                  /**< spatial and temporal step sizes */
   
-  H_DBL xL, xR;
-  H_DBL h, dt;
-  
-  int is_master;
-  void *master;
+  int is_master;                /**< marker if grid is a master grid */
+
+  void *master;                 /**< pointer to the main grid */
   
   void *offspring;
   void *sibling;
@@ -34,14 +35,20 @@ typedef struct
   void **children;
   int Nchildren;
   
-  H_DBL t, tlast;
+  H_DBL t, tlast;               /**< current time and the time of the grid in the previous step */
   int Ncalls;                   /**< number of calls by the RHS equation */
   
-  H_DBL *x;
-  H_DBL *u;
+  H_DBL *x;                     /**< pointer to the grid positions */
+  H_DBL *u;                     /**< pointer to the grid values */
   
-  int Lghost, Rghost;
-  int Ntotal;
+  int Lghost, Rghost;           /**< number of left and right ghost points */
+  int Ntotal;                   /**< total number of grids points, i.e. Ntotal=N+Lghost+Rghost  */
+
+  int id_xL, id_xR;
+  int id_Lgh, id_Rgh;
+
+  H_DBL xL_gh, xR_gh;           /**< total range of grid */
+
   
 } h_grid;
 

@@ -12,6 +12,7 @@
 #include "src/common/hms_common.h"
 
 
+H_DBL *_h_find_5_nearest ( H_DBL x, h_grid *grid, h_amrp *amrp  );
 
 int _h_update_grid_interior ( h_grid *parent, h_grid *child, h_amrp *amrp );
 int _h_update_grid_ghosts ( h_grid *parent, h_grid *child, h_amrp *amrp );

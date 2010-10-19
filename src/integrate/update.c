@@ -19,6 +19,60 @@ int _h_dbl_eq ( H_DBL a, H_DBL b )
 }
 
 
+H_DBL *_h_find_5_nearest ( H_DBL x, h_grid *grid, h_amrp *amrp  )
+{
+  char *fnc_msg = "Find five nearest points to x";
+
+  H_DBL xL_gh = grid->xL_gh; 
+  H_DBL xR_gh = grid->xR_gh; 
+
+  H_DBL *xnear;
+
+  H_DBL *xgrid = h_get_grid_positions_wghosts ( grid );
+
+  int i, j, N = grid->Ntotal;
+  
+  if ( x < xL_gh || x > xR_gh ) {
+      _STAT_MSG ( fnc_msg,
+                  "x outside the grid range",
+                  ERROR, 0 );
+      return NULL;
+  }
+  else {
+      xnear = (H_DBL*) malloc ( 5*sizeof( H_DBL ) );
+
+
+      if ( x == xR_gh ) {
+          for (j = 0; j < 5; j++) {
+              xnear[j] = xgrid[N-5+j];
+          }
+      }
+      else if ( x == xL_gh ) {
+          for (j = 0; j < 5; j++) {
+              xnear[j] = xgrid[j];
+          }
+      }
+      else {
+          for (i = 0; i < N; i++) {
+              if ( ( xgrid[i]-x )> 0. ){
+                  for (j = 0; j < 5; j++) {
+                      xnear[j] = xgrid[i-2+j];
+                  }
+                  break;
+              }
+              else if ( ( xgrid[i]-x ) == 0. ){
+                  for (j = 0; j < 5; j++) {
+                      xnear[j] = xgrid[i-2+j];
+                  }
+                  break;
+              }
+          }
+      }
+  }
+
+  return xnear;
+}
+
 
 int _h_update_grid ( h_grid *parent, h_grid *child, h_amrp *amrp  )
 {
@@ -29,6 +83,7 @@ int _h_update_grid ( h_grid *parent, h_grid *child, h_amrp *amrp  )
 
   int status;
 
+  printf(" **** l_child=%g, l_parent=%g\n", child->t, parent->t );
 
   if ( _h_dbl_eq ( parent->t, child->t ) != 1 ) {
       _STAT_MSG ( fnc_msg,

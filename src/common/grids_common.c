@@ -110,10 +110,17 @@ void h_init_grid ( h_grid * g, H_DBL xL, H_DBL xR,
       g->xR = xR;
       g->h = (xR-xL)/(N-1);
       g->N = N;
+
+      /* number of ghost points */
       g->Lghost = Lghost;
       g->Rghost = Rghost;
 
-      Ntotal = N+Lghost+Rghost; /* the total number of grid points */
+      /* setting total range of grid */
+      g->xL_gh = xL - Lghost*( g->h );
+      g->xR_gh = xR + Rghost*( g->h );
+      
+      /* the total number of grid points */
+      Ntotal = N+Lghost+Rghost;
       g->Ntotal = Ntotal;
 
       /* TODO:
