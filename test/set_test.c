@@ -118,7 +118,7 @@ int main( int argc, char *argv[] )
 
   H_DBL *xnear;
   int j;
-  xnear = _h_find_5_nearest ( -0.95, h_point_to_grid( hms->gset, 0, 0 ), hms->amrp );
+  xnear = _h_find_5_nearest ( -0.90, h_point_to_grid( hms->gset, 0, 0 ), hms->amrp );
   for (j = 0; j < 5; j++) {
       printf("xnear[j=%d]=%e\n", j, xnear[j] );
   }
@@ -132,8 +132,8 @@ int main( int argc, char *argv[] )
   /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 1, 4 ), 0, H_TRUE, "grid 0,4: rank 0 ", -1 ); */
   /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 1, 4 ), 1, H_TRUE, "grid 0,4: rank 1 ", -1 ); */
 
-  h_1Dplot_save_gset ( hms->gset, 0, H_FALSE, "gset: rank 0", -1 );
-  h_1Dplot_save_gset ( hms->gset, 1, H_FALSE, "gset: rank 1", -1 );
+  /* h_1Dplot_save_gset ( hms->gset, 0, H_FALSE, "gset: rank 0", -1 ); */
+  /* h_1Dplot_save_gset ( hms->gset, 1, H_FALSE, "gset: rank 1", -1 ); */
 
   /* h_1Dplot_save_eps_grid ( h_point_to_grid( hms->gset, 1, 4 ), 0, H_FALSE, "grid 0 4: rank 0", "grid04.eps"); */
 

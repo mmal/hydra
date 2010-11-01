@@ -32,44 +32,61 @@ H_DBL *_h_find_5_nearest ( H_DBL x, h_grid *grid, h_amrp *amrp  )
 
   int i, j, N = grid->Ntotal;
   
-  if ( x < xL_gh || x > xR_gh ) {
-      _STAT_MSG ( fnc_msg,
-                  "x outside the grid range",
-                  ERROR, 0 );
-      return NULL;
-  }
-  else {
-      xnear = (H_DBL*) malloc ( 5*sizeof( H_DBL ) );
+  const int Npts = 5;
+  
+  xnear = (H_DBL*) malloc ( 5*sizeof( H_DBL ) );
+
+  if ( xnear != NULL ) {
 
 
-      if ( x == xR_gh ) {
-          for (j = 0; j < 5; j++) {
-              xnear[j] = xgrid[N-5+j];
+
+      if ( x >= xgrid[N-1] ) {
+          for (j = 0; j < Npts; j++) {
+              xnear[j] = xgrid[N-1-(Npts-1)+j];
           }
       }
-      else if ( x == xL_gh ) {
-          for (j = 0; j < 5; j++) {
+      else if ( x <= xgrid[0] ) {
+          for (j = 0; j < Npts; j++) {
               xnear[j] = xgrid[j];
           }
       }
       else {
+          /* iterating all points in the grid */
           for (i = 0; i < N; i++) {
-              if ( ( xgrid[i]-x )> 0. ){
-                  for (j = 0; j < 5; j++) {
-                      xnear[j] = xgrid[i-2+j];
+              if ( ( xgrid[i]-x )>= 0. ){
+                  if ( i>1 && i < N-2 ) {
+                      for (j = 0; j < Npts; j++) {
+                          xnear[j] = xgrid[i-Npts/2+j];
+                      }
                   }
-                  break;
-              }
-              else if ( ( xgrid[i]-x ) == 0. ){
-                  for (j = 0; j < 5; j++) {
-                      xnear[j] = xgrid[i-2+j];
+                  /* else if ( i==0 ) { */
+                  /*     for (j = 0; j < 5; j++) { */
+                  /*         xnear[j] = xgrid[i+j]; */
+                  /*     } */
+                  /* } */
+                  else if ( i==1 ) {
+                      for (j = 0; j < Npts; j++) {
+                          xnear[j] = xgrid[i-1+j];
+                      }
                   }
+                  else if ( i==N-2 ) {
+                      for (j = 0; j < Npts; j++) {
+                          xnear[j] = xgrid[i-(Npts-2)+j];
+                      }
+                  }
+                  /* else if ( i==N-1 ) { */
+                  /*     for (j = 0; j < 5; j++) { */
+                  /*         xnear[j] = xgrid[i-4+j]; */
+                  /*     } */
+                  /* } */
+              
                   break;
               }
           }
       }
   }
-
+      
+  
   return xnear;
 }
 
