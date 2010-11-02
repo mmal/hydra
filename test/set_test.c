@@ -2,6 +2,8 @@
 
 #include "set_test.h"
 
+/* #define _paste(front,back) front ## back */
+
 
 H_DBL zero_ ( H_DBL x, void *params )
 {
@@ -93,8 +95,19 @@ int main( int argc, char *argv[] )
   const H_DBL xL = -1.;
 
   const H_DBL xR = 1.;
+
+
   
   h_hms *hms = h_alloc_hms( );
+
+  /* h_create_run ( const char * path, const char *name, h_hms * hms );  */
+  
+  /* initialize utils */
+  /* h_init_utils ( hms->utils ); */
+
+  
+
+  
 
   h_init_amrp ( hms->amrp, argc, argv );
 
@@ -123,7 +136,7 @@ int main( int argc, char *argv[] )
       printf("xnear[j=%d]=%e\n", j, xnear[j] );
   }
 
-  
+  free( xnear );
   /* while ( hms->gset->glevel[0]->grid[0]->t < 1.5 ) { */
   /*     printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t ); */
   /*     h_boialg ( hms ); */

@@ -159,7 +159,7 @@ void h_init_amrp ( h_amrp *p, int argc, char *argv[] )
  */
 void h_free_amrp ( h_amrp *p )
 {
-  char *fnc_msg = "Freeing h_amrc structure";
+  char *fnc_msg = "Freeing h_amrp structure";
 
   if ( p != NULL ) {
       free( p );

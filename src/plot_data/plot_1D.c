@@ -12,7 +12,6 @@
 #include "plot_1D.h"
 
 
-
 void _h_1Dplot_set_options ( gnuplot_ctrl * h, const char * title,
                              const H_DBL time )
 {
@@ -211,62 +210,62 @@ void h_1Dplot_gset ( h_gset * gset, int rank, int wghost,
 
 
 
-void _h_1D_save_set_of_grids_recursion ( h_grid *g, int rank, int wghosts )
-{
-  int i;
-  int m;
-  int N;
-  int l = g->l;
+/* void _h_1D_save_set_of_grids_recursion ( h_grid *g, int rank, int wghosts ) */
+/* { */
+/*   int i; */
+/*   int m; */
+/*   int N; */
+/*   int l = g->l; */
  
-  char *mode;
+/*   char *mode; */
 
-  H_DBL *x, *u, xL, xR, xLgh, xRgh;
+/*   H_DBL *x, *u, xL, xR, xLgh, xRgh; */
   
-  FILE *fdata;
-  FILE *fpos;
+/*   FILE *fdata; */
+/*   FILE *fpos; */
 
-  h_grid **child;
+/*   h_grid **child; */
 
 
-  if ( g->is_master == H_TRUE )
-      mode = "w";
-  else
-      mode = "a";
+/*   if ( g->is_master == H_TRUE ) */
+/*       mode = "w"; */
+/*   else */
+/*       mode = "a"; */
   
-  fdata = fopen( "data.dat", mode );
-  fpos = fopen( "position.dat", mode );
+/*   fdata = fopen( "data.dat", mode ); */
+/*   fpos = fopen( "position.dat", mode ); */
      
-  if (fpos == NULL)
-    {
-        perror ("fopen(fpos)");
-        exit (EXIT_FAILURE);
-    }
+/*   if (fpos == NULL) */
+/*     { */
+/*         perror ("fopen(fpos)"); */
+/*         exit (EXIT_FAILURE); */
+/*     } */
   
 
-  /* VL(( "Lghost=%d, Rghost=%d, N=%d\n", g->Lghost, g->Rghost, N )); */
+/*   /\* VL(( "Lghost=%d, Rghost=%d, N=%d\n", g->Lghost, g->Rghost, N )); *\/ */
   
-  /* VL(("l=%d xL=%f xLgh=%f xR=%f xRgh=%f\n", l, xL, xLgh, xR, xRgh )); */
+/*   /\* VL(("l=%d xL=%f xLgh=%f xR=%f xRgh=%f\n", l, xL, xLgh, xR, xRgh )); *\/ */
 
-  fprintf( fpos, "%f\t%f\t%d\n" "%f\t%f\t%d\n" "%f\t%f\t%d\n" "%f\t%f\t%d\n\n\n",
-           xL, xLgh, l-1, xL, xLgh, l, xR, xRgh, l, xR, xRgh, l-1 );
+/*   fprintf( fpos, "%f\t%f\t%d\n" "%f\t%f\t%d\n" "%f\t%f\t%d\n" "%f\t%f\t%d\n\n\n", */
+/*            xL, xLgh, l-1, xL, xLgh, l, xR, xRgh, l, xR, xRgh, l-1 ); */
 
   
-  fclose ( fpos );
+/*   fclose ( fpos ); */
   
-  for (i = 0; i < N; i++) {
-      fprintf( fdata, "%e\t%e\n", x[i], u[i] );
-  }
+/*   for (i = 0; i < N; i++) { */
+/*       fprintf( fdata, "%e\t%e\n", x[i], u[i] ); */
+/*   } */
 
-  fclose ( fdata );
+/*   fclose ( fdata ); */
   
-  if ( g->children != NULL ) {
-      child = (h_grid **) g->children;
+/*   if ( g->children != NULL ) { */
+/*       child = (h_grid **) g->children; */
   
-      for (m = 0; m < g->Nchildren; m++) {
-          _h_1D_save_set_of_grids_recursion ( child[m], rank, wghosts );
-      }
-  }
-}
+/*       for (m = 0; m < g->Nchildren; m++) { */
+/*           _h_1D_save_set_of_grids_recursion ( child[m], rank, wghosts ); */
+/*       } */
+/*   } */
+/* } */
 
 
 /* void h_1D_plot_set_of_grids ( h_grid * cg, int lmax, const char* title, */

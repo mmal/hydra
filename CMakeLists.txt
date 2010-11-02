@@ -33,6 +33,13 @@ FIND_PACKAGE(GSL REQUIRED)
 # argtable2 libraries
 FIND_PACKAGE(ARGTABLE2 REQUIRED)
 
+# lwl libraries
+FIND_PACKAGE(LWL REQUIRED)
+
+# HDF5 libraries
+FIND_PACKAGE(HDF5 REQUIRED)
+
+
 # Use Doxygen
 INCLUDE(UseDoxygen OPTIONAL)
 
@@ -62,12 +69,12 @@ ADD_SUBDIRECTORY(test)
 # add_custom_target(bla ALL DEPENDS ${hydra_SOURCE_DIR}/bla )
 
 
-add_custom_command(
+ADD_CUSTOM_COMMAND(
   OUTPUT bla.txt
   COMMAND sh ${hydra_SOURCE_DIR}/scripts/test.sh arg
   COMMENT " ... config comment ..."
   )
-add_custom_target(config ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bla.txt)
+ADD_CUSTOM_TARGET(config ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/bla.txt)
 
 
 # to provide the "make uninstall" target

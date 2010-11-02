@@ -11,6 +11,7 @@
 #include "src/common/grids_common.h"
 #include "src/common/amrp_common.h"
 #include "src/common/fnc_common.h"
+#include "src/common/utils_common.h"
 #include "src/common/hms_common.h"
 #include "src/stat_log/stat_msg.h"
 

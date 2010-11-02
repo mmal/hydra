@@ -23,16 +23,16 @@ typedef struct
 
   void *master;                 /**< pointer to the main grid */
   
-  void *offspring;
-  void *sibling;
+  /* void *offspring; */
+  /* void *sibling; */
   
   void *parent;
-  void *neighbour;
+  /* void *neighbour; */
 
-  void *Lsibling;
-  void *Rsibling;
+  /* void *Lsibling; */
+  /* void *Rsibling; */
   
-  void **children;
+  /* void **children; */
   int Nchildren;
   
   H_DBL t, tlast;               /**< current time and the time of the grid in the previous step */

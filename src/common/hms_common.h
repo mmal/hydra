@@ -6,6 +6,7 @@
 #include "src/common/grids_common.h"
 #include "src/common/amrp_common.h"
 #include "src/common/fnc_common.h"
+#include "src/common/utils_common.h"
 #include "src/stat_log/stat_msg.h"
 
 
@@ -25,9 +26,13 @@ typedef struct
 typedef struct
 {
   h_gset *gset;                 /**< grids set */
-  h_amrp *amrp;                 /**< adaptive mesh refinement algorithm parameters */
+
+  h_amrp *amrp;                 /**< adaptive mesh refinement algorithm params */
+  
   h_fnc *fnc;                   /**< function structure */
 
+  h_utils *utils;               /**< utils */
+  
 } h_hms;
 
 

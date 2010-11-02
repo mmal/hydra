@@ -44,13 +44,15 @@ h_grid * h_alloc_grid ( void )
       g->x = NULL;
       g->u = NULL;
       g->master = NULL;
-      g->offspring = NULL;
-      g->sibling = NULL;
       g->parent = NULL;
-      g->neighbour = NULL;
-      g->Lsibling = NULL;
-      g->Rsibling = NULL;
-      g->children = NULL;
+      
+      /* g->offspring = NULL; */
+      /* g->sibling = NULL; */
+      /* g->neighbour = NULL; */
+      /* g->Lsibling = NULL; */
+      /* g->Rsibling = NULL; */
+      /* g->children = NULL; */
+
       g->is_master = H_FALSE;
   }
   return g;

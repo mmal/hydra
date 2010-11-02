@@ -3,7 +3,41 @@
 #include "stat_msg.h"
 
 
+lwlh_t h;
+
+
+void h_init_log ( void )
+{
+  /* FILE  *file = fopen("file", "w"); */
+  /* FILE  *fileINFO = fopen("info", "w"); */
+  
+
+  h = lwl_alloc ();
+  
+  /* lwl_set_attributes ( h, LWL_TAG_PREFIX, */
+  /*                      "my example app", */
+  /*                      LWL_TAG_FILE, file, */
+  /*                      LWL_TAG_OPTIONS, LWL_OPT_PRIORITY | */
+  /*                      LWL_OPT_DATE | LWL_OPT_TIME | LWL_OPT_PREFIX | */
+  /*                      LWL_OPT_PERROR | LWL_OPT_USE_LOCALE , LWL_TAG_DONE ); */
+  
+  /* lwl_set_attributes ( h, LWL_TAG_FILE_INFO, fileINFO ); */
+  
+}
+
 void STAT_MSG ( const char * msg, const char * rsn, const int stat_id,
+                       const char * file, int line, const int errno )
+{
+
+  /* lwl_write_log ( h, LWL_PRI_INFO, "%s %s %i %s %i %i", */
+  /*                 msg, rsn, stat_id, file, line, errno ); */
+
+  lwl_write_log ( h, LWL_PRI_INFO, "test %s", msg );
+
+  return;
+}
+
+void STAT_MSG_old ( const char * msg, const char * rsn, const int stat_id,
                 const char * file, int line, const int errno )
 {
   int i;
