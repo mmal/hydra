@@ -90,7 +90,7 @@ int main( int argc, char *argv[] )
 {
   const int rank = 2;
 
-  const int N = 41;
+  const int N = 21;
   
   const H_DBL xL = -1.;
 
@@ -104,9 +104,6 @@ int main( int argc, char *argv[] )
   
   /* initialize utils */
   /* h_init_utils ( hms->utils ); */
-
-  
-
   
 
   h_init_amrp ( hms->amrp, argc, argv );
@@ -125,6 +122,7 @@ int main( int argc, char *argv[] )
 
   h_info_gset ( hms->gset );
 
+  /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 0, 0 ), 0, H_TRUE, "grid 0,0: rank 0 ", -1 ); */
   
 
   /* h_boialg ( hms ); */
@@ -137,6 +135,11 @@ int main( int argc, char *argv[] )
   }
 
   free( xnear );
+
+  /* _h_save_grid_data ( h_point_to_grid( hms->gset, 0, 0 ) ); */
+
+  _h_save_glevel ( h_point_to_glevel( hms->gset, 0 ) );
+  
   /* while ( hms->gset->glevel[0]->grid[0]->t < 1.5 ) { */
   /*     printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t ); */
   /*     h_boialg ( hms ); */

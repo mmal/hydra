@@ -13,6 +13,12 @@ void h_init_log ( void )
   
 
   h = lwl_alloc ();
+
+  lwl_set_attributes ( h,
+                       LWL_TAG_OPTIONS, LWL_OPT_PRIORITY |
+                       LWL_OPT_DATE | LWL_OPT_TIME |
+                       LWL_OPT_PERROR | LWL_OPT_USE_LOCALE , LWL_TAG_DONE );
+
   
   /* lwl_set_attributes ( h, LWL_TAG_PREFIX, */
   /*                      "my example app", */
@@ -32,7 +38,7 @@ void STAT_MSG ( const char * msg, const char * rsn, const int stat_id,
   /* lwl_write_log ( h, LWL_PRI_INFO, "%s %s %i %s %i %i", */
   /*                 msg, rsn, stat_id, file, line, errno ); */
 
-  lwl_write_log ( h, LWL_PRI_INFO, "test %s", msg );
+  lwl_write_log ( h, LWL_PRI_INFO, "%s", msg );
 
   return;
 }
