@@ -12,12 +12,84 @@
 #include "backup.h"
 #define FILE "dset.h5"
 
+#define MAX_NAME_LEN 25
+#define GLEVEL_NAME_MASK "glevel_%d"
+#define GRID_NAME_MASK "grid_%d_%d"
+
+
+h_bas *h_alloc_bas ( void )
+{
+  h_bas *b = (h_bas *) malloc ( sizeof( h_bas ) );
+
+  if ( b == NULL ) {
+      _STAT_MSG ( "Allocating h_bas",
+                  "cannot allocate h_bas",
+                  WARNING, 0 );
+  }
+
+  return b;
+}
+
+
+void h_free_bas ( h_bas *b )
+{
+  if ( b != NULL ) {
+      free ( b );
+      b = NULL;
+  }
+}
+
+
+char *_h_create_glevel_name ( int l )
+{
+  char *name = (char*) malloc( MAX_NAME_LEN*sizeof(char) );
+  
+  if ( sprintf( name, GLEVEL_NAME_MASK, l ) < 0  )
+      _STAT_MSG ( "MAX_NAME_LEN exceed",
+                  NULL,
+                  ERROR, 0 );
+  return name;
+}
+
+
+char *_h_create_grid_name ( int l, int m )
+{
+  char *name = (char*) malloc( MAX_NAME_LEN*sizeof(char) );
+  
+  if ( sprintf( name, GRID_NAME_MASK, l, m ) < 0  )
+      _STAT_MSG ( "MAX_NAME_LEN exceed",
+                  NULL,
+                  ERROR, 0 );
+  return name;
+}
+
+
+void _h_open_file ( h_bas *bas )
+{
+  /* Create a new file using default properties. */
+  bas->file_id = H5Fcreate ( "test.h5",
+                             H5F_ACC_TRUNC,
+                             H5P_DEFAULT,
+                             H5P_DEFAULT );
+}
+
+void _h_close_file ( h_bas *bas )
+{
+  herr_t status;
+
+  /* Close the file. */
+  status = H5Fclose ( bas->file_id );
+
+}
+
+
+
 
 void _h_save_grid_data ( h_grid *grid )
 {
   int i;
   hid_t       file_id, dataset_id, dataspace_id;  /* identifiers */
-  hsize_t     dims;
+  hsize_t     dims[1];
   herr_t      status;
   
   const int rank = grid->rank; 
@@ -29,7 +101,7 @@ void _h_save_grid_data ( h_grid *grid )
   file_id = H5Fcreate(FILE, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   
   /* Create the data space for the dataset. */
-  dims = N*rank;
+  dims[0] = N*rank;
   
   dataspace_id = H5Screate_simple ( 1, dims, NULL );
 
@@ -52,7 +124,7 @@ void _h_save_grid_data ( h_grid *grid )
   status = H5Dclose ( dataset_id );
 
 
-  dims = N;
+  dims[0] = N;
   dataspace_id = H5Screate_simple( 1, dims, NULL );
   /* Create the dataset. */
   dataset_id = H5Dcreate ( file_id,
@@ -81,33 +153,91 @@ void _h_save_grid_data ( h_grid *grid )
 }
 
 
-void _h_save_glevel ( h_glevel *glevel )
+void _h_save_gset ( h_bas *bas, h_gset *gset )
 {
+  herr_t      status;
 
-   hid_t       file_id, group1_id, group2_id, group3_id;  /* identifiers */
-   herr_t      status;
+  const int L = gset->L;
+  int l;
 
-   /* Create a new file using default properties. */
-   file_id = H5Fcreate(FILE, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  _h_open_file ( bas );
 
-   /* Create group "MyGroup" in the root group using absolute name. */
-   group1_id = H5Gcreate(file_id, "/MyGroup", 0);
+  /* Create a group named "/gset" in the file */
+  bas->gset_id = H5Gcreate( bas->file_id, "/gset", 0);
 
-   /* Create group "Group_A" in group "MyGroup" using absolute name. */
-   group2_id = H5Gcreate(file_id, "/MyGroup/Group_A", 0);
+  for (l = 0; l < L; l++) {
+      _h_save_glevel ( bas, gset->glevel[l] );
+  }
 
-   /* Create group "Group_B" in group "MyGroup" using relative name. */
-   group3_id = H5Gcreate(group1_id, "Group_B", 0);
+  /* Close the "/gset" group */
+  status = H5Gclose ( bas->gset_id );
 
-   /* Close groups. */
-   status = H5Gclose(group1_id);
-   status = H5Gclose(group2_id);
-   status = H5Gclose(group3_id);
+  _h_close_file ( bas );
+  
+}
+  
 
-   /* Close the file. */
-   status = H5Fclose(file_id);
+
+void _h_save_glevel ( h_bas *bas, h_glevel *glevel )
+{
+  /* hid_t  *file_id = bas->file_id; */
+  /* hid_t *gset_id = &bas->gset_id; */
+  /* hid_t *glevel_id = bas->glevel_id; */
+  /* hid_t *grid_id = bas->grid_id; */
+
+  
+  herr_t      status;
+  
+  const int l = glevel->l;
+  const int M = glevel->M;
+  int m;
+
+  /* Create a new group named "grid_l" in the "gset" group */
+  bas->glevel_id = H5Gcreate ( bas->gset_id, _h_create_glevel_name( l ), 0 );
+
+  for (m = 0; m < M; m++) {
+
+      /* Create a new group named "grid_l_m" in the "grid_l" group */
+      bas->grid_id = H5Gcreate ( bas->glevel_id, _h_create_grid_name( l, m ), 0 );
+      
+      /* _h_save_grid ( bas, glevel->grid[m] ); */
+
+      /* Close the "grid_l_m" group */
+      status = H5Gclose ( bas->grid_id );
+  }
+  
+  /* Close the "glevel_l" group */
+  status = H5Gclose ( bas->glevel_id );
+  
+   
+   /* /\* Create a new file using default properties. *\/ */
+   /* file_id = H5Fcreate(FILE, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT); */
+
+   /* /\* Create group "MyGroup" in the root group using absolute name. *\/ */
+   /* group1_id = H5Gcreate(file_id, "/MyGroup", 0); */
+
+   /* /\* Create group "Group_A" in group "MyGroup" using absolute name. *\/ */
+   /* group2_id = H5Gcreate(file_id, "/MyGroup/Group_A", 0); */
+
+   /* /\* Create group "Group_B" in group "MyGroup" using relative name. *\/ */
+   /* group3_id = H5Gcreate(group1_id, "Group_B", 0); */
+
+   /* /\* Close groups. *\/ */
+   /* status = H5Gclose(group1_id); */
+   /* status = H5Gclose(group2_id); */
+   /* status = H5Gclose(group3_id); */
+
+   /* /\* Close the file. *\/ */
+   /* status = H5Fclose(file_id); */
+
+   /* status = H5Eclear1(); */
+   
 }
 
+void _h_save_grid ( h_bas *bas, h_glevel *grid )
+{
+  
+}
 /* { */
 /*   /\* int i; *\/ */
 /*   /\* hid_t       file_id, dataset_id, dataspace_id;  /\\* identifiers *\\/ *\/ */

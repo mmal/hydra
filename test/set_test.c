@@ -138,7 +138,7 @@ int main( int argc, char *argv[] )
 
   /* _h_save_grid_data ( h_point_to_grid( hms->gset, 0, 0 ) ); */
 
-  _h_save_glevel ( h_point_to_glevel( hms->gset, 0 ) );
+  /* _h_save_glevel ( h_point_to_glevel( hms->gset, 0 ) ); */
   
   /* while ( hms->gset->glevel[0]->grid[0]->t < 1.5 ) { */
   /*     printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t ); */

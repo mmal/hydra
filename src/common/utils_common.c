@@ -26,8 +26,11 @@ h_utils *h_alloc_utils ( void )
       _STAT_MSG ( "Allocating h_utils",
                   "cannot allocate h_utils",
                   WARNING, 0 );
-
-  /* u->log = h_alloc_log(); */
+  else {
+      /* u->bas = h_alloc_bas ( ); */
+      /* u->log = h_alloc_log(); */ /* TODO: logger structure */
+  }
+  
 
   return u;
 }
@@ -78,7 +81,9 @@ void h_free_utils ( h_utils *u )
           /* fclose ( lwl_get_log_file( u->log_hand ) ); */
           /* lwl_free ( u->log->h ); */
       }
-      
+      if ( u->bas != NULL ) {
+          /* h_free_bas ( u->bas ); */
+      }
       free( u );
       u = NULL;
   }

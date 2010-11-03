@@ -27,6 +27,7 @@ enum STAT_ID {
 };
 
 void h_init_log ( void );
+void h_free_log ( void );
 
 /* void STAT_MSG ( const char * msg, const char * rsn, */
 /*                 const int stat_id, const char * file, */

@@ -8,7 +8,7 @@ h_hms *h_alloc_hms ( void )
 {
   h_hms * m;
 
-  /* initializing main logger */ 
+  /* Initializing main logger */ 
   h_init_log ();
 
   m = (h_hms *) malloc ( sizeof( h_hms ) );
@@ -56,5 +56,8 @@ void h_free_hms ( h_hms *m )
       
       free ( m );
       m = NULL;
+
+      h_free_log ( );
+
   }
 }
