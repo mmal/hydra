@@ -1,9 +1,25 @@
+/**
+ * @file   hms_common.c
+ * @author Maciej Maliborski <maciej.maliborski@gmail.com>
+ * @date   Wed Nov  3 22:46:03 2010
+ * 
+ * @brief  The h_hms structure management functions.
+ * 
+ * 
+ */
 
 
 #include "hms_common.h"
 
 
 
+/** 
+ * Allocates memory a the h_hms structure
+ * and initializes loggger.
+ * 
+ * 
+ * @return pointer to the h_hms structure
+ */
 h_hms *h_alloc_hms ( void )
 {
   h_hms * m;
@@ -11,6 +27,7 @@ h_hms *h_alloc_hms ( void )
   /* Initializing main logger */ 
   h_init_log ();
 
+  /* Allocating the h_hms */
   m = (h_hms *) malloc ( sizeof( h_hms ) );
 
   if ( m == NULL ) {
@@ -19,6 +36,7 @@ h_hms *h_alloc_hms ( void )
                   WARNING, 0 );
   }
   else {
+      /* Allocating all components of the h_hms */
       h_gset * g = h_alloc_gset ( );
       h_amrp * p = h_alloc_amrp ( );
       h_fnc * f = h_alloc_fnc ( );
@@ -35,6 +53,13 @@ h_hms *h_alloc_hms ( void )
 }
 
 
+
+/** 
+ * Frees the memory space pointed by m
+ * and frees the logger.
+ * 
+ * @param m pointer to the h_hms structure
+ */
 void h_free_hms ( h_hms *m )
 {
   if ( m!=NULL ) {

@@ -34,7 +34,7 @@ H_DBL *_h_find_5_nearest ( H_DBL x, h_grid *grid, h_amrp *amrp  )
   
   const int Npts = 5;
   
-  xnear = (H_DBL*) malloc ( 5*sizeof( H_DBL ) );
+  xnear = (H_DBL*) malloc ( Npts*sizeof( H_DBL ) );
 
   if ( xnear != NULL ) {
 

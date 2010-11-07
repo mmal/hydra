@@ -37,10 +37,11 @@ void _h_close_file ( h_bas *bas );
 
 void _h_save_gset ( h_bas *bas, h_gset *gset );
 void _h_save_glevel ( h_bas *bas, h_glevel *glevel );
-void _h_save_grid ( h_bas *bas, h_glevel *grid );
+void _h_save_grid ( h_bas *bas, h_grid *grid );
 
-void _h_save_grid_data ( h_grid *grid );
-/* void _h_save_glevel ( h_glevel *glevel ); */
+void _h_save_grid_data ( h_bas *bas, h_grid *grid );
+void _h_save_grid_struct ( h_bas *bas, h_grid *grid );
+    /* void _h_save_glevel ( h_glevel *glevel ); */
 /* void _h_save_gset ( h_gset *gset ); */
 
 #endif /* _BACKUP_H_ */

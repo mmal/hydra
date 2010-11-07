@@ -136,6 +136,8 @@ int main( int argc, char *argv[] )
 
   free( xnear );
 
+  _h_save_gset ( hms->utils->bas, hms->gset );
+  
   /* _h_save_grid_data ( h_point_to_grid( hms->gset, 0, 0 ) ); */
 
   /* _h_save_glevel ( h_point_to_glevel( hms->gset, 0 ) ); */

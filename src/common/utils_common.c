@@ -27,7 +27,7 @@ h_utils *h_alloc_utils ( void )
                   "cannot allocate h_utils",
                   WARNING, 0 );
   else {
-      /* u->bas = h_alloc_bas ( ); */
+      u->bas = h_alloc_bas ( );
       /* u->log = h_alloc_log(); */ /* TODO: logger structure */
   }
   
