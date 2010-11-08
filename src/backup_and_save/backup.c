@@ -19,6 +19,7 @@
 #define GRID_NAME_MASK "grid_%d_%d"
 
 
+
 h_bas *h_alloc_bas ( void )
 {
   h_bas *b = (h_bas *) malloc ( sizeof( h_bas ) );
@@ -33,6 +34,7 @@ h_bas *h_alloc_bas ( void )
 }
 
 
+
 void h_free_bas ( h_bas *b )
 {
   if ( b != NULL ) {
@@ -40,6 +42,7 @@ void h_free_bas ( h_bas *b )
       b = NULL;
   }
 }
+
 
 
 char *_h_create_glevel_name ( int l )
@@ -54,6 +57,7 @@ char *_h_create_glevel_name ( int l )
 }
 
 
+
 char *_h_create_grid_name ( int l, int m )
 {
   char *name = (char*) malloc( MAX_NAME_LEN*sizeof(char) );
@@ -66,6 +70,7 @@ char *_h_create_grid_name ( int l, int m )
 }
 
 
+
 void _h_open_file ( h_bas *bas )
 {
   /* Create a new file using default properties. */
@@ -73,7 +78,10 @@ void _h_open_file ( h_bas *bas )
                              H5F_ACC_TRUNC,
                              H5P_DEFAULT,
                              H5P_DEFAULT );
+  /* TODO: now this function creates new file and than write a data */
 }
+
+
 
 void _h_close_file ( h_bas *bas )
 {
@@ -159,6 +167,8 @@ void _h_save_gset ( h_bas *bas, h_gset *gset )
   /* Create a group named "/gset" in the file */
   bas->gset_id = H5Gcreate( bas->file_id, "/gset", 0);
 
+  _h_save_grid_struct_t ( bas );  
+  
   for (l = 0; l < L; l++) {
       _h_save_glevel ( bas, gset->glevel[l] );
   }
@@ -210,35 +220,9 @@ void _h_save_grid ( h_bas *bas, h_grid *grid )
 
 void _h_save_grid_struct ( h_bas *bas, h_grid *grid )
 {
-  hid_t       h_grid_id; /* memory datatype handle */
   hid_t       dataset_id, dataspace_id;  /* identifiers */
   hsize_t     dims[1];
   herr_t      status;
-  
-
-  /* Create the memory data type */
-  h_grid_id = H5Tcreate ( H5T_COMPOUND, sizeof(h_grid) );
-
-  H5Tinsert( h_grid_id, "N", HOFFSET(h_grid, N), H5T_NATIVE_INT );
-  H5Tinsert( h_grid_id, "rank", HOFFSET(h_grid, rank), H5T_NATIVE_INT );
-  H5Tinsert( h_grid_id, "l", HOFFSET(h_grid, l), H5T_NATIVE_INT );
-  H5Tinsert( h_grid_id, "m", HOFFSET(h_grid, m), H5T_NATIVE_INT );
-  H5Tinsert( h_grid_id, "xL", HOFFSET(h_grid, xL), H5T_NATIVE_DOUBLE );
-  H5Tinsert( h_grid_id, "xR", HOFFSET(h_grid, xR), H5T_NATIVE_DOUBLE );
-  H5Tinsert( h_grid_id, "h", HOFFSET(h_grid, h), H5T_NATIVE_DOUBLE );
-  H5Tinsert( h_grid_id, "dt", HOFFSET(h_grid, dt), H5T_NATIVE_DOUBLE );
-  H5Tinsert( h_grid_id, "is_master", HOFFSET(h_grid, is_master), H5T_NATIVE_INT );
-  
-  H5Tinsert( h_grid_id, "Nchildren", HOFFSET(h_grid, Nchildren), H5T_NATIVE_INT );
-
-  H5Tinsert( h_grid_id, "t", HOFFSET(h_grid, t), H5T_NATIVE_DOUBLE );
-  H5Tinsert( h_grid_id, "tlast", HOFFSET(h_grid, tlast), H5T_NATIVE_DOUBLE );
-  H5Tinsert( h_grid_id, "Ncalls", HOFFSET(h_grid, Ncalls), H5T_NATIVE_INT );
-
-  H5Tinsert( h_grid_id, "Lghost", HOFFSET(h_grid, Lghost), H5T_NATIVE_INT );
-  H5Tinsert( h_grid_id, "Rghost", HOFFSET(h_grid, Rghost), H5T_NATIVE_INT );
-  H5Tinsert( h_grid_id, "Ntotal", HOFFSET(h_grid, Ntotal), H5T_NATIVE_INT );
-
   
   /* Create the data space for the dataset. */
   dims[0] = 1;
@@ -248,13 +232,13 @@ void _h_save_grid_struct ( h_bas *bas, h_grid *grid )
   /* Create the dataset. */
   dataset_id = H5Dcreate ( bas->grid_id,
                            "struct",
-                           h_grid_id,
+                           bas->h_grid_id,
                            dataspace_id,
                            H5P_DEFAULT );
   
   /* Write the dataset */
   status = H5Dwrite ( dataset_id,
-                      h_grid_id,
+                      bas->h_grid_id,
                       H5S_ALL,
                       H5S_ALL,
                       H5P_DEFAULT,
@@ -267,4 +251,59 @@ void _h_save_grid_struct ( h_bas *bas, h_grid *grid )
   /* Terminate access to the data space. */ 
   status = H5Sclose ( dataspace_id );
 
+}
+
+
+
+void _h_save_grid_struct_t ( h_bas *bas )
+{
+  /* Memory datatype handler */
+  bas->h_grid_id = H5Tcreate ( H5T_COMPOUND, sizeof(h_grid) );
+
+  /* Create the memory data type */
+  H5Tinsert( bas->h_grid_id, "N", HOFFSET(h_grid, N), H5T_NATIVE_INT );
+  H5Tinsert( bas->h_grid_id, "rank", HOFFSET(h_grid, rank), H5T_NATIVE_INT );
+  H5Tinsert( bas->h_grid_id, "l", HOFFSET(h_grid, l), H5T_NATIVE_INT );
+  H5Tinsert( bas->h_grid_id, "m", HOFFSET(h_grid, m), H5T_NATIVE_INT );
+  H5Tinsert( bas->h_grid_id, "xL", HOFFSET(h_grid, xL), H5T_NATIVE_DOUBLE );
+  H5Tinsert( bas->h_grid_id, "xR", HOFFSET(h_grid, xR), H5T_NATIVE_DOUBLE );
+  H5Tinsert( bas->h_grid_id, "h", HOFFSET(h_grid, h), H5T_NATIVE_DOUBLE );
+  H5Tinsert( bas->h_grid_id, "dt", HOFFSET(h_grid, dt), H5T_NATIVE_DOUBLE );
+  H5Tinsert( bas->h_grid_id, "is_master", HOFFSET(h_grid, is_master), H5T_NATIVE_INT );
+  
+  H5Tinsert( bas->h_grid_id, "Nchildren", HOFFSET(h_grid, Nchildren), H5T_NATIVE_INT );
+
+  H5Tinsert( bas->h_grid_id, "t", HOFFSET(h_grid, t), H5T_NATIVE_DOUBLE );
+  H5Tinsert( bas->h_grid_id, "tlast", HOFFSET(h_grid, tlast), H5T_NATIVE_DOUBLE );
+  H5Tinsert( bas->h_grid_id, "Ncalls", HOFFSET(h_grid, Ncalls), H5T_NATIVE_INT );
+
+  H5Tinsert( bas->h_grid_id, "Lghost", HOFFSET(h_grid, Lghost), H5T_NATIVE_INT );
+  H5Tinsert( bas->h_grid_id, "Rghost", HOFFSET(h_grid, Rghost), H5T_NATIVE_INT );
+  H5Tinsert( bas->h_grid_id, "Ntotal", HOFFSET(h_grid, Ntotal), H5T_NATIVE_INT );
+
+  /* TODO:
+   * add other h_grid elements */
+
+}
+
+
+
+void _h_save_amrp_struct_t ( h_bas *bas )
+{
+  /* Memory datatype handler */
+  bas->h_amrp_id = H5Tcreate ( H5T_COMPOUND, sizeof(h_amrp) );
+
+  /* Create the memory data type */
+  H5Tinsert( bas->h_amrp_id, "rr",   HOFFSET(h_amrp, rr), H5T_NATIVE_INT );
+  H5Tinsert( bas->h_amrp_id, "buf",  HOFFSET(h_amrp, buf), H5T_NATIVE_INT );
+  H5Tinsert( bas->h_amrp_id, "sp",   HOFFSET(h_amrp, sp), H5T_NATIVE_INT );
+  H5Tinsert( bas->h_amrp_id, "lmax", HOFFSET(h_amrp, lmax), H5T_NATIVE_INT );
+  H5Tinsert( bas->h_amrp_id, "lmbd", HOFFSET(h_amrp, lmbd), H5T_NATIVE_INT );
+  H5Tinsert( bas->h_amrp_id, "ngh",  HOFFSET(h_amrp, ngh), H5T_NATIVE_INT );
+  H5Tinsert( bas->h_amrp_id, "gme",  HOFFSET(h_amrp, gme), H5T_NATIVE_INT );
+  
+  H5Tinsert( bas->h_amrp_id, "errt", HOFFSET(h_amrp, errt), H5T_NATIVE_DOUBLE );
+
+  /* TODO:
+   * add other h_amrp elements */
 }

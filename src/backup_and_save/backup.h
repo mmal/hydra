@@ -13,6 +13,15 @@
 /* #include "src/common/hms_common.h" */
 
 
+#define FILE "dset.h5"
+
+#define TEST_FILE "test.h5"
+
+#define MAX_NAME_LEN 25
+#define GLEVEL_NAME_MASK "glevel_%d"
+#define GRID_NAME_MASK "grid_%d_%d"
+
+
 typedef struct
 {
 
@@ -23,7 +32,9 @@ typedef struct
   hid_t glevel_id;
   hid_t grid_id;
 
-  /* hid_t group_id; */
+  hid_t  h_grid_id;
+  hid_t  h_amrp_id;
+
 } h_bas;
 
 
@@ -41,7 +52,10 @@ void _h_save_grid ( h_bas *bas, h_grid *grid );
 
 void _h_save_grid_data ( h_bas *bas, h_grid *grid );
 void _h_save_grid_struct ( h_bas *bas, h_grid *grid );
-    /* void _h_save_glevel ( h_glevel *glevel ); */
-/* void _h_save_gset ( h_gset *gset ); */
+
+void _h_save_grid_struct_t ( h_bas *bas );
+
+void _h_save_amrp_struct_t ( h_bas *bas );
+
 
 #endif /* _BACKUP_H_ */
