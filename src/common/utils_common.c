@@ -82,7 +82,7 @@ void h_free_utils ( h_utils *u )
           /* lwl_free ( u->log->h ); */
       }
       if ( u->bas != NULL ) {
-          /* h_free_bas ( u->bas ); */
+          h_free_bas ( u->bas );
       }
       free( u );
       u = NULL;

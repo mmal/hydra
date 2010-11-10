@@ -34,7 +34,10 @@ void h_init_log ( void )
 
 void h_free_log ( void )
 {
-  lwl_free ( h );	
+  if ( h != NULL ) {
+      lwl_free ( h );
+      h = NULL;
+  }
 }
 
 void STAT_MSG ( const char * msg, const char * rsn, const int stat_id,
