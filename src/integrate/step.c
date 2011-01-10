@@ -38,6 +38,8 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
   
   int ngh = hss->amrp->ngh;
   int sp = hss->amrp->sp;
+
+  int rr = hss->amrp->rr;
   
   int Lghost = hss->grid->Lghost;
   int Rghost = hss->grid->Rghost;
@@ -55,7 +57,7 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
   
   Ncalls = hss->grid->Ncalls;
 
-  if ( Ncalls == 4 ) {
+  if ( Ncalls == 4*rr ) {
       hss->grid->tlast = t;
       hss->grid->Ncalls = 0;
   }
@@ -102,67 +104,24 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
   else {
       /* VL(("  Grid is not master\n")); */
 
-      xL_m = -1.;
-      xR_m = 1.;
+      /* TODO: */
+      xL_m = -1.0;
+      xR_m = 1.0;
       
       if ( Lghost < ngh - (Ncalls-1)*sp  )
           Lmove = 0;
       else
-          Lmove = (Ncalls-1)*sp;
+          Lmove = (Ncalls-0)*sp;
       
       if ( Rghost < ngh - (Ncalls-1)*sp  )
           Rmove = 0;
       else
-          Rmove = (Ncalls-1)*sp;
+          Rmove = (Ncalls-0)*sp;
 
-      /* N = N-Lmove-Rmove; */
-
-      /* VL(("  Grid is not master 2, Lmove=%d, Rmove=%d\n", Lmove, Rmove)); */
-      /* VL(("  Grid is not master 3, Lghost=%d, Rghost=%d\n", Lghost, Rghost)); */
-      /* VL(("  Grid is not master 4, x[0]=%f, x[N-1]=%f\n", xptr[0], xptr[N-1])); */
-      /* yptr+=Lmove; */
-      /* xptr+=Lmove; */
-
-      /* for (i = Lmove; i < N; i++) { */
-      /*     /\* VL(("i=%d\n", i)); *\/ */
-      /*     if ( i<ISN && ( xptr[i] == xL_m + i*h ) ) { */
-      /*         status = (*hss->fnc->deriv[i])(t, xptr, yptr, f, i, N, &h); */
-      /*     } */
-      /*     else if ( i>N-ISN && ( xptr[i] == xR_m - i*h ) ) { */
-      /*         status = (*hss->fnc->deriv[ISN-1-i])(t, xptr, yptr, f, -i, N, &h); */
-      /*     } */
-      /*     else */
-      /*         status = (*hss->fnc->deriv[ISN-1])(t, xptr, yptr, f, i, N, &h); */
-      /* } */
-
+      /* printf("m=%d, Lmove=%d, Rmove=%d\n", hss->grid->m, Lmove, Rmove); */
+      /* sleep( 1 ); */
+      
       for (i = Lmove; i < N-Rmove; i++) {
-
-          /* printf("x[%d]=%e\n", i, xptr[i]); */
-          /* printf("u[%d]=%e\n", i, y[i]); */
-          /* VL(("i=%d\n", i)); */
-          
-          /* if ( xptr[i] - h == xL_m ) { */
-          /*     /\* VL(("xptr[i] - h == xL_m ")); *\/ */
-          /*     status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h); */
-          /* } */
-          /* else if ( xptr[i] + h == xR_m ) { */
-          /*     /\* VL(("xptr[i] + h == xR_m ")); *\/ */
-          /*     status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h); */
-          /* } */
-          /* else if ( xptr[i] == xL_m ) { */
-          /*     /\* VL(("xptr[i] == xL_m ")); *\/ */
-          /*     status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h); */
-          /* } */
-          /* else if ( xptr[i] == xR_m ) { */
-          /*     /\* VL(("xptr[i] == xR_m ")); *\/ */
-          /*     status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h); */
-          /* } */
-          /* else if ( xptr[i]-2*h >= xL_m && xptr[i]+2*h <= xR_m ) { */
-          /*     /\* centered derivative *\/ */
-          /*     /\* VL(("xptr[i]-2*h >= xL_m && xptr[i]+2*h <= xR_m ")); *\/ */
-          /*     status = (*hss->fnc->deriv[2])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h); */
-          /* } */
-
 
           if ( i == 0 ) {
               status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
@@ -181,7 +140,6 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
               status = (*hss->fnc->deriv[2])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
           }
           
-
           /* sleep(1); */
 
       }

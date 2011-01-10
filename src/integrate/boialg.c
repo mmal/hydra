@@ -132,7 +132,7 @@ int _h_boialg ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
           
           if ( status != H_OK )
               break;
-          
+
           status = _h_boialg ( gset, amrp, fnc , l+1 );
           if ( status != H_OK )
               break;
@@ -159,6 +159,8 @@ int _h_boialg ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
         }
         status = _h_update_glevel ( h_point_to_glevel ( gset, l-1 ), glevel, amrp );
 
+        h_1Dplot_save_gset ( gset, 1, H_FALSE, "gset: rank 1", -1 );
+        
         /* status = _h_update_glevel ( h_point_to_glevel ( gset, l-1 ), glevel, amrp ); */
     }
   else if ( L == 1 ) {

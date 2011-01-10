@@ -55,12 +55,12 @@ int RHS_extern_0 ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
   t=h;
   /* VL(("called RHS_extern_0\n")); */
   if ( i >= 0 ) {
-      f[i] = 0.0;
-      f[N+i] = 0.0;
+      f[i] = 0.;
+      f[N+i] = 0.;
   }
   else {
-      f[N-1] = 0.0;
-      f[2*N-1] = 0.0;
+      f[N-1] = 0.;
+      f[2*N-1] = 0.;
   }
   
   return H_TRUE;
@@ -84,17 +84,18 @@ int RHS_extern_1 ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
 }
 
 
+
 int main( int argc, char *argv[] )
 {
   const int rank = 2;
 
-  const int N = 101;
+  const int N = 21;
   
   const H_DBL xL = -1.0;
 
   const H_DBL xR = 1.0;
 
-  const H_DBL T = 1.0e1;
+
   
   h_hms *hms = h_alloc_hms( );
 
@@ -124,58 +125,21 @@ int main( int argc, char *argv[] )
   h_info_gset ( hms->gset );
 
 
+  h_write_h5_amrp (  hms->utils->bas, "amrp_wt.h5", hms->amrp );
+  
+  h_read_h5_amrp (  hms_cpy->utils->bas, "amrp_wt.h5", hms_cpy->amrp );
+
+  h_write_h5_amrp (  hms_cpy->utils->bas, "amrp_rwt.h5", hms_cpy->amrp );
+
+
+  h_write_h5_gset (  hms->utils->bas, "gset_wt.h5", hms->gset );
+  
+  h_read_h5_gset (  hms_cpy->utils->bas, "gset_wt.h5", hms_cpy->gset );
+
+  h_write_h5_gset (  hms_cpy->utils->bas, "gset_rwt.h5", hms_cpy->gset );
 
 
   
-  /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 0, 0 ), 0, H_TRUE, "grid 0,0: rank 0 ", -1 ); */
-  
-
-  /* h_boialg ( hms ); */
-
-  /* H_DBL *xnear; */
-  /* int j; */
-  /* xnear = _h_find_5_nearest ( -0.90, h_point_to_grid( hms->gset, 0, 0 ), hms->amrp ); */
-  /* for (j = 0; j < 5; j++) { */
-  /*     printf("xnear[j=%d]=%e\n", j, xnear[j] ); */
-  /* } */
-
-  /* free( xnear ); */
-
-
-  /* _h_read_gset ( hms->utils->bas, hms->gset ); */
-
-  /* printf("N=%d\n", hms->gset->glevel[0]->grid[0]->N ); */
-  /* printf("u[0]=%E\n", hms->gset->glevel[0]->grid[0]->u[0] ); */
-  
-  /* h_info_gset ( hms->gset ); */
-
-  /* _h_save_gset ( hms->utils->bas, hms->gset ); */
-
-  
-  /* _h_save_grid_data ( h_point_to_grid( hms->gset, 0, 0 ) ); */
-
-  /* _h_save_glevel ( h_point_to_glevel( hms->gset, 0 ) ); */
-  
-  while ( hms->gset->glevel[0]->grid[0]->t < T ) {
-      printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t );
-      h_boialg ( hms );
-  }
-  
-  /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 1, 4 ), 0, H_TRUE, "grid 0,4: rank 0 ", -1 ); */
-  /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 1, 4 ), 1, H_TRUE, "grid 0,4: rank 1 ", -1 ); */
-
-
-  h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 0, 0 ), 0, H_TRUE, "grid 0,0: rank 0 ", -1 );
-  h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 0, 0 ), 1, H_TRUE, "grid 0,0: rank 1 ", -1 );
-
-  h_1Dplot_save_gset ( hms->gset, 0, H_FALSE, "gset: rank 0", -1 );
-  h_1Dplot_save_gset ( hms->gset, 1, H_FALSE, "gset: rank 1", -1 );
-
-  /* h_1Dplot_save_eps_grid ( h_point_to_grid( hms->gset, 1, 4 ), 0, H_FALSE, "grid 0 4: rank 0", "grid04.eps"); */
-
-  /* h_1Dplot_save_eps_grid ( h_point_to_grid( hms->gset, 1, 4 ), 0, H_TRUE, "grid 0 4: rank 0", "grid04gh.eps"); */
-  
-  /* h_1Dplot_save_eps_gset ( hms->gset, 0, H_FALSE, "gset : rank 0", "gset.eps"); */
 
   h_free_hms ( hms_cpy );
 

@@ -6,7 +6,7 @@
 /* gsl_interp_polynomial */
 /* gsl_interp_cspline */
 
-#define INTERP_TYPE gsl_interp_linear
+#define INTERP_TYPE gsl_interp_polynomial
 #define N_CHILD 2
 
 
@@ -109,13 +109,13 @@ int _h_update_grid ( h_grid *parent, h_grid *child, h_amrp *amrp  )
       return H_ER;
   }
   else {
-      status = _h_update_grid_interior ( parent, child, amrp );
-      if ( status != H_OK )
-          return status;
+      /* status = _h_update_grid_interior ( parent, child, amrp ); */
+      /* if ( status != H_OK ) */
+      /*     return status; */
   
-      status = _h_update_grid_ghosts ( parent, child, amrp );
+      /* status = _h_update_grid_ghosts ( parent, child, amrp ); */
       
-      /* status = _h_update_grid_all ( parent, child, amrp ); */
+      status = _h_update_grid_all ( parent, child, amrp );
   }
   
   return status;
@@ -145,7 +145,7 @@ int _h_update_grid_all  ( h_grid *parent, h_grid *child, h_amrp *amrp )
 
       uchild = h_get_grid_values_wghosts ( child, r );
       
-      for (i = 0; i < Lghost; i++) {
+      for (i = 0; i < child->Ntotal; i++) {
           if ( r == 0 )
               uchild[i] =
                   sin(2*M_PI*xchild[i])*cos(2*M_PI*t);
@@ -154,14 +154,14 @@ int _h_update_grid_all  ( h_grid *parent, h_grid *child, h_amrp *amrp )
                   -2*M_PI*sin(2*M_PI*xchild[i])*sin(2*M_PI*t);
       }
 
-      for (i = 0; i < Rghost; i++) {
-          if ( r == 0 )
-              uchild[Lghost+Nchild+i] =
-                  sin(2*M_PI*xchild[Lghost+Nchild+i])*cos(2*M_PI*t);
-          if ( r == 1 )
-              uchild[Lghost+Nchild+i] =
-                  -2*M_PI*sin(2*M_PI*xchild[Lghost+Nchild+i])*sin(2*M_PI*t);
-      }
+      /* for (i = 0; i < Rghost; i++) { */
+      /*     if ( r == 0 ) */
+      /*         uchild[Lghost+Nchild+i] = */
+      /*             sin(2*M_PI*xchild[Lghost+Nchild+i])*cos(2*M_PI*t); */
+      /*     if ( r == 1 ) */
+      /*         uchild[Lghost+Nchild+i] = */
+      /*             -2*M_PI*sin(2*M_PI*xchild[Lghost+Nchild+i])*sin(2*M_PI*t); */
+      /* } */
   }
 
   return H_OK;
