@@ -11,6 +11,7 @@
 
 #include "plot_1D.h"
 
+extern char SCR_NAME[];
 
 void _h_1Dplot_set_options ( gnuplot_ctrl * h, const char * title,
                              const H_DBL time )
@@ -28,13 +29,28 @@ void _h_1Dplot_set_options ( gnuplot_ctrl * h, const char * title,
       sprintf(set_title, "set title \"t=%.5e\"", time);
   }
 
-  
-  gnuplot_cmd( h, set_title);
-  gnuplot_cmd( h, "set xlabel \"x\"; set ylabel \"u(t, x)\"");
-  gnuplot_cmd( h, "set term x11" );
+  FILE *fscript = fopen( SCR_NAME, "a");
 
-  gnuplot_cmd( h, "set style data lines");
-  gnuplot_cmd( h, "unset key");
+  if ( fscript == NULL ) {
+      perror ("fopen(fscript)");
+      exit (EXIT_FAILURE);
+  }
+
+  fprintf ( fscript, "#t = %e\n", time);
+  fprintf ( fscript, "%s\n", set_title);
+  fprintf ( fscript, "%s\n", "set xlabel \"x\"; set ylabel \"u(t, x)\"");
+  /* fprintf ( fscript, "%s\n", "set term x11" ); */
+  fprintf ( fscript, "%s\n", "set style data lines");
+  fprintf ( fscript, "%s\n", "unset key");
+  fclose ( fscript );
+
+  /* sleep( 100 ); */
+  /* gnuplot_cmd( h, set_title); */
+  /* gnuplot_cmd( h, "set xlabel \"x\"; set ylabel \"u(t, x)\""); */
+  /* gnuplot_cmd( h, "set term x11" ); */
+
+  /* gnuplot_cmd( h, "set style data lines"); */
+  /* gnuplot_cmd( h, "unset key"); */
 
   free( set_title );
 }

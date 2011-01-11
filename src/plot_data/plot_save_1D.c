@@ -11,6 +11,7 @@ char DAT_NAME[] = "TTT.XXXXXX";
 char POS_NAME[] = "TTT.XXXXXX";
 char SCR_NAME[] = "TTT.XXXXXX";
 
+const char *LIST_OF_SCRIPTS = "list_of_scr";
 
 
 void _h_1Dplot_gen_names ( void )
@@ -36,13 +37,19 @@ void _h_1Dplot_gen_names ( void )
       /* printf("fname = %s\n", ptr[i]); */
       /* sleep(3); */
   }
+  /* open file LIST_OF_SCRIPTS
+   * and write name of each used script */
+  
+  fptr = fopen( LIST_OF_SCRIPTS, "a");
+  fprintf ( fptr, "%s\n", SCR_NAME );
+  fclose ( fptr );
 }
 
 
 
 void _h_1Dplot_save_script ( int L )
 {
-  FILE *fscript = fopen( SCR_NAME, "w");
+  FILE *fscript = fopen( SCR_NAME, "a");
 
   if ( fscript == NULL ) {
       perror ("fopen(fscript)");

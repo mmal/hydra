@@ -159,7 +159,8 @@ int _h_boialg ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
         }
         status = _h_update_glevel ( h_point_to_glevel ( gset, l-1 ), glevel, amrp );
 
-        h_1Dplot_save_gset ( gset, 1, H_FALSE, "gset: rank 1", -1 );
+        h_1Dplot_save_gset ( gset, 1, H_TRUE, "gset: rank 1", 0 );
+        /* h_1Dplot_save_gset ( gset, 1, H_FALSE, "gset: rank 1", 1 ); */
         
         /* status = _h_update_glevel ( h_point_to_glevel ( gset, l-1 ), glevel, amrp ); */
     }

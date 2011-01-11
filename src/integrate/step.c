@@ -104,19 +104,19 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
   else {
       /* VL(("  Grid is not master\n")); */
 
-      /* TODO: */
-      xL_m = -1.0;
-      xR_m = 1.0;
+      /* /\* TODO: *\/ */
+      /* xL_m = -1.0; */
+      /* xR_m = 1.0; */
       
       if ( Lghost < ngh - (Ncalls-1)*sp  )
           Lmove = 0;
       else
-          Lmove = (Ncalls-0)*sp;
+          Lmove = (Ncalls-1)*sp;
       
       if ( Rghost < ngh - (Ncalls-1)*sp  )
           Rmove = 0;
       else
-          Rmove = (Ncalls-0)*sp;
+          Rmove = (Ncalls-1)*sp;
 
       /* printf("m=%d, Lmove=%d, Rmove=%d\n", hss->grid->m, Lmove, Rmove); */
       /* sleep( 1 ); */

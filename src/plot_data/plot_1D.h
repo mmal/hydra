@@ -18,6 +18,8 @@
 /* #define FPOSITION "positions.dat" */
 /* #define FSCRIPT "script.gp" */
 
+
+
 #define MAX_CHAR 1024
 
 void _h_1Dplot_gen_names ( void );

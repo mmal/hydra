@@ -6,7 +6,7 @@
 /* gsl_interp_polynomial */
 /* gsl_interp_cspline */
 
-#define INTERP_TYPE gsl_interp_polynomial
+#define INTERP_TYPE gsl_interp_linear
 #define N_CHILD 2
 
 
@@ -90,6 +90,67 @@ H_DBL *_h_find_5_nearest ( H_DBL x, h_grid *grid, h_amrp *amrp  )
   return xnear;
 }
 
+int *_h_find_5_nearest_indices ( H_DBL x, h_grid *grid, h_amrp *amrp  )
+{
+  char *fnc_msg = "Find indices of five nearest points to x";
+
+  H_DBL xL_gh = grid->xL_gh;
+  H_DBL xR_gh = grid->xR_gh; 
+
+  int *inear;
+
+  H_DBL *xgrid = h_get_grid_positions_wghosts ( grid );
+
+  int i, j, N = grid->Ntotal;
+  
+  const int Npts = 5;
+  
+  inear = (int*) malloc ( Npts*sizeof( int ) );
+
+  if ( inear != NULL ) {
+
+
+
+      if ( x >= xgrid[N-1] ) {
+          for (j = 0; j < Npts; j++) {
+              inear[j] = N-1-(Npts-1)+j;
+          }
+      }
+      else if ( x <= xgrid[0] ) {
+          for (j = 0; j < Npts; j++) {
+              inear[j] = j;
+          }
+      }
+      else {
+          /* iterating all points in the grid */
+          for (i = 0; i < N; i++) {
+              if ( ( xgrid[i]-x )>= 0. ){
+                  if ( i>1 && i < N-2 ) {
+                      for (j = 0; j < Npts; j++) {
+                          inear[j] = i-Npts/2+j;
+                      }
+                  }
+                  else if ( i==1 ) {
+                      for (j = 0; j < Npts; j++) {
+                          inear[j] = i-1+j;
+                      }
+                  }
+                  else if ( i==N-2 ) {
+                      for (j = 0; j < Npts; j++) {
+                          inear[j] = i-(Npts-2)+j;
+                      }
+                  }
+                  break;
+              }
+          }
+      }
+  }
+      
+  
+  return inear;
+}
+
+
 
 int _h_update_grid ( h_grid *parent, h_grid *child, h_amrp *amrp  )
 {
@@ -113,9 +174,9 @@ int _h_update_grid ( h_grid *parent, h_grid *child, h_amrp *amrp  )
       /* if ( status != H_OK ) */
       /*     return status; */
   
-      /* status = _h_update_grid_ghosts ( parent, child, amrp ); */
+      status = _h_update_grid_ghosts_new ( parent, child, amrp );
       
-      status = _h_update_grid_all ( parent, child, amrp );
+      /* status = _h_update_grid_all ( parent, child, amrp ); */
   }
   
   return status;
@@ -202,6 +263,117 @@ int _h_update_grid_interior ( h_grid *parent, h_grid *child, h_amrp *amrp )
 
 
 
+int _h_update_grid_ghosts_new ( h_grid *parent, h_grid *child, h_amrp *amrp )
+{
+  int status;
+
+  int i, j, r;
+  int *inear; /* indices of nearest points */
+
+  int rank = child->rank;
+  H_DBL Lghost= child->Lghost;
+  H_DBL Rghost= child->Rghost;
+  H_DBL Nchild = child->N;
+
+  H_DBL *xchild = h_get_grid_positions_wghosts ( child );
+  H_DBL *xparent = h_get_grid_positions_wghosts ( parent );
+
+  H_DBL *uchild, *uparent;
+  
+  H_DBL *x_to_interpolate;
+  H_DBL *u_to_interpolate;
+
+  x_to_interpolate = (H_DBL*) malloc ( 5*sizeof( H_DBL ) ); 
+  u_to_interpolate = (H_DBL*) malloc ( 5*sizeof( H_DBL ) ); 
+
+  
+  /* update left ghost points */
+  /* wskaznik i numeruje punkty siatki child ktorych wartosci mamy zinterpolowac */
+  for (i = 0; i < Lghost; i++) {
+
+      /* znaleziono indeksy punktów z któych będziemy interpolować */ 
+      inear = _h_find_5_nearest_indices ( xchild[i], parent, amrp );
+
+      for (j = 0; j < 5; j++) {
+          x_to_interpolate[j] = xparent[inear[j]];
+      }
+
+      /* interpolujemy r-ty rząd */
+      for (r = 0; r < rank; r++)
+        {
+            uchild = h_get_grid_values_wghosts ( child, r );
+            uparent = h_get_grid_values_wghosts ( parent, r );
+
+            for (j = 0; j < 5; j++) {
+                u_to_interpolate[j] = uparent[inear[j]];
+            }
+
+            gsl_interp_accel *acc
+                = gsl_interp_accel_alloc ();
+            
+            gsl_spline *spline
+                = gsl_spline_alloc (INTERP_TYPE, 5);
+            
+            gsl_spline_init (spline, x_to_interpolate, u_to_interpolate, 5);
+            
+                  
+            uchild[i] =
+                gsl_spline_eval (spline, xchild[i], acc);
+          
+          gsl_spline_free (spline);
+          
+          gsl_interp_accel_free (acc);
+        }
+      if ( inear != NULL ) {
+          free ( inear );
+      }
+  }
+
+
+  /* update right ghost points */
+  /* wskaznik i numeruje punkty siatki child ktorych wartosci mamy zinterpolowac */
+  for (i = Nchild+Lghost; i < Nchild+Lghost+Rghost; i++) {
+
+      /* znaleziono indeksy punktów z któych będziemy interpolować */ 
+      inear = _h_find_5_nearest_indices ( xchild[i], parent, amrp );
+
+      for (j = 0; j < 5; j++) {
+          x_to_interpolate[j] = xparent[inear[j]];
+      }
+
+      /* interpolujemy r-ty rząd */
+      for (r = 0; r < rank; r++)
+        {
+            uchild = h_get_grid_values_wghosts ( child, r );
+            uparent = h_get_grid_values_wghosts ( parent, r );
+
+            for (j = 0; j < 5; j++) {
+                u_to_interpolate[j] = uparent[inear[j]];
+            }
+
+            gsl_interp_accel *acc
+                = gsl_interp_accel_alloc ();
+            
+            gsl_spline *spline
+                = gsl_spline_alloc (INTERP_TYPE, 5);
+            
+            gsl_spline_init (spline, x_to_interpolate, u_to_interpolate, 5);
+            
+
+            uchild[i] =
+                0.0*gsl_spline_eval (spline, xchild[i], acc);
+          
+          gsl_spline_free (spline);
+          
+          gsl_interp_accel_free (acc);
+        }
+      if ( inear != NULL ) {
+          free ( inear );
+      }
+  }
+
+  
+}
 
 int _h_update_grid_ghosts ( h_grid *parent, h_grid *child, h_amrp *amrp )
 {
