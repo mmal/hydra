@@ -110,7 +110,7 @@ int main( int argc, char *argv[] )
 
   const H_DBL xR = 10.0;
 
-  const H_DBL T = 3.5e0q;
+  const H_DBL T = 5.e0;
   
   h_hms *hms = h_alloc_hms( );
 
@@ -144,12 +144,30 @@ int main( int argc, char *argv[] )
 
   
   
-  while ( hms->gset->glevel[0]->grid[0]->t < T ) {
-      printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t );
-      h_boialg ( hms );
-  }
-  
+  /* while ( hms->gset->glevel[0]->grid[0]->t < T ) { */
+  /*     printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t ); */
+  /*     h_boialg ( hms ); */
+  /* } */
 
+  int status;
+  while ( hms->gset->glevel[0]->grid[0]->t < T ) {
+      status = _h_boialg_step_glevel ( hms->gset->glevel[0], hms->amrp, hms->fnc );
+
+      status = _h_boialg_step_glevel ( hms->gset->glevel[1], hms->amrp, hms->fnc );
+
+      status = _h_boialg_step_glevel ( hms->gset->glevel[1], hms->amrp, hms->fnc );
+
+
+      /* ten update nie działa ! */
+      /* status = _h_update_glevel ( hms->gset->glevel[0], hms->gset->glevel[1], hms->amrp ); */
+      
+      status = _h_update_grid_interior ( hms->gset->glevel[0]->grid[0], hms->gset->glevel[1]->grid[0], hms->amrp );
+
+      status = _h_update_grid_ghosts_new ( hms->gset->glevel[0]->grid[0], hms->gset->glevel[1]->grid[0], hms->amrp );
+
+      h_1Dplot_save_gset ( hms->gset, 0, H_TRUE, "gset: rank 0", 0 );
+      /* h_1Dplot_save_gset ( hms->gset, 1, H_TRUE, "gset: rank 1", 1 ); */
+  }
 
   /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 0, 0 ), 0, H_TRUE, "grid 0,0: rank 0 ", -1 ); */
   /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 0, 0 ), 1, H_TRUE, "grid 0,0: rank 1 ", -1 ); */

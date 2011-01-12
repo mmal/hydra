@@ -6,7 +6,7 @@
 /* gsl_interp_polynomial */
 /* gsl_interp_cspline */
 
-#define INTERP_TYPE gsl_interp_linear
+#define INTERP_TYPE gsl_interp_cspline
 #define N_CHILD 2
 
 
@@ -271,9 +271,9 @@ int _h_update_grid_ghosts_new ( h_grid *parent, h_grid *child, h_amrp *amrp )
   int *inear; /* indices of nearest points */
 
   int rank = child->rank;
-  H_DBL Lghost= child->Lghost;
-  H_DBL Rghost= child->Rghost;
-  H_DBL Nchild = child->N;
+  int Lghost= child->Lghost;
+  int Rghost= child->Rghost;
+  int Nchild = child->N;
 
   H_DBL *xchild = h_get_grid_positions_wghosts ( child );
   H_DBL *xparent = h_get_grid_positions_wghosts ( parent );
@@ -361,8 +361,12 @@ int _h_update_grid_ghosts_new ( h_grid *parent, h_grid *child, h_amrp *amrp )
             
 
             uchild[i] =
-                0.0*gsl_spline_eval (spline, xchild[i], acc);
-          
+                gsl_spline_eval (spline, xchild[i], acc);
+
+            /* child->u[i+r*(Nchild+Lghost+Rghost)] = */
+            /*     gsl_spline_eval (spline, xchild[i], acc); */
+
+            
           gsl_spline_free (spline);
           
           gsl_interp_accel_free (acc);
