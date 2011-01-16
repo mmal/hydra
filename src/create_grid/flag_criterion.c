@@ -22,14 +22,16 @@ int h_fc_Test ( void *vgrid, void *vamrp, void *vfnc, H_DBL * tau )
   h_amrp *amrp;
   h_fnc *fnc;
 
+  int wdth = 4;
+  
   grid = (h_grid *) vgrid;
   amrp = (h_amrp *) vamrp;
   fnc  = (h_fnc *) vfnc;
   
   N = grid->N;
 
-  for (i = 0; i < N; i++) {
-      tau[i] = sin(2*i)*10;
+  for (i = (N-7*wdth)/2; i < (N+wdth)/2; i++) {
+      tau[i] = 10;
   }
   
   return H_OK;
@@ -59,10 +61,10 @@ int h_fc_SV ( void *vgrid, void *vamrp, void *vfnc, H_DBL * tau )
       tau[i] = fabs ( ( u[i+1]-u[i-1] )/( 2*h ) );
   }
 
-  tau[0] = 0.;
-  tau[1] = 0.;
-  tau[N-2] = 0.;
-  tau[N-1] = 0.;
+  tau[0] = 0.0;
+  tau[1] = 0.0;
+  tau[N-2] = 0.0;
+  tau[N-1] = 0.0;
 
   return H_OK;
 }

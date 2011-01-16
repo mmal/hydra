@@ -89,17 +89,6 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
                 status = (*hss->fnc->deriv[2])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
             }
         }
-        /* for (i = 0; i < N; i++) { */
-        /*     if (i<ISN) { */
-        /*         deriv_ptr = hss->fnc->deriv[i]; */
-        /*         status = deriv_ptr(t, hss->grid->x, yptr, f, i, N, &h); */
-        /*     } */
-        /*     else if ( i>N-ISN ) { */
-        /*         status = (*hss->fnc->deriv[N-1-i])(t, hss->grid->x, yptr, f, -i, N, &h); */
-        /*     } */
-        /*     else */
-        /*         status = (*hss->fnc->deriv[ISN-1])(t, hss->grid->x, yptr, f, i, N, &h); */
-        /* } */
     }
   else {
       /* VL(("  Grid is not master\n")); */
@@ -107,21 +96,25 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
       /* /\* TODO: *\/ */
       /* xL_m = -1.0; */
       /* xR_m = 1.0; */
-      
-      if ( Lghost < ngh - (Ncalls-1)*sp  )
-          Lmove = 1;
-      else
-          Lmove = (Ncalls-1)*sp;
-      
-      if ( Rghost < ngh - (Ncalls-1)*sp  )
-          Rmove = 1;
-      else
-          Rmove = (Ncalls-1)*sp;
 
-      /* printf("m=%d, Lmove=%d, Rmove=%d\n", hss->grid->m, Lmove, Rmove); */
-      /* sleep( 1 ); */
+
+      if ( Lghost <= ngh )
+          Lmove = 0;
+      else if ( Lghost <= ngh - (Ncalls-0)*sp  )
+          Lmove = 0;
+      else
+          Lmove = (Ncalls-0)*sp;
       
-      for (i = Lmove-1; i < Ntotal-Rmove-1; i++) {
+      if ( Rghost <= ngh - (Ncalls-0)*sp  )
+          Rmove = 0;
+      else
+          Rmove = (Ncalls-0)*sp;
+
+      /* printf("m=%d, Ncalls=%d, Lmove=%d, Rmove=%d\n", */
+      /* hss->grid->m, Ncalls, Lmove, Rmove); */
+      /* sleep( 2 ); */
+      
+      for (i = Lmove; i < Ntotal-Rmove; i++) {
 
           if ( i == 0 ) {
               status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);

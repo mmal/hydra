@@ -44,7 +44,7 @@ int RHS_centered ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
                    int i, int N, void *vparams )
 {
   H_DBL h = *(H_DBL *) vparams;
-  H_DBL eps = 0.01/h;
+  H_DBL eps = 0.02/h;
   
   t=x[0];
   t=u[0];
@@ -54,15 +54,15 @@ int RHS_centered ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
   f[abs(i)] = u[N+abs(i)];
 
   if ( i >=3 && i<= N-3 )
-      f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i ) + 2.0/x[abs(i)]*fda_D1_5_inner_node ( u, h, i ) + eps*(u[-3+i]-6*u[-2+i]+15*u[-1+i]-20*u[i]+15*u[1+i]-6*u[2+i]+u[3+i]);
+      f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i ) + 0.0/x[abs(i)]*fda_D1_5_inner_node ( u, h, i ) + eps*(u[-3+i]-6*u[-2+i]+15*u[-1+i]-20*u[i]+15*u[1+i]-6*u[2+i]+u[3+i]);
   else if ( i == 2 )
-      f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i ) + 2.0/x[abs(i)]*fda_D1_5_inner_node ( u, h, i ) + eps*(2*u[sgn(i)*(-2+i)]-13*u[sgn(i)*(-1+i)]+36*u[sgn(i)*(i)]-55*u[sgn(i)*(1+i)]+50*u[sgn(i)*(2+i)]-27*u[sgn(i)*(3+i)]+8*u[sgn(i)*(4+i)]-u[sgn(i)*(5+i)]);
+      f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i ) + 0.0/x[abs(i)]*fda_D1_5_inner_node ( u, h, i ) + eps*(2*u[sgn(i)*(-2+i)]-13*u[sgn(i)*(-1+i)]+36*u[sgn(i)*(i)]-55*u[sgn(i)*(1+i)]+50*u[sgn(i)*(2+i)]-27*u[sgn(i)*(3+i)]+8*u[sgn(i)*(4+i)]-u[sgn(i)*(5+i)]);
   else if ( i == N-2 ) {
       i = -i;
-      f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i ) + 2.0/x[abs(i)]*fda_D1_5_inner_node ( u, h, i ) + eps*(2*u[sgn(i)*(-2+i)]-13*u[sgn(i)*(-1+i)]+36*u[sgn(i)*(i)]-55*u[sgn(i)*(1+i)]+50*u[sgn(i)*(2+i)]-27*u[sgn(i)*(3+i)]+8*u[sgn(i)*(4+i)]-u[sgn(i)*(5+i)]);
+      f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i ) + 0.0/x[abs(i)]*fda_D1_5_inner_node ( u, h, i ) + eps*(2*u[sgn(i)*(-2+i)]-13*u[sgn(i)*(-1+i)]+36*u[sgn(i)*(i)]-55*u[sgn(i)*(1+i)]+50*u[sgn(i)*(2+i)]-27*u[sgn(i)*(3+i)]+8*u[sgn(i)*(4+i)]-u[sgn(i)*(5+i)]);
   }
   else
-      f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i ) + 2.0/x[abs(i)]*fda_D1_5_inner_node ( u, h, i );
+      f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i ) + 0.0/x[abs(i)]*fda_D1_5_inner_node ( u, h, i );
 
     /* f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i ) + 2.0/x[i]*fda_D1_5_inner_node ( u, h, i ); */
     /* f[N+abs(i)] = fda_D2_3_inner_node( u, h, abs(i) ) + 2.0/x[abs(i)]*fda_D1_3_inner_node ( u, h, abs(i) ); */
@@ -105,7 +105,7 @@ int RHS_extern_1 ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
   t=h;
   /* VL(("called RHS_extern_1\n")); */
   f[abs(i)] = u[N+abs(i)];
-  f[N+abs(i)] = fda_D2_5_extern_1_node( u, h, i ) + 2.0/x[abs(i)]*fda_D1_5_extern_1_node ( u, h, i );
+  f[N+abs(i)] = fda_D2_5_extern_1_node( u, h, i ) + 0.0/x[abs(i)]*fda_D1_5_extern_1_node ( u, h, i );
   /* f[N+abs(i)] = fda_D2_3_inner_node( u, h, abs(i) ) + 2.0/x[abs(i)]*fda_D1_3_inner_node ( u, h, abs(i) ); */
 
   /* fda_D2_5_extern_1_node */
@@ -117,13 +117,13 @@ int main( int argc, char *argv[] )
 {
   const int rank = 2;
 
-  const int N = 31;
+  const int N = 201;
   
   const H_DBL xL = 1.0;
 
-  const H_DBL xR = 15.0;
+  const H_DBL xR = 25.0;
 
-  const H_DBL T = 15.e0;
+  const H_DBL T = 25.e0;
   
   h_hms *hms = h_alloc_hms( );
 
@@ -154,6 +154,7 @@ int main( int argc, char *argv[] )
 
 
 
+  FILE *fp = fopen("file", "w");
 
   
   
@@ -161,8 +162,11 @@ int main( int argc, char *argv[] )
       printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t );
       h_boialg ( hms );
       h_1Dplot_save_gset ( hms->gset, 0, H_FALSE, "gset: rank 0", -1 );
+
+      fprintf(fp, "%e %e %e\n", hms->gset->glevel[0]->grid[0]->t, hms->gset->glevel[0]->grid[0]->u[1], hms->gset->glevel[0]->grid[0]->u[N+1]);
       /* h_1Dplot_save_gset ( hms->gset, 1, H_TRUE, "gset: rank 1", 0 ); */
   }
+  fclose( fp );
 
   /* int status; */
   /* while ( hms->gset->glevel[0]->grid[0]->t < T ) { */

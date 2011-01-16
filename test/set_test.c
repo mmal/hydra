@@ -88,13 +88,13 @@ int main( int argc, char *argv[] )
 {
   const int rank = 2;
 
-  const int N = 101;
+  const int N = 51;
   
   const H_DBL xL = -1.0;
 
   const H_DBL xR = 1.0;
 
-  const H_DBL T = 1.0e1;
+  const H_DBL T = 4.0e0;
   
   h_hms *hms = h_alloc_hms( );
 
@@ -115,7 +115,7 @@ int main( int argc, char *argv[] )
 
   h_init_fnc_step_type ( hms->fnc, gsl_odeiv_step_rk4 );
 
-  h_init_fnc_flag_crit ( hms->fnc, h_fc_SV );
+  h_init_fnc_flag_crit ( hms->fnc, h_fc_Test );
 
   h_init_master_grid ( hms->gset->glevel[0]->grid[0], xL, xR, N, rank, hms->amrp );
 
@@ -159,17 +159,18 @@ int main( int argc, char *argv[] )
   while ( hms->gset->glevel[0]->grid[0]->t < T ) {
       printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t );
       h_boialg ( hms );
+      h_1Dplot_save_gset ( hms->gset, 0, H_TRUE, "gset: rank 0", -1 );
   }
   
   /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 1, 4 ), 0, H_TRUE, "grid 0,4: rank 0 ", -1 ); */
   /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 1, 4 ), 1, H_TRUE, "grid 0,4: rank 1 ", -1 ); */
 
 
-  h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 0, 0 ), 0, H_TRUE, "grid 0,0: rank 0 ", -1 );
-  h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 0, 0 ), 1, H_TRUE, "grid 0,0: rank 1 ", -1 );
+  /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 0, 0 ), 0, H_TRUE, "grid 0,0: rank 0 ", -1 ); */
+  /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 0, 0 ), 1, H_TRUE, "grid 0,0: rank 1 ", -1 ); */
 
-  h_1Dplot_save_gset ( hms->gset, 0, H_FALSE, "gset: rank 0", -1 );
-  h_1Dplot_save_gset ( hms->gset, 1, H_FALSE, "gset: rank 1", -1 );
+  /* h_1Dplot_save_gset ( hms->gset, 0, H_FALSE, "gset: rank 0", -1 ); */
+  /* h_1Dplot_save_gset ( hms->gset, 1, H_FALSE, "gset: rank 1", -1 ); */
 
   /* h_1Dplot_save_eps_grid ( h_point_to_grid( hms->gset, 1, 4 ), 0, H_FALSE, "grid 0 4: rank 0", "grid04.eps"); */
 

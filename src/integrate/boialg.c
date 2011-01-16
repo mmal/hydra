@@ -227,9 +227,8 @@ int _h_boialg_new ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
           
           status = _h_boialg_new ( gset, amrp, fnc , l+1 );
           
-          status = _h_update_glevel ( glevel, h_point_to_glevel ( gset, l+1 ), amrp );
-
       }
+      status = _h_update_glevel ( glevel, h_point_to_glevel ( gset, l+1 ), amrp );
   }
       
   return status;
