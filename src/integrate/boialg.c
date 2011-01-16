@@ -36,7 +36,7 @@ int h_boialg ( h_hms *hms )
 
       l = 0;
 
-      status = _h_boialg ( gset, amrp, fnc, l );
+      status = _h_boialg_new ( gset, amrp, fnc, l );
 
       if ( status != H_OK )
           _STAT_MSG ( fnc_msg,
@@ -201,5 +201,36 @@ int _h_boialg ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
 
   /* } while ( repeat > 0 ); */
   
+  return status;
+}
+
+
+int _h_boialg_new ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
+{
+  int status=H_OK, L, refinement_ratio, r;
+
+  h_glevel *glevel;
+  
+  L = gset->L;
+
+  refinement_ratio = amrp->rr;
+
+  glevel = h_point_to_glevel ( gset, l );
+  
+
+  /* perform 1 evolution step on all grids at level l */
+  status = _h_boialg_step_glevel ( glevel, amrp, fnc );
+
+  if ( l < L-1 ) {
+          
+      for (r = 0; r < refinement_ratio; r++) {
+          
+          status = _h_boialg_new ( gset, amrp, fnc , l+1 );
+          
+          status = _h_update_glevel ( glevel, h_point_to_glevel ( gset, l+1 ), amrp );
+
+      }
+  }
+      
   return status;
 }

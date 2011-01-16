@@ -31,7 +31,7 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
   h_hss *hss = (h_hss *) params;
 
   int (*deriv_ptr)(H_DBL, H_DBL*, H_DBL*, H_DBL*, int, int, void*);
-  int N = hss->grid->Ntotal;
+  int N = hss->grid->N;
   int Ntotal = hss->grid->Ntotal;
   int ISN = hss->fnc->ISN;
   int Ncalls;
@@ -71,7 +71,7 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
   
   if ( hss->grid->is_master == H_TRUE )
     {
-        for (i = 0; i < N; i++) {
+        for (i = 0; i < Ntotal; i++) {
             if ( i == 0 ) {
                 status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
             }
@@ -109,19 +109,19 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
       /* xR_m = 1.0; */
       
       if ( Lghost < ngh - (Ncalls-1)*sp  )
-          Lmove = 0;
+          Lmove = 1;
       else
           Lmove = (Ncalls-1)*sp;
       
       if ( Rghost < ngh - (Ncalls-1)*sp  )
-          Rmove = 0;
+          Rmove = 1;
       else
           Rmove = (Ncalls-1)*sp;
 
       /* printf("m=%d, Lmove=%d, Rmove=%d\n", hss->grid->m, Lmove, Rmove); */
       /* sleep( 1 ); */
       
-      for (i = Lmove; i < N-Rmove; i++) {
+      for (i = Lmove-1; i < Ntotal-Rmove-1; i++) {
 
           if ( i == 0 ) {
               status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);

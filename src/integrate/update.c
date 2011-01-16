@@ -6,9 +6,9 @@
 /* gsl_interp_polynomial */
 /* gsl_interp_cspline */
 
-#define INTERP_TYPE gsl_interp_cspline
+#define INTERP_TYPE gsl_interp_polynomial
 #define N_CHILD 2
-
+#define NPOINTS 8
 
 int _h_dbl_eq ( H_DBL a, H_DBL b )
 {
@@ -32,13 +32,11 @@ H_DBL *_h_find_5_nearest ( H_DBL x, h_grid *grid, h_amrp *amrp  )
 
   int i, j, N = grid->Ntotal;
   
-  const int Npts = 5;
+  const int Npts = NPOINTS;
   
   xnear = (H_DBL*) malloc ( Npts*sizeof( H_DBL ) );
 
   if ( xnear != NULL ) {
-
-
 
       if ( x >= xgrid[N-1] ) {
           for (j = 0; j < Npts; j++) {
@@ -103,7 +101,7 @@ int *_h_find_5_nearest_indices ( H_DBL x, h_grid *grid, h_amrp *amrp  )
 
   int i, j, N = grid->Ntotal;
   
-  const int Npts = 5;
+  const int Npts = NPOINTS;
   
   inear = (int*) malloc ( Npts*sizeof( int ) );
 
@@ -170,9 +168,9 @@ int _h_update_grid ( h_grid *parent, h_grid *child, h_amrp *amrp  )
       return H_ER;
   }
   else {
-      /* status = _h_update_grid_interior ( parent, child, amrp ); */
-      /* if ( status != H_OK ) */
-      /*     return status; */
+      status = _h_update_grid_interior ( parent, child, amrp );
+      if ( status != H_OK )
+          return status;
   
       status = _h_update_grid_ghosts_new ( parent, child, amrp );
       
@@ -283,8 +281,8 @@ int _h_update_grid_ghosts_new ( h_grid *parent, h_grid *child, h_amrp *amrp )
   H_DBL *x_to_interpolate;
   H_DBL *u_to_interpolate;
 
-  x_to_interpolate = (H_DBL*) malloc ( 5*sizeof( H_DBL ) ); 
-  u_to_interpolate = (H_DBL*) malloc ( 5*sizeof( H_DBL ) ); 
+  x_to_interpolate = (H_DBL*) malloc ( NPOINTS*sizeof( H_DBL ) ); 
+  u_to_interpolate = (H_DBL*) malloc ( NPOINTS*sizeof( H_DBL ) ); 
 
   
   /* update left ghost points */
@@ -294,7 +292,7 @@ int _h_update_grid_ghosts_new ( h_grid *parent, h_grid *child, h_amrp *amrp )
       /* znaleziono indeksy punktów z któych będziemy interpolować */ 
       inear = _h_find_5_nearest_indices ( xchild[i], parent, amrp );
 
-      for (j = 0; j < 5; j++) {
+      for (j = 0; j < NPOINTS; j++) {
           x_to_interpolate[j] = xparent[inear[j]];
       }
 
@@ -304,7 +302,7 @@ int _h_update_grid_ghosts_new ( h_grid *parent, h_grid *child, h_amrp *amrp )
             uchild = h_get_grid_values_wghosts ( child, r );
             uparent = h_get_grid_values_wghosts ( parent, r );
 
-            for (j = 0; j < 5; j++) {
+            for (j = 0; j < NPOINTS; j++) {
                 u_to_interpolate[j] = uparent[inear[j]];
             }
 
@@ -312,9 +310,9 @@ int _h_update_grid_ghosts_new ( h_grid *parent, h_grid *child, h_amrp *amrp )
                 = gsl_interp_accel_alloc ();
             
             gsl_spline *spline
-                = gsl_spline_alloc (INTERP_TYPE, 5);
+                = gsl_spline_alloc (INTERP_TYPE, NPOINTS);
             
-            gsl_spline_init (spline, x_to_interpolate, u_to_interpolate, 5);
+            gsl_spline_init (spline, x_to_interpolate, u_to_interpolate, NPOINTS);
             
                   
             uchild[i] =
@@ -337,7 +335,7 @@ int _h_update_grid_ghosts_new ( h_grid *parent, h_grid *child, h_amrp *amrp )
       /* znaleziono indeksy punktów z któych będziemy interpolować */ 
       inear = _h_find_5_nearest_indices ( xchild[i], parent, amrp );
 
-      for (j = 0; j < 5; j++) {
+      for (j = 0; j < NPOINTS; j++) {
           x_to_interpolate[j] = xparent[inear[j]];
       }
 
@@ -347,7 +345,7 @@ int _h_update_grid_ghosts_new ( h_grid *parent, h_grid *child, h_amrp *amrp )
             uchild = h_get_grid_values_wghosts ( child, r );
             uparent = h_get_grid_values_wghosts ( parent, r );
 
-            for (j = 0; j < 5; j++) {
+            for (j = 0; j < NPOINTS; j++) {
                 u_to_interpolate[j] = uparent[inear[j]];
             }
 
@@ -355,9 +353,9 @@ int _h_update_grid_ghosts_new ( h_grid *parent, h_grid *child, h_amrp *amrp )
                 = gsl_interp_accel_alloc ();
             
             gsl_spline *spline
-                = gsl_spline_alloc (INTERP_TYPE, 5);
+                = gsl_spline_alloc (INTERP_TYPE, NPOINTS);
             
-            gsl_spline_init (spline, x_to_interpolate, u_to_interpolate, 5);
+            gsl_spline_init (spline, x_to_interpolate, u_to_interpolate, NPOINTS);
             
 
             uchild[i] =
@@ -644,7 +642,14 @@ int _h_update_glevel ( h_glevel *parent, h_glevel *child, h_amrp *amrp )
 
   M = child->M;
   for (m = 0; m < M; m++) {
-      status = _h_update_grid ( child->grid[m]->parent, child->grid[m], amrp );
+
+      status = _h_update_grid_interior ( child->grid[m]->parent, child->grid[m], amrp );
+      if ( status != H_OK )
+          return status;
+  
+      status = _h_update_grid_ghosts_new ( child->grid[m]->parent, child->grid[m], amrp );
+
+      /* status = _h_update_grid ( child->grid[m]->parent, child->grid[m], amrp ); */
 
       if ( status != H_OK )
               break;

@@ -31,12 +31,12 @@ H_DBL gauss_x_ ( H_DBL x, void *params )
 {
   void *newp = (void*) params;
 
-  H_DBL exponent = x*x;
+  H_DBL exponent = (x-3.0)*(x-3.0);
 
-  if ( exponent > 20 )
+  if ( exponent > 40.0 )
       return 0.0;
   else  
-      return (x-1.0)*exp(-x*x);
+      return (x-1.0)*exp(-exponent);
 }
 
 
@@ -44,15 +44,28 @@ int RHS_centered ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
                    int i, int N, void *vparams )
 {
   H_DBL h = *(H_DBL *) vparams;
-
+  H_DBL eps = 0.01/h;
+  
   t=x[0];
   t=u[0];
   t=h;
   /* VL(("called RHS_centered\n")); */
 
   f[abs(i)] = u[N+abs(i)];
-  /* f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i ) + 2.0/x[i]*fda_D1_5_inner_node ( u, h, i ); */
-  f[N+abs(i)] = fda_D2_3_inner_node( u, h, abs(i) ) + 2.0/x[abs(i)]*fda_D1_3_inner_node ( u, h, abs(i) );
+
+  if ( i >=3 && i<= N-3 )
+      f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i ) + 2.0/x[abs(i)]*fda_D1_5_inner_node ( u, h, i ) + eps*(u[-3+i]-6*u[-2+i]+15*u[-1+i]-20*u[i]+15*u[1+i]-6*u[2+i]+u[3+i]);
+  else if ( i == 2 )
+      f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i ) + 2.0/x[abs(i)]*fda_D1_5_inner_node ( u, h, i ) + eps*(2*u[sgn(i)*(-2+i)]-13*u[sgn(i)*(-1+i)]+36*u[sgn(i)*(i)]-55*u[sgn(i)*(1+i)]+50*u[sgn(i)*(2+i)]-27*u[sgn(i)*(3+i)]+8*u[sgn(i)*(4+i)]-u[sgn(i)*(5+i)]);
+  else if ( i == N-2 ) {
+      i = -i;
+      f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i ) + 2.0/x[abs(i)]*fda_D1_5_inner_node ( u, h, i ) + eps*(2*u[sgn(i)*(-2+i)]-13*u[sgn(i)*(-1+i)]+36*u[sgn(i)*(i)]-55*u[sgn(i)*(1+i)]+50*u[sgn(i)*(2+i)]-27*u[sgn(i)*(3+i)]+8*u[sgn(i)*(4+i)]-u[sgn(i)*(5+i)]);
+  }
+  else
+      f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i ) + 2.0/x[abs(i)]*fda_D1_5_inner_node ( u, h, i );
+
+    /* f[N+abs(i)] = fda_D2_5_inner_node ( u, h, i ) + 2.0/x[i]*fda_D1_5_inner_node ( u, h, i ); */
+    /* f[N+abs(i)] = fda_D2_3_inner_node( u, h, abs(i) ) + 2.0/x[abs(i)]*fda_D1_3_inner_node ( u, h, abs(i) ); */
 
   return H_TRUE;
 }
@@ -92,8 +105,8 @@ int RHS_extern_1 ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
   t=h;
   /* VL(("called RHS_extern_1\n")); */
   f[abs(i)] = u[N+abs(i)];
-  /* f[N+abs(i)] = fda_D2_5_extern_1_node( u, h, i ) + 2.0/x[abs(i)]*fda_D1_5_extern_1_node ( u, h, i ); */
-  f[N+abs(i)] = fda_D2_3_inner_node( u, h, abs(i) ) + 2.0/x[abs(i)]*fda_D1_3_inner_node ( u, h, abs(i) );
+  f[N+abs(i)] = fda_D2_5_extern_1_node( u, h, i ) + 2.0/x[abs(i)]*fda_D1_5_extern_1_node ( u, h, i );
+  /* f[N+abs(i)] = fda_D2_3_inner_node( u, h, abs(i) ) + 2.0/x[abs(i)]*fda_D1_3_inner_node ( u, h, abs(i) ); */
 
   /* fda_D2_5_extern_1_node */
   return H_TRUE;
@@ -104,13 +117,13 @@ int main( int argc, char *argv[] )
 {
   const int rank = 2;
 
-  const int N = 101;
+  const int N = 31;
   
   const H_DBL xL = 1.0;
 
-  const H_DBL xR = 10.0;
+  const H_DBL xR = 15.0;
 
-  const H_DBL T = 5.e0;
+  const H_DBL T = 15.e0;
   
   h_hms *hms = h_alloc_hms( );
 
@@ -144,31 +157,36 @@ int main( int argc, char *argv[] )
 
   
   
-  /* while ( hms->gset->glevel[0]->grid[0]->t < T ) { */
-  /*     printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t ); */
-  /*     h_boialg ( hms ); */
-  /* } */
-
-  int status;
   while ( hms->gset->glevel[0]->grid[0]->t < T ) {
-      status = _h_boialg_step_glevel ( hms->gset->glevel[0], hms->amrp, hms->fnc );
-
-      status = _h_boialg_step_glevel ( hms->gset->glevel[1], hms->amrp, hms->fnc );
-
-      status = _h_boialg_step_glevel ( hms->gset->glevel[1], hms->amrp, hms->fnc );
-
-
-      /* ten update nie działa ! */
-      /* status = _h_update_glevel ( hms->gset->glevel[0], hms->gset->glevel[1], hms->amrp ); */
-      
-      status = _h_update_grid_interior ( hms->gset->glevel[0]->grid[0], hms->gset->glevel[1]->grid[0], hms->amrp );
-
-      status = _h_update_grid_ghosts_new ( hms->gset->glevel[0]->grid[0], hms->gset->glevel[1]->grid[0], hms->amrp );
-
-      h_1Dplot_save_gset ( hms->gset, 0, H_TRUE, "gset: rank 0", 0 );
-      /* h_1Dplot_save_gset ( hms->gset, 1, H_TRUE, "gset: rank 1", 1 ); */
+      printf( "t=%e\n", hms->gset->glevel[0]->grid[0]->t );
+      h_boialg ( hms );
+      h_1Dplot_save_gset ( hms->gset, 0, H_FALSE, "gset: rank 0", -1 );
+      /* h_1Dplot_save_gset ( hms->gset, 1, H_TRUE, "gset: rank 1", 0 ); */
   }
 
+  /* int status; */
+  /* while ( hms->gset->glevel[0]->grid[0]->t < T ) { */
+  /*     status = _h_boialg_step_glevel ( hms->gset->glevel[0], hms->amrp, hms->fnc ); */
+
+  /*     status = _h_boialg_step_glevel ( hms->gset->glevel[1], hms->amrp, hms->fnc ); */
+
+  /*     status = _h_boialg_step_glevel ( hms->gset->glevel[1], hms->amrp, hms->fnc ); */
+
+
+  /*     /\* ten update nie działa ! *\/ */
+  /*     status = _h_update_glevel ( hms->gset->glevel[0], hms->gset->glevel[1], hms->amrp ); */
+      
+  /*     /\* status = _h_update_grid_interior ( hms->gset->glevel[0]->grid[0], hms->gset->glevel[1]->grid[0], hms->amrp ); *\/ */
+
+  /*     /\* status = _h_update_grid_ghosts_new ( hms->gset->glevel[0]->grid[0], hms->gset->glevel[1]->grid[0], hms->amrp ); *\/ */
+
+  /*     /\* h_1Dplot_save_gset ( hms->gset, 0, H_TRUE, "gset: rank 0", 0 ); *\/ */
+  /*     h_1Dplot_save_gset ( hms->gset, 1, H_TRUE, "gset: rank 1", 0 ); */
+  /* } */
+
+
+
+  
   /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 0, 0 ), 0, H_TRUE, "grid 0,0: rank 0 ", -1 ); */
   /* h_1Dplot_save_grid ( h_point_to_grid( hms->gset, 0, 0 ), 1, H_TRUE, "grid 0,0: rank 1 ", -1 ); */
 

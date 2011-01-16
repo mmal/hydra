@@ -260,6 +260,9 @@ void h_1Dplot_save_gset ( h_gset * gset, int rank, int wghost,
       /* if sleep_time is negative do not kill the plot window */
       /* obtained by setting x11 terminal option persist */
       if ( sleep_time < 0 ) {
+          /* do nothing */
+      }
+      else if ( sleep_time == 0 ) {
           _h_1Dplot_add_options ( handler, "set term x11 persist" );
           gnuplot_cmd( handler, "load \"%s\"", SCR_NAME );
       }
