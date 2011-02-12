@@ -8,7 +8,7 @@
 
 #define INTERP_TYPE gsl_interp_polynomial
 #define N_CHILD 2
-#define NPOINTS 5
+#define NPOINTS 6
 
 int _h_dbl_eq ( H_DBL a, H_DBL b )
 {
@@ -172,7 +172,7 @@ int _h_update_grid ( h_grid *parent, h_grid *child, h_amrp *amrp  )
       if ( status != H_OK )
           return status;
   
-      status = _h_update_grid_ghosts_new ( parent, child, amrp );
+      status = _h_update_grid_ghosts_new_new ( parent, child, amrp );
       
       /* status = _h_update_grid_all ( parent, child, amrp ); */
   }
@@ -374,6 +374,115 @@ int _h_update_grid_ghosts_new ( h_grid *parent, h_grid *child, h_amrp *amrp )
       }
   }
 }
+
+
+
+void _h_splint (H_DBL xa[], H_DBL ya[],
+                H_DBL y2a[],
+                int n,
+                H_DBL x,
+                H_DBL *y )
+{
+  int klo, khi, k;
+  H_DBL h, b,a;
+
+  klo=0;
+  khi=n-1;
+  while (khi-klo >1)
+    {
+        k=(khi+klo) >> 1;
+        if ( xa[k] > x ) khi=k;
+        else klo=k;
+    }
+  h=xa[khi]-xa[klo];
+  a=(xa[khi]-x)/h;
+  b=(x-xa[klo])/h;
+  *y=a*ya[klo]+b*ya[khi]+((a*a*a-a)*y2a[klo]
+                          +(b*b*b-b)*y2a[khi])*(h*h)/6.0;
+}
+
+H_DBL *_h_compute_D2 (H_DBL xa[], H_DBL ya[], int n)
+{
+  int i;
+  H_DBL h, *y2a = (H_DBL*) malloc( n*sizeof(H_DBL) );
+
+  h=xa[1]-xa[0];
+  
+  for (i = 0; i < n; i++) {
+      y2a[i] = fda_D2_eon_5 ( &ya, h, n, i );
+  }
+  return y2a;
+}
+
+
+int _h_update_grid_ghosts_new_new ( h_grid *parent, h_grid *child, h_amrp *amrp )
+{
+  int status;
+
+  int i, j, r;
+  int *inear; /* indices of nearest points */
+
+  int rank = child->rank;
+  int Lghost= child->Lghost;
+  int Rghost= child->Rghost;
+  int Nchild = child->N;
+  int Nparent = parent->Ntotal;
+
+  H_DBL *xchild = h_get_grid_positions_wghosts ( child );
+  H_DBL *xparent = h_get_grid_positions_wghosts ( parent );
+
+  H_DBL *uchild, *uparent, *u2parent;
+  
+  /* interpolujemy r-ty rząd */
+  for (r = 0; r < rank; r++)
+    {
+        uchild = h_get_grid_values_wghosts ( child, r );
+        uparent = h_get_grid_values_wghosts ( parent, r );
+
+        /* licze 2 pochodna przestrzenna funkcji dla
+         * siatki parent */ 
+        u2parent = _h_compute_D2 (xparent, uparent, Nparent);
+
+        /* interpoluje lewe punkty siatki child */
+        for (i = 0; i < Lghost; i++) {
+
+            _h_splint (xparent, uparent,
+                       u2parent,
+                       Nparent,
+                       xchild[i],
+                       &uchild[i]);
+        }
+        
+        /* interpoluje prawe punkty siatki child */
+        for (i = Nchild+Lghost; i < Nchild+Lghost+Rghost; i++) {
+            _h_splint (xparent, uparent,
+                       u2parent,
+                       Nparent,
+                       xchild[i],
+                       &uchild[i]);
+        }
+
+        /* zwalniam pamiec zaalokowana dla drugich pochodnych
+         * przestrzennych u2parent */
+        if ( u2parent != NULL ) {
+            free ( u2parent );
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

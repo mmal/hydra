@@ -113,11 +113,36 @@ int RHS_extern_1 ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
 }
 
 
+/* compare the integers */
+int comp(const void *i, const void *j)
+{
+  return *(int *)i - *(int *)j;
+}
+
+
+int *merge(int *num1, int *num2, int size1, int size2)
+{
+  int *out = malloc((size1+size2)*sizeof(int));
+  int i;
+  
+  for (i = 0; i < size1; i++) {
+      out[i]=num1[i];
+  }
+  
+  for (i = 0; i < size2; i++) {
+      out[size1+i]=num2[i];
+  }
+  
+  return out;
+}
+
+
+
 int main( int argc, char *argv[] )
 {
   const int rank = 2;
 
-  const int N = 201;
+  const int N = 101;
   
   const H_DBL xL = 1.0;
 
@@ -152,10 +177,31 @@ int main( int argc, char *argv[] )
 
   h_info_gset ( hms->gset );
 
+ /* int num1[10] = { */
+ /*    1, 3, 4, 5, 8, 7, 9, 6, 2, 0 */
+ /*  }; */
 
+ /* int num2[10] = { */
+ /*    7, 6, 4, 5, 8, 7, 9, 6, 2, 0 */
+ /*  }; */
 
+ /* int *num3 = merge(num1, num2, 10, 10); */
+
+ /* /\* int NN = remove_duplex( *\/ */
+ 
+ /* int i; */
+
+ /* printf("Original array: "); */
+ /* for(i=0; i<20; i++) printf("%d ", num[i]); */
+ 
+ /* qsort(num, 20, sizeof(int), comp); */
+ 
+ /* printf("Sorted array: "); */
+ /* for(i=0; i<20; i++) printf("%d ", num[i]); */
+ 
+ 
+ 
   FILE *fp = fopen("file", "w");
-
   
   
   while ( hms->gset->glevel[0]->grid[0]->t < T ) {
@@ -168,6 +214,9 @@ int main( int argc, char *argv[] )
   }
   fclose( fp );
 
+
+
+  
   /* int status; */
   /* while ( hms->gset->glevel[0]->grid[0]->t < T ) { */
   /*     status = _h_boialg_step_glevel ( hms->gset->glevel[0], hms->amrp, hms->fnc ); */
