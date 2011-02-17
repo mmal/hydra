@@ -7,6 +7,7 @@
 
 
 #include "src/common/types.h"
+#include "src/common/pos_common.h"
 #include "src/common/amrp_common.h"
 #include "src/stat_log/stat_msg.h"
 
@@ -22,18 +23,9 @@ typedef struct
   int is_master;                /**< marker if grid is a master grid */
 
   void *master;                 /**< pointer to the main grid */
-  
-  /* void *offspring; */
-  /* void *sibling; */
-  
-  void *parent;
-  /* void *neighbour; */
+  void *parent;                 /**< pointer to the parent grid */
 
-  /* void *Lsibling; */
-  /* void *Rsibling; */
-  
-  /* void **children; */
-  int Nchildren;
+  int Nchildren;                /**< number of children grids */
   
   H_DBL t, tlast;               /**< current time and the time of the grid in the previous step */
   int Ncalls;                   /**< number of calls by the RHS equation */
@@ -44,11 +36,13 @@ typedef struct
   int Lghost, Rghost;           /**< number of left and right ghost points */
   int Ntotal;                   /**< total number of grids points, i.e. Ntotal=N+Lghost+Rghost  */
 
-  int id_xL, id_xR;
-  int id_Lgh, id_Rgh;
+  h_pos *pos_on_parent;         /**< position on parent grid */
+  h_pos *pos_on_parent_wgh;     /**< position on parent grid with ghost points */
+  
+  int id_xL, id_xR;             /**< ??? */
+  int id_Lgh, id_Rgh;           /**< ??? */
 
   H_DBL xL_gh, xR_gh;           /**< total range of grid */
-
   
 } h_grid;
 
@@ -56,17 +50,14 @@ typedef struct
 typedef struct
 {
   int l;                        /**< level of grids */
-  int M;                        /**< actual number of grids in glevel
-                                 * struct */
-  h_grid **grid;                /**< pointer to the table of grids
-                                 * to the same level  */
+  int M;                        /**< actual number of grids in glevel struct */
+  h_grid **grid;                /**< pointer to the table of grids to the same level  */
 } h_glevel;
 
 
 typedef struct
 {
-  int L;                        /**< actual number of grids levels */
-  
+  int L;                        /**< actual number of grids levels */  
   h_glevel **glevel;            /**< pointer to the table of grids levels */
 } h_gset;
 
@@ -98,5 +89,7 @@ h_glevel *h_point_to_glevel ( h_gset *gset, int l );
 int h_get_num_glevels_in_gset ( h_gset *gset );
 int h_get_num_grids_in_gset ( h_gset *gset, int l );
 int h_get_num_grids_in_glevel ( h_glevel *glevel );
+
+void h_free_rem_glevel ( h_gset *gset, int l );
 
 #endif /* _H_GRIDS_COMMON_H_ */

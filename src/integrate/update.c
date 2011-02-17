@@ -377,42 +377,6 @@ int _h_update_grid_ghosts_new ( h_grid *parent, h_grid *child, h_amrp *amrp )
 
 
 
-void _h_splint (H_DBL xa[], H_DBL ya[],
-                H_DBL y2a[],
-                int n,
-                H_DBL x,
-                H_DBL *y )
-{
-  int klo, khi, k;
-  H_DBL h, b,a;
-
-  klo=0;
-  khi=n-1;
-  while (khi-klo >1)
-    {
-        k=(khi+klo) >> 1;
-        if ( xa[k] > x ) khi=k;
-        else klo=k;
-    }
-  h=xa[khi]-xa[klo];
-  a=(xa[khi]-x)/h;
-  b=(x-xa[klo])/h;
-  *y=a*ya[klo]+b*ya[khi]+((a*a*a-a)*y2a[klo]
-                          +(b*b*b-b)*y2a[khi])*(h*h)/6.0;
-}
-
-H_DBL *_h_compute_D2 (H_DBL xa[], H_DBL ya[], int n)
-{
-  int i;
-  H_DBL h, *y2a = (H_DBL*) malloc( n*sizeof(H_DBL) );
-
-  h=xa[1]-xa[0];
-  
-  for (i = 0; i < n; i++) {
-      y2a[i] = fda_D2_eon_5 ( &ya, h, n, i );
-  }
-  return y2a;
-}
 
 
 int _h_update_grid_ghosts_new_new ( h_grid *parent, h_grid *child, h_amrp *amrp )
@@ -651,7 +615,7 @@ int _h_update_glevel ( h_glevel *parent, h_glevel *child, h_amrp *amrp )
           if ( status != H_OK )
               return status;
   
-          status = _h_update_grid_ghosts_new ( child->grid[m]->parent, child->grid[m], amrp );
+          status = _h_update_grid_ghosts_new_new ( child->grid[m]->parent, child->grid[m], amrp );
           if ( status != H_OK )
               break;
       }

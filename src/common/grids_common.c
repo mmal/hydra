@@ -32,28 +32,35 @@ h_grid * h_alloc_grid ( void )
                   WARNING, 0 );
   else {
       g->N = 0;
+      g->rank = 0;
       g->l = 0;
       g->m = 0;
-      g->rank = 0;
+      g->xL = 0.0;
+      g->xR = 0.0;
+      g->h = 0.0;
+      g->dt = 0.0;
+      
+      g->is_master = H_FALSE; /// by default
+
+      g->master = NULL;
+      g->parent = NULL;
+
       g->Nchildren = 0;
+
+      g->t = 0.0;
+      g->tlast = 0.0;
+      
       g->Ncalls = 0;
+
+      g->x = NULL;
+      g->u = NULL;
+
       g->Lghost = 0;
       g->Rghost = 0;
       g->Ntotal = 0;
 
-      g->x = NULL;
-      g->u = NULL;
-      g->master = NULL;
-      g->parent = NULL;
-      
-      /* g->offspring = NULL; */
-      /* g->sibling = NULL; */
-      /* g->neighbour = NULL; */
-      /* g->Lsibling = NULL; */
-      /* g->Rsibling = NULL; */
-      /* g->children = NULL; */
-
-      g->is_master = H_FALSE;
+      g->pos_on_parent = h_alloc_pos();
+      g->pos_on_parent_wgh = h_alloc_pos();
   }
   return g;
 }
@@ -210,6 +217,7 @@ void h_init_master_grid ( h_grid * g, H_DBL xL, H_DBL xR,
 {
   h_init_grid ( g, xL, xR, N, 0, 0, rank, 0, 0, p );
   g->master = NULL;
+  g->parent = NULL;
   g->is_master = H_TRUE;
   g->Nchildren = 0;
 }
@@ -300,7 +308,13 @@ void h_free_grid ( h_grid * g )
 
       if ( g->u != NULL )
           free ( g->u );
-    
+
+      if ( g->pos_on_parent != NULL )
+          h_free_pos ( g->pos_on_parent );
+
+      if ( g->pos_on_parent_wgh != NULL )
+          h_free_pos ( g->pos_on_parent_wgh );
+
       free( g );
       g = NULL;
   }
@@ -609,7 +623,7 @@ void h_info_gset ( h_gset *gset )
 {
   char *fnc_msg = "Info gset";
 
-  int l;
+  int l, m;
   int L, M;
 
   if ( gset == NULL ) {
@@ -625,13 +639,18 @@ void h_info_gset ( h_gset *gset )
       for (l = 0; l < L; l++) {
           M = gset->glevel[l]->M;
           
-          if ( M > 0 )
+          if ( M > 0 ) {
               printf ("  ** level %d contains %d allocated grids"
                       " with identifiers %d...%d\n", l, M, 0, M-1 );
+
+              for (m = 0; m < M; m++) {
+                  h_info_grid ( gset->glevel[l]->grid[m] );
+              }
+          }
           else
               printf ("  ** level %d contains %d allocated grids\n",
                       l, M );
-
+          
       }
       printf("\n");
   }
@@ -650,7 +669,7 @@ void h_info_glevel ( h_glevel *glevel )
   char *fnc_msg = "Info glevel";
 
   int l;
-  int M;
+  int m, M;
 
   if ( glevel == NULL ) {
       _STAT_MSG ( fnc_msg,
@@ -665,6 +684,9 @@ void h_info_glevel ( h_glevel *glevel )
       printf ("  ** level %d contains %d allocated grids"
                   " with identifiers %d...%d\n", l, M, 0, M-1);
       printf("\n");
+      for (m = 0; m < M; m++) {
+          h_info_grid ( glevel->grid[m] );
+      }
   }
 }
 
@@ -691,14 +713,23 @@ void h_info_grid ( h_grid *grid )
       l = grid->l; /* level of grid */
       m = grid->m; /* id of grid in this level */
 
-      printf(" * h_grid structure:\n");
-      printf("  ** is at level %d and has identifier %d\n",
+      printf("  *** h_grid structure:\n");
+      printf("      is at level %d and has identifier %d\n",
              l, m);
       if ( grid->x == NULL ) {
-          printf("     and is uninitialized\n");
+          printf("      and is uninitialized\n");
       }
       else
-          printf("     and is initialized\n");
+          printf("      and is initialized\n");
+      if ( grid->is_master == H_TRUE ) {
+          printf("      this is master grid\n");
+          printf("      with position: xL[%d]=%e, xR[%d]=%e\n",
+                 0, grid->xL, grid->N, grid->xR );
+      }
+      else
+          printf("      position on master grid: xL[%d]=%e, xR[%d]=%e\n",
+                 grid->pos_on_parent->iLin, (double) grid->pos_on_parent->xLin,
+                 grid->pos_on_parent->iRin, (double) grid->pos_on_parent->xRin);
       printf("\n");
   }
 }
@@ -900,3 +931,35 @@ int h_get_num_grids_in_glevel ( h_glevel *glevel )
   else 
       return glevel->M;
 }
+
+
+void h_free_rem_glevel ( h_gset *gset, int l )
+{
+  char *fnc_msg = "Remove glevel from gset";
+
+  int m, M;
+  
+  if ( gset == NULL ) {
+      _STAT_MSG ( fnc_msg,
+                  "h_gset is unallocated",
+                  WARNING, 0 );
+  }
+  else if ( l > gset->L ) {
+      _STAT_MSG ( fnc_msg,
+                  "you can not remove nonexisting glevel",
+                  WARNING, 0 );
+  }
+  else {
+
+      M=gset->glevel[l]->M;
+
+      /* freeing grids */
+      for (m = 0; m < M; m++) {
+          h_free_grid( gset->glevel[l]->grid[m] );
+          /* free(gset->glevel[l]); */
+      }
+      gset->glevel[l]->M=0;
+  }
+}
+
+  

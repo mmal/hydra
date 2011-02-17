@@ -1,5 +1,5 @@
-#ifndef _SET_TEST_H_
-#define _SET_TEST_H_
+#ifndef _RWAVE_TEST_H_
+#define _RWAVE_TEST_H_
 
 
 #include <stdio.h>
@@ -26,7 +26,6 @@
 #include "src/create_grid/create_grid.h"
 
 #include "src/integrate/boialg.h"
-#include "src/regrid/regrid.h"
 
 
 
@@ -44,4 +43,4 @@ int RHS_extern_1 ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
                    int i, int N, void *vparams );
 
 
-#endif /* _SET_TEST_H_ */
+#endif /* _RWAVE_TEST_H_ */

@@ -79,7 +79,7 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
                 status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
             }
             else if ( i == Ntotal-1 ) {
-                status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h);
+                status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
             }
             else if ( i == Ntotal-2 ) {
                 status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h);

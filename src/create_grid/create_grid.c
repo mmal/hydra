@@ -3,7 +3,7 @@
 #include "create_grid.h"
 
 
-int asd=0;
+/* int asd=0; */
 
 
 
@@ -64,11 +64,60 @@ void _h_create_child_grid ( h_grid *parent, h_grid *child,
   h_init_grid ( child, xL_c, xR_c, N_c, Lghost_c, Rghost_c,
                 parent->rank, (parent->l)+1, m, p );
 
-  child->master = (void *) master_grid;
+  /* pozycja siatki child na siatce parent */
+  /* bez punktow duchow */
+  child->pos_on_parent->iLout=idL;
+  child->pos_on_parent->xLout=x_c[idL];
 
+  child->pos_on_parent->iLin=idL;
+  child->pos_on_parent->xLin=x_c[idL];
+
+  child->pos_on_parent->iRout=idR;
+  child->pos_on_parent->xRout=x_c[idR];
+
+  child->pos_on_parent->iRin=idR;
+  child->pos_on_parent->xRin=x_c[idR];
+
+  /* z duchami */
+  if ( Lghost_c%rr == 0 ) {
+      /* lewy brzeg siatki child pokrywa sie z punktem siatki parent */
+      child->pos_on_parent_wgh->iLout=(idL-Lghost_c/rr);
+      child->pos_on_parent_wgh->xLout=x_c[(idL-Lghost_c/rr)];
+
+      child->pos_on_parent_wgh->iLin=(idL-Lghost_c/rr);
+      child->pos_on_parent_wgh->xLin=x_c[(idL-Lghost_c/rr)];
+  }
+  else {
+      /* lewy brzeg siatki child lezy pomiedzy dwoma punktami siatki parent */
+      child->pos_on_parent_wgh->iLout=(idL-Lghost_c/rr>0)? idL-Lghost_c/rr-1: idL-Lghost_c/rr;
+      child->pos_on_parent_wgh->xLout=x_c[(idL-Lghost_c/rr>0)? idL-Lghost_c/rr-1: idL-Lghost_c/rr];
+
+      child->pos_on_parent_wgh->iLin=idL-Lghost_c/rr;
+      child->pos_on_parent_wgh->xLin=x_c[idL-Lghost_c/rr];
+  }
+  
+  if ( Rghost_c%rr == 0 ) {
+      /* prawy brzeg siatki child pokrywa sie z punktem siatki parent */
+      child->pos_on_parent_wgh->iRout=(idR+Rghost_c/rr);
+      child->pos_on_parent_wgh->xRout=x_c[(idR+Rghost_c/rr)];
+
+      child->pos_on_parent_wgh->iRin=(idR+Rghost_c/rr);
+      child->pos_on_parent_wgh->xRin=x_c[(idR+Rghost_c/rr)];
+  }
+  else {
+      /* prawy brzeg siatki child lezy pomiedzy dwoma punktami siatki parent */
+      child->pos_on_parent_wgh->iRout=(idR+Rghost_c/rr<parent->N-1)? idR+Rghost_c/rr+1: idR+Rghost_c/rr;
+      child->pos_on_parent_wgh->xRout=x_c[(idR+Rghost_c/rr<parent->N-1)? idR+Rghost_c/rr+1: idR+Rghost_c/rr];
+
+      child->pos_on_parent_wgh->iRin=idR+Rghost_c/rr;
+      child->pos_on_parent_wgh->xRin=x_c[idR+Rghost_c/rr];
+  }
+  
+
+  /* set pointers to master and parent grids */
+  child->master = (void *) master_grid;
   child->parent = (void *) parent;
 
-  /* *child = fine_grid; */
 }
 
 

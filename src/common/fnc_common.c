@@ -20,6 +20,8 @@ h_fnc *h_alloc_fnc ( void )
       
       return f;
   }
+  
+  return f;
 }
 
 

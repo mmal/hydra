@@ -433,3 +433,4 @@ H_DBL fda_D2_11_extern_4_node ( H_DBL * f, H_DBL h, int i ) {
 /*   /\** Sixth derivative, 11-point scheme, inner node, order O(h^6) *\/ */
 /*   return (13*f[-5+i]-190*f[-4+i]+1305*f[-3+i]-4680*f[-2+i]+9690*f[-1+i]-12276*f[i]+9690*f[1+i]-4680*f[2+i]+1305*f[3+i]-190*f[4+i]+13*f[5+i])/(240*pow(h, 6.)); */
 /* } */
+

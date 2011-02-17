@@ -11,6 +11,8 @@
 #include "src/common/amrp_common.h"
 #include "src/common/hms_common.h"
 
+#include "src/interpolate/interpolate.h"
+
 
 H_DBL *_h_find_5_nearest ( H_DBL x, h_grid *grid, h_amrp *amrp  );
 
