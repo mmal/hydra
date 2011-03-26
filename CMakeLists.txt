@@ -44,7 +44,7 @@ FIND_PACKAGE(HDF5 REQUIRED)
 INCLUDE(UseDoxygen OPTIONAL)
 
 # additional compiler flags
-ADD_DEFINITIONS(-Wall -Wextra -pedantic -std=c99 -D_BSD_SOURCE)
+ADD_DEFINITIONS(-Wall -Wextra -pedantic -D_BSD_SOURCE)
 
 # 'other' documentation files
 SET(DOC_FILES AUTHORS NEWS README)

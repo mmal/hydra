@@ -44,8 +44,8 @@ int RHS_centered ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
                    int i, int N, void *vparams )
 {
   H_DBL h = *(H_DBL *) vparams;
-  H_DBL eps = 0.0;
-  
+  const H_DBL eps = -0.2;
+
   /* t=x[0]; */
   /* t=u[0]; */
   /* t=h; */
@@ -54,6 +54,11 @@ int RHS_centered ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
   f[i] = u[N+i];
   /* f[N+i] = ( u[abs(i)+1]-2*u[abs(i)]+u[abs(i)-1] )/( h*h ); */
   f[N+i]=(-u[i-2]+16*u[i-1]-30*u[i]+16*u[i+1]-u[i+2])/(12*h*h);
+
+
+  /* dyssypacja */
+  if ( i >=3 && i<=N-4 )
+      f[i] = f[i] - eps*(u[-3+i]-6*u[-2+i]+15*u[-1+i]-20*u[i]+15*u[1+i]-6*u[2+i]+u[3+i]);
 
   /* fda_D2_3_inner_node ( u, h, i ); */
 
@@ -107,6 +112,10 @@ int RHS_extern_1 ( H_DBL t, H_DBL *x, H_DBL *u, H_DBL *f,
   /* f[N+abs(i)] = (11*u[sgn(i)*(i-1)]-20*u[sgn(i)*i]+6*u[sgn(i)*(i+1)]+4*u[sgn(i)*(i+2)]- */
   /*                u[sgn(i)*(i+3)])/(12*h*h); */
 
+  /* if ( i==1 ) */
+  /*     f[N+abs(i)]= (u[abs(i)+2]+16*u[abs(i)-1]-30*u[abs(i)]+16*u[abs(i)+1]-u[abs(i)+2])/(12*h*h); */
+  /* else */
+  /*     f[N+abs(i)]= (-u[abs(i)-2]+16*u[abs(i)-1]-30*u[abs(i)]+16*u[abs(i)+1]+u[abs(i)-2])/(12*h*h); */
 
   /* fda_D2_3_inner_node( u, h, fabs(i) ) */
       /* fda_D2_5_extern_1_node( u, h, i ) */;
@@ -124,13 +133,13 @@ int main( int argc, char *argv[] )
 {
   const int rank = 2;
 
-  const int N = 201;
+  const int N = 128*2+1;
   
   const H_DBL xL = 0.0;
 
-  const H_DBL xR = 25.0;
+  const H_DBL xR = 16.0;
 
-  const H_DBL T = 25.e0;
+  const H_DBL T = 40.e0;
 
   int Nstep = 0;
 
@@ -165,7 +174,7 @@ int main( int argc, char *argv[] )
 
       Nstep++;
 
-      if (Nstep%10==0)
+      if (Nstep%50==0)
         {
             h_regrid ( hms );
         }

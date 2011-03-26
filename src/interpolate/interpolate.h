@@ -1,12 +1,12 @@
 #ifndef _INTERPOLATE_H_
 #define _INTERPOLATE_H_
 
-#include <float.h>
-#include <math.h>
+/* #include <float.h> */
+/* #include <math.h> */
 
 #include "src/common/types.h"
 #include "src/common/grids_common.h"
-#include "src/derivs_fda/derivs.h"
+/* #include "src/derivs_fda/derivs.h" */
 
 /* #include "src/common/amrp_common.h" */
 /* #include "src/common/hms_common.h" */

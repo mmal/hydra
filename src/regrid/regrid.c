@@ -36,6 +36,11 @@ int h_regrid ( h_hms * hms )
       L = gset->L;
       /* printf("in  L=%d\n", L); */
       /* sleep(1); */
+      
+      /* if ( L < LMAX )
+       *  create new level if needed for l=L...LMAX
+       *  then regrid lover levels */
+      
       for (l = L-1; l > 0; l--) {
           status = _h_regrid_glevel ( gset, amrp, fnc, l );
       }
@@ -71,7 +76,9 @@ int _h_regrid_glevel ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
   /* allocating l-th level without grids */
   /* h_alloc_add_glevel ( gset, l, 0 ); */
   /* niszcze poprzedni istniejacy level l */
-  h_free_rem_glevel ( gset, l );
+  
+  /* h_free_rem_glevel ( gset, l ); */ /* TODO: z ta linijka program sie
+                                        * wysypywal ???????? */
   h_alloc_add_glevel ( gset, l, 0 );
   /* gset->L = gset->L-1; */
   child_glevel = gset->glevel[l];
@@ -93,7 +100,8 @@ int _h_regrid_glevel ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
 
           /* save # of grids in child_glevel */
           J = h_get_num_grids_in_glevel ( child_glevel );
-          /* printf("M=%d\n", M); */
+          printf("J=%d\n", J);
+          J = 0;/* printf("M=%d\n", M); */
           /* sleep(1); */
           /* add and alloc N grids in child_glevel */
           h_alloc_add_N_grids_to_glevel ( child_glevel, Ngrids );
@@ -102,13 +110,20 @@ int _h_regrid_glevel ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
               /* alloc and initialize child grid in child_glevel */
               _h_create_child_grid ( parent_grid, child_glevel->grid[J+j], amrp, j, idL[j], idR[j] );
 
+              child_glevel->grid[J+j]->parent = parent_grid;
+              /* child_glevel->grid[J+j]->master = parent_grid->master; */
+
+
               /* synchronize time in grids */
               child_glevel->grid[J+j]->t = parent_grid->t;
               
               /* interpolate from parent_grid to child_grid */
               _h_interpolate_from_parent_to_child_grid ( parent_grid, child_glevel->grid[J+j] );
+
+
           }
           child_glevel->M=J+Ngrids;
+          
           /* free vectors needed for flagging */
           /* TODO: construct some flagging structure
            * containing these vectors and flagging
@@ -129,6 +144,8 @@ int _h_regrid_glevel ( h_gset *gset, h_amrp *amrp, h_fnc *fnc, int l )
           return H_ER;
       }
   }
+  gset->glevel[l] = child_glevel; /* \bug ? */
+
   if (child_glevel->M==0)
     {
         gset->L = gset->L-1;

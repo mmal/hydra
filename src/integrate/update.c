@@ -234,7 +234,7 @@ int _h_update_grid_interior ( h_grid *parent, h_grid *child, h_amrp *amrp )
   int i, j, r, Nchild, Nparent;
 
   int rratio = amrp->rr;
-  int rank = 2;
+  int rank = parent->rank;
   
   H_DBL *xparent = h_get_grid_positions ( parent );
   H_DBL *xchild = h_get_grid_positions ( child );
@@ -397,7 +397,7 @@ int _h_update_grid_ghosts_new_new ( h_grid *parent, h_grid *child, h_amrp *amrp 
 
   H_DBL *uchild, *uparent, *u2parent;
   
-  /* interpolujemy r-ty rząd */
+  /* interpolujemy r-ty rzad */
   for (r = 0; r < rank; r++)
     {
         uchild = h_get_grid_values_wghosts ( child, r );

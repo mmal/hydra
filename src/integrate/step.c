@@ -78,11 +78,11 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
             else if ( i == 1 ) {
                 status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
             }
-            else if ( i == Ntotal-1 ) {
-                status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
-            }
             else if ( i == Ntotal-2 ) {
                 status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h);
+            }
+            else if ( i == Ntotal-1 ) {
+                status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
             }
             else {
                 /* centered derivative */
@@ -100,12 +100,12 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
 
       if ( Lghost <= ngh )
           Lmove = 0;
-      else if ( Lghost <= ngh - (Ncalls-0)*sp  )
+      else if ( Lghost <= ngh - (Ncalls-1)*sp  ) /* \bug (Ncalls-0) ? */
           Lmove = 0;
       else
           Lmove = (Ncalls-0)*sp;
       
-      if ( Rghost <= ngh - (Ncalls-0)*sp  )
+      if ( Rghost <= ngh - (Ncalls-1)*sp  ) /* \bug (Ncalls-0) ? */
           Rmove = 0;
       else
           Rmove = (Ncalls-0)*sp;
@@ -114,7 +114,7 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
       /* hss->grid->m, Ncalls, Lmove, Rmove); */
       /* sleep( 2 ); */
       
-      for (i = Lmove; i < Ntotal-Rmove; i++) {
+      for (i = Lmove; i < Ntotal-Rmove-Lmove; i++) {
 
           if ( i == 0 ) {
               status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
@@ -122,11 +122,11 @@ RHS_eq ( H_DBL t, const H_DBL y[], H_DBL f[], void *params )
           else if ( i == 1 ) {
               status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, i, hss->grid->Ntotal, &h);
           }
-          else if ( i == Ntotal-1 ) {
-              status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h);
-          }
           else if ( i == Ntotal-2 ) {
               status = (*hss->fnc->deriv[1])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h);
+          }
+          else if ( i == Ntotal-1 ) {
+              status = (*hss->fnc->deriv[0])(t, xptr, yptr, f, -i, hss->grid->Ntotal, &h);
           }
           else {
               /* centered derivative */
@@ -289,52 +289,3 @@ int _h_boialg_step_grid ( h_grid *grid, h_amrp *amrp, h_fnc *fnc )
       return H_OK;
   }
 }
-
-
-/* int _h_step ( H_DBL t0, H_DBL t1, H_DBL dt, */
-/*               H_DBL *u, h_hms *m ) */
-/* { */
-/*   int status; */
-  
-/*   int rank = m->g->rank; */
-  
-/*   int N = m->g->Ntotal; */
-  
-/*   gsl_odeiv_step * s */
-/*       = gsl_odeiv_step_alloc ( m->f->step_T, rank*N); */
-
-     
-/*   gsl_odeiv_system sys = {RHS_eq, RHS_jac, rank*N, m}; */
-
-/*   H_DBL * dydt_in  =  ( H_DBL* ) malloc( rank*N*sizeof( H_DBL ) ); */
-/*   H_DBL * dydt_out =  ( H_DBL* ) malloc( rank*N*sizeof( H_DBL ) ); */
-/*   H_DBL * y_err = ( H_DBL* ) malloc( rank*N*sizeof( H_DBL ) ); */
-
-/*   /\* initialise dydt_in from system parameters *\/ */
-/*   /\* GSL_ODEIV_FN_EVAL(&sys, t0, u, dydt_in); *\/ */
-  
-/*   while (t0 < t1) */
-/*     { */
-/*         status = gsl_odeiv_step_apply ( s, t0, dt, u, y_err, */
-/*                                         NULL, NULL, &sys ); */
-        
-/*       if ( status != GSL_SUCCESS ) { */
-/*           _STAT_MSG("Stepping _h_step", "status != GSL_SUCCESS", */
-/*                     H_WA, 0); */
-/*           break; */
-/*       } */
-
-/*       /\* memcpy( dydt_in, dydt_out, (rank*N)*sizeof(H_DBL) ); *\/ */
-     
-/*       t0 += dt; */
-/*       /\* h_1D_plot_set_of_grids_2 ( m->g, 0, H_TRUE, "main integrated rank 0", 2 ); *\/ */
-/*   } */
-  
-/*   gsl_odeiv_step_free ( s ); */
-
-/*   free ( dydt_in ); */
-/*   free ( dydt_out ); */
-/*   free ( y_err ); */
-
-/*   return status; */
-/* } */
