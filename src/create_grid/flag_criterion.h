@@ -7,10 +7,7 @@
 #include <gsl/gsl_errno.h>
 
 
-#include "src/common/types.h"
-#include "src/common/grids_common.h"
-#include "src/common/amrp_common.h"
-#include "src/common/hms_common.h"
+#include "src/common/common.h"
 
 #include "src/create_grid/create_grid.h"
 

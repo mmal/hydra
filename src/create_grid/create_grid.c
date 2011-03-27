@@ -129,9 +129,9 @@ int h_create_init_gset ( h_hms *hms )
   int l, lmax, status;
   
   if ( hms == NULL )
-      _STAT_MSG ( fnc_msg,
-                  "h_hms is unallocated",
-                  ERROR, 0 );
+      SEND_MESSAGE ( fnc_msg,
+                     "h_hms is unallocated",
+                     ERROR, 0 );
 
   l = 0;
   lmax = hms->amrp->lmax;
@@ -166,21 +166,21 @@ int h_create_init_glevel ( h_hms *hms, int l )
   h_fnc *fnc;
   
   if ( hms == NULL ) {
-      _STAT_MSG ( fnc_msg,
-                  "h_hms is unallocated",
-                  ERROR, 0 );
+      SEND_MESSAGE ( fnc_msg,
+                     "h_hms is unallocated",
+                     ERROR, 0 );
       return status;
   }
   else if ( hms->gset == NULL ) {
-      _STAT_MSG ( fnc_msg,
-                  "h_gset is unallocated",
-                  ERROR, 0 );
+      SEND_MESSAGE ( fnc_msg,
+                     "h_gset is unallocated",
+                     ERROR, 0 );
       return status;
   }
   else if ( hms->gset->glevel == NULL ) {
-      _STAT_MSG ( fnc_msg,
-                  "h_glevel is unallocated",
-                  ERROR, 0 );
+      SEND_MESSAGE ( fnc_msg,
+                     "h_glevel is unallocated",
+                     ERROR, 0 );
       return status;
   }
   else {
@@ -194,15 +194,15 @@ int h_create_init_glevel ( h_hms *hms, int l )
           grid = h_point_to_master_grid ( gset );
 
           if ( grid == NULL ) {
-              _STAT_MSG ( fnc_msg,
-                          "master h_grid is unallocated",
-                          ERROR, 0 );
+              SEND_MESSAGE ( fnc_msg,
+                             "master h_grid is unallocated",
+                             ERROR, 0 );
               return status;
           }
           else if ( grid->x == NULL || grid->u == NULL ) {
-              _STAT_MSG ( fnc_msg,
-                          "master h_grid is uninitialized",
-                          ERROR, 0 );
+              SEND_MESSAGE ( fnc_msg,
+                             "master h_grid is uninitialized",
+                             ERROR, 0 );
               return status;
           }
           else {
@@ -245,27 +245,27 @@ int h_create_init_grid ( h_grid *pgrid, h_glevel *chglevel,
 
   
   if ( pgrid == NULL ) {
-      _STAT_MSG ( fnc_msg,
-                  "parent h_grid is unallocated",
-                  WARNING, 0 );
+      SEND_MESSAGE ( fnc_msg,
+                     "parent h_grid is unallocated",
+                     WARNING, 0 );
       return status;
   }
   else if ( chglevel == NULL ) {
-      _STAT_MSG ( fnc_msg,
-                  "child h_glevel is unallocated",
-                  WARNING, 0 );
+      SEND_MESSAGE ( fnc_msg,
+                     "child h_glevel is unallocated",
+                     WARNING, 0 );
       return status;
   }
   else if ( amrp == NULL ) {
-      _STAT_MSG ( fnc_msg,
-                  "h_amrp is unallocated",
-                  WARNING, 0 );
+      SEND_MESSAGE ( fnc_msg,
+                     "h_amrp is unallocated",
+                     WARNING, 0 );
       return status;
   }
   else if ( fnc == NULL ) {
-      _STAT_MSG ( fnc_msg,
-                  "h_fnc is unallocated",
-                  WARNING, 0 );
+      SEND_MESSAGE ( fnc_msg,
+                     "h_fnc is unallocated",
+                     WARNING, 0 );
       return status;
   }
   else {
@@ -306,9 +306,9 @@ int h_create_init_grid ( h_grid *pgrid, h_glevel *chglevel,
           return H_OK;
       }
       else {
-          _STAT_MSG ( fnc_msg,
-                      "no flagged points at given glevel",
-                      WARNING, 0 );
+          SEND_MESSAGE ( fnc_msg,
+                         "no flagged points at given glevel",
+                         WARNING, 0 );
           return H_ER;
       }
   }
@@ -325,14 +325,14 @@ void _h_acd_to_grid ( h_grid *g, h_fnc *f )
   _fnc_1D fnc_ptr;
 
   if ( g == NULL || g->x == NULL || g->u == NULL )
-      _STAT_MSG ( fnc_msg,
-                  "h_grid is non initiated/unallocated",
-                  ERROR, 0 );
+      SEND_MESSAGE ( fnc_msg,
+                     "h_grid is non initiated/unallocated",
+                     ERROR, 0 );
   
   if ( g->rank != f->rank )
-      _STAT_MSG ( fnc_msg,
-                  "ranks of h_grid and h_fnc structures are not equal",
-                  ERROR, 0 );
+      SEND_MESSAGE ( fnc_msg,
+                     "ranks of h_grid and h_fnc structures are not equal",
+                     ERROR, 0 );
   
   Ntotal = g->Ntotal;
   
@@ -357,14 +357,14 @@ void _h_acd_to_glevel ( h_glevel *glevel, h_fnc *fnc )
   int m, M;
 
   if ( glevel == NULL ) {
-      _STAT_MSG ( fnc_msg,
-                  "h_glevel is unallocated",
-                  WARNING, 0 );
+      SEND_MESSAGE ( fnc_msg,
+                     "h_glevel is unallocated",
+                     WARNING, 0 );
   }
   else if ( fnc == NULL ) {
-      _STAT_MSG ( fnc_msg,
-                  "h_fnc is unallocated",
-                  WARNING, 0 );
+      SEND_MESSAGE ( fnc_msg,
+                     "h_fnc is unallocated",
+                     WARNING, 0 );
   }
   else {
       /* there is no need to check whether each grid
@@ -391,14 +391,14 @@ void _h_acd_to_gset ( h_gset *gset, h_fnc *fnc )
   int l, L;
 
   if ( gset == NULL ) {
-      _STAT_MSG ( fnc_msg,
-                  "h_gset is unallocated",
-                  WARNING, 0 );
+      SEND_MESSAGE ( fnc_msg,
+                     "h_gset is unallocated",
+                     WARNING, 0 );
   }
   else if ( fnc == NULL ) {
-      _STAT_MSG ( fnc_msg,
-                  "h_fnc is unallocated",
-                  WARNING, 0 );
+      SEND_MESSAGE ( fnc_msg,
+                     "h_fnc is unallocated",
+                     WARNING, 0 );
   }
   else {
       /* there is no need to check whether each grid

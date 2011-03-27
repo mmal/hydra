@@ -2,13 +2,7 @@
 #define _FLAGGING_H_
 
 
-#include "src/common/types.h"
-#include "src/common/grids_common.h"
-#include "src/common/amrp_common.h"
-#include "src/common/fnc_common.h"
-#include "src/common/hms_common.h"
-
-
+#include "src/common/common.h"
 
 
 void h_flagging_points ( h_grid *grid, h_amrp *amrp, h_fnc *fnc,

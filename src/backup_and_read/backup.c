@@ -18,9 +18,9 @@ h_bas *h_alloc_bas ( void )
   h_bas *b = (h_bas *) malloc ( sizeof( h_bas ) );
 
   if ( b == NULL ) {
-      _STAT_MSG ( "Allocating h_bas",
-                  "cannot allocate h_bas",
-                  WARNING, 0 );
+      SEND_MESSAGE ( "Allocating h_bas",
+                     "cannot allocate h_bas",
+                     ERROR, 0 );
   }
   /* TODO:
    * create new fuction which initializes h_bas structure */
@@ -47,7 +47,7 @@ char *_h_create_glevel_name ( int l )
   char *name = (char*) malloc( MAX_NAME_LEN*sizeof(char) );
   
   if ( sprintf( name, GLEVEL_NAME_MASK, l ) < 0  )
-      _STAT_MSG ( "MAX_NAME_LEN exceed",
+      SEND_MESSAGE ( "MAX_NAME_LEN exceed",
                   NULL,
                   ERROR, 0 );
   return name;
@@ -60,9 +60,9 @@ char *_h_create_grid_name ( int l, int m )
   char *name = (char*) malloc( MAX_NAME_LEN*sizeof(char) );
   
   if ( sprintf( name, GRID_NAME_MASK, l, m ) < 0  )
-      _STAT_MSG ( "MAX_NAME_LEN exceed",
-                  NULL,
-                  ERROR, 0 );
+      SEND_MESSAGE ( "MAX_NAME_LEN exceed",
+                     NULL,
+                     ERROR, 0 );
   return name;
 }
 

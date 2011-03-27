@@ -19,7 +19,7 @@ INCLUDE_DIRECTORIES(
 SET(CMAKE_REQUIRED_LIBRARIES "hydra-lib;${GSL_LIBRARIES};${GSLCBLAS_LIBRARIES};${ARGTABLE2_LIBRARY};${LWL_LIBRARY};${HDF5_LIBRARY}${CMAKE_REQUIRED_LIBRARIES}")
 
 # compiler switches
-SET(w_flags "-ansi -pedantic -Wall -Wshadow -Wmissing-prototypes -Wstrict-prototypes -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wnested-externs -fshort-enums -fno-common -Dinline=")
+SET(w_flags "-ansi -pedantic -Wall -Wshadow -Wmissing-prototypes -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wnested-externs -fshort-enums -fno-common -Dinline=")
 SET(o_flags "-O1")
 SET(d_flags "-ggdb")
 

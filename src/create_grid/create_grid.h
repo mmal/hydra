@@ -1,14 +1,8 @@
 #ifndef _H_GENERATE_GRID_H_
 #define _H_GENERATE_GRID_H_
 
-#include <stdarg.h>
-#include <math.h>
 
-
-#include "src/common/types.h"
-#include "src/common/grids_common.h"
-#include "src/common/amrp_common.h"
-#include "src/common/fnc_common.h"
+#include "src/common/common.h"
 
 #include "src/create_grid/flagging.h"
 #include "src/create_grid/flag_criterion.h"

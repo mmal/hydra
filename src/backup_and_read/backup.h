@@ -5,10 +5,7 @@
 #include <hdf5.h>
 
 
-#include "src/common/types.h"
-#include "src/common/grids_common.h"
-#include "src/common/amrp_common.h"
-#include "src/common/fnc_common.h"
+#include "src/common/common.h"
 /* #include "src/common/utils_common.h" */
 /* #include "src/common/hms_common.h" */
 
@@ -18,20 +15,6 @@
 #define GRID_NAME_MASK "grid_%d_%d"
 
 
-typedef struct
-{
-
-  H_DBL t_last;
-
-  hid_t file_id;
-  hid_t gset_id;
-  hid_t glevel_id;
-  hid_t grid_id;
-
-  hid_t  h_grid_id;
-  hid_t  h_amrp_id;
-
-} h_bas;
 
 
 h_bas *h_alloc_bas ( void );

@@ -34,9 +34,9 @@ void h_flagging_points ( h_grid *grid, h_amrp *amrp, h_fnc *fnc,
   tau = (H_DBL*) malloc( N*sizeof( H_DBL ) );
 
   if ( tau==NULL ) {
-      _STAT_MSG( fnc_msg,
-                 "cannot allocate memory for tau",
-                 ERROR, 0);
+      SEND_MESSAGE( fnc_msg,
+                    "cannot allocate memory for tau",
+                    ERROR, 0);
   }
   
   _fc = &fnc->fc; /* TODO */
@@ -44,9 +44,9 @@ void h_flagging_points ( h_grid *grid, h_amrp *amrp, h_fnc *fnc,
   status = (*_fc)( grid, amrp, fnc, tau );
 
   if ( status!=H_OK ) {
-      _STAT_MSG( fnc_msg,
-                 "flagging criterion failed",
-                 ERROR, 0);
+      SEND_MESSAGE( fnc_msg,
+                    "flagging criterion failed",
+                    ERROR, 0);
   }
   
   /* at the beginning there are no flagged points */
